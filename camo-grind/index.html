@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camo Grind: setup guide</title>
+<meta name="description" content="Set up Camo Grind, the free Stream Deck camo tracker for Call of Duty by itsCRA1G: keys, OBS overlays, camo pictures and troubleshooting.">
+<meta property="og:title" content="Camo Grind: setup guide">
+<meta property="og:description" content="Track your Call of Duty camo grind from your Stream Deck and show it on stream.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --warn:#FFB020;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+img{max-width:100%;display:block}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+/* top bar */
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display);letter-spacing:.2px}
+.brand img{width:34px;height:34px}
+.bar nav{margin-left:auto;margin-right:-12px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.bar nav::-webkit-scrollbar{display:none}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover,.bar nav a.on{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:auto;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}}
+.bar nav + .kofi{margin-left:16px}@media (max-width:860px){.bar nav + .kofi{margin-left:auto}}
+/* hero */
+.hero{padding-block:72px 56px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px;align-items:center}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(40px,6vw,64px)/1.02 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;color:var(--body);max-width:34em;margin:0 0 26px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.deck{background:var(--tile);border:1px solid var(--edge);border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:0 0 0 1px #000,0 30px 80px -30px var(--acc-soft)}
+.keys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.keys img{border-radius:16px;width:100%;height:auto}
+.deck .ov{border-radius:12px;border:1px solid var(--edge)}
+.cap{font-size:12px;color:var(--mute);margin:0}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:44px 32px;gap:32px}}
+/* sections */
+main section{padding-block:56px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:34px 0 10px}
+p{margin:0 0 14px;max-width:46em}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);padding:1px 6px;border-radius:6px;overflow-wrap:anywhere}
+ol,ul{margin:0 0 16px;padding-left:22px;max-width:46em}
+li{margin:6px 0}
+ol.steps{list-style:none;padding:0;counter-reset:s;display:grid;gap:10px}
+ol.steps>li{counter-increment:s;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;margin:0;background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:14px 16px}
+ol.steps>li::before{content:counter(s);width:28px;height:28px;border-radius:14px;background:var(--acc);color:#000;font:700 14px var(--display);display:flex;align-items:center;justify-content:center}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;max-width:46em;margin:18px 0}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--edge);border-radius:14px;margin:6px 0 18px;background:var(--tile)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th{font:700 11px var(--text);letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);text-align:left;padding:12px 14px;border-bottom:1px solid var(--edge);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--edge);vertical-align:top;color:var(--body)}
+tr:last-child td{border-bottom:0}
+td:first-child{color:var(--fg);font-weight:600;white-space:nowrap}
+td.addr{white-space:nowrap}
+.copy{margin-left:8px;font:600 12px var(--text);color:var(--acc);background:transparent;border:1px solid var(--edge2);border-radius:6px;padding:3px 8px;cursor:pointer}
+.copy:hover{border-color:var(--acc)}
+/* deck layout grids */
+.grid5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:620px;margin:10px 0 22px}
+.grid5 div{aspect-ratio:1;border-radius:12px;background:var(--tile);border:1px solid var(--edge);display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;font-weight:600;color:var(--body);padding:6px;line-height:1.25}
+.grid5 .g1{border-color:var(--acc);color:var(--fg);box-shadow:inset 0 0 0 1px var(--acc-soft)}
+.grid5 .g2{border-color:#FF7A1A;color:var(--fg)}
+.grid5 .nav{color:var(--mute);border-style:dashed}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--mute);margin:-10px 0 20px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid var(--edge2)}
+.legend .l1::before{border-color:var(--acc)}.legend .l2::before{border-color:#FF7A1A}.legend .l3::before{border-style:dashed}
+@media (max-width:480px){.grid5 div{font-size:10px;border-radius:9px}}
+footer{border-top:1px solid var(--edge);padding-block:40px 60px;color:var(--mute);font-size:13.5px}
+footer .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin-bottom:18px}
+footer p{max-width:60em}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="img/logo.png" alt="">Camo Grind</a>
+    <nav aria-label="Guide sections">
+      <a href="#install">Install</a><a href="#keys">Keys</a><a href="#first-run">First run</a><a href="#obs">OBS</a><a href="#pictures">Pictures</a><a href="#look">Look</a><a href="#updates">Updates</a><a href="#help">Help</a>
+    </nav>
+    <a class="kofi" href="https://ko-fi.com/itscra1g" target="_blank" rel="noopener">Tip on Ko-fi</a>
+  </div>
+</header>
+
+<div class="wrap" id="top">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Setup guide · by itsCRA1G</div>
+      <h1>Your camo grind, on your Stream Deck and on stream.</h1>
+      <p class="lead">Tap a key for every kill, see what's next, and show viewers your progress live in OBS. One free install, no Streamer.bot, nothing reading your game.</p>
+      <div class="chips"><span class="chip">Stream Deck 6.5+</span><span class="chip">Windows 10+ · macOS 12+</span><span class="chip">Modern Warfare 4</span><span class="chip">Free</span></div>
+    </div>
+    <figure class="deck" style="margin:0">
+      <div class="keys">
+        <img src="img/key-grinding.png" width="288" height="288" alt="Now grinding key: Kastov 762 on Samnim, counter and bar">
+        <img src="img/key-upnext.png" width="288" height="288" alt="Up next key: Raster Aux, tap when done">
+        <img src="img/key-gold.png" width="288" height="288" alt="Gold stat key: golds earned out of 33">
+      </div>
+      <img class="ov" src="img/overlay-card.png" width="540" height="250" alt="Card overlay showing the Kastov 762, now grinding Samnim, with Gold, Platinum, Harmonic and Divergence totals">
+      <figcaption class="cap">Keys and the Card overlay, shown with Camo Grind's built-in stand-in patterns. Add your own camo screenshots to show the real ones.</figcaption>
+    </figure>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section id="need">
+  <div class="sec-head"><span class="num">00</span><h2>What you need</h2></div>
+  <ul>
+    <li><strong>Stream Deck</strong> app 6.5 or newer, on Windows 10+ or macOS 12+</li>
+    <li><strong>Call of Duty: Modern Warfare 4.</strong> New season weapons arrive by themselves.</li>
+    <li><strong>OBS</strong> (or any streaming app with a browser source), only if you want the on-stream overlay</li>
+    <li><strong>Camo screenshots</strong>, optional. Keys show stand-in patterns until you add your own.</li>
+  </ul>
+  <div class="note"><p>Nothing reads the game. Every kill and camo is logged by your key presses, so there's no risk to your Call of Duty account.</p></div>
+</section>
+
+<section id="install">
+  <div class="sec-head"><span class="num">01</span><h2>Install and open Camo Grind</h2></div>
+  <ol class="steps">
+    <li><div>Install <strong>Camo Grind</strong> from the Elgato Marketplace, or double-click the <code>.streamDeckPlugin</code> file.</div></li>
+    <li><div>In the Stream Deck app, find <strong>Camo Grind</strong> in the action list on the right and drag any of its keys onto your deck.</div></li>
+    <li><div>Click the key. At the top of its settings is a 4-step checklist, which ticks itself off as you go.</div></li>
+    <li><div>Press <strong>Open Camo Grind</strong>. Your browser opens the tracker at <code>http://127.0.0.1:39150/</code>.</div></li>
+  </ol>
+  <p style="margin-top:18px">That page is your setup and editing screen. The plugin runs it on your own PC: nothing goes online, and your progress stays on your computer.</p>
+  <div class="note warn"><p><strong>Keys need something to talk to.</strong> Presses work while the tracker page or the OBS overlay is open. While neither is open, keys show a dashed border and a press shows a warning.</p></div>
+</section>
+
+<section id="keys">
+  <div class="sec-head"><span class="num">02</span><h2>Your keys</h2></div>
+  <p>Camo Grind has four key types. Drag in as many of each as you like and pick what each one does in its settings.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Key</th><th>Shows</th><th>Press</th><th>Settings</th></tr></thead>
+    <tbody>
+      <tr><td>Weapon</td><td>The camo you're on, with its picture, counter and progress bar</td><td>+1 to the counter, tick the camo when done, or track its challenge</td><td>Gun 1 or Gun 2; Now grinding, Up next or Track</td></tr>
+      <tr><td>Pick weapon</td><td>A grid icon</td><td>Turns your other Camo Grind keys into a class menu, then a weapon menu. Tap a gun to grind it</td><td>Which gun it fills</td></tr>
+      <tr><td>Stat</td><td>One number: overall %, Gold, Platinum, Harmonic Break, Divergence, mastery, Military or Special totals</td><td>Refreshes all keys</td><td>What it shows. <strong>Mastery (follows the Mode key)</strong> switches between Warzone, Multiplayer and DMZ</td></tr>
+      <tr><td>Control</td><td>A button</td><td>Swap guns, Undo, Mode, +1, −1, Up next, Track or Reset</td><td>Which button</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Up next</strong> shows the camo after the one you're grinding. Tap it when you've finished the current camo and Camo Grind moves on. If you were tracking a challenge, the tracker moves to the next camo's challenge too.</p>
+  <p><strong>Mode</strong> cycles Warzone → Multiplayer → DMZ. Challenge targets change with the mode, since Raster Aux is 10 longshot kills in Warzone but 20 in Multiplayer, while your count stays the same.</p>
+
+  <h3>A suggested layout</h3>
+  <p>For a 15-key Stream Deck. Use Stream Deck's own <strong>Next Page</strong> and <strong>Previous Page</strong> keys (under Navigation) to move between pages.</p>
+  <p><strong>Page 1, grinding</strong></p>
+  <div class="grid5" role="img" aria-label="Page 1: gun 1 row Now grinding, Up next, minus 1, Track, Pick; gun 2 row the same; bottom row Back, Swap, Undo, Mode, Forward">
+    <div class="g1">Now grinding</div><div class="g1">Up next</div><div class="g1">−1</div><div class="g1">Track</div><div class="g1">Pick</div>
+    <div class="g2">Now grinding</div><div class="g2">Up next</div><div class="g2">−1</div><div class="g2">Track</div><div class="g2">Pick</div>
+    <div class="nav">Back</div><div>Swap</div><div>Undo</div><div>Mode</div><div class="nav">Forward</div>
+  </div>
+  <p><strong>Page 2, progress</strong></p>
+  <div class="grid5" role="img" aria-label="Page 2: Overall, Gold, Platinum, Harmonic, Divergence; Mastery following mode, Warzone, Multiplayer, DMZ, Military; Back, Pyroclast, Special, Mode, Forward">
+    <div>Overall %</div><div>Gold</div><div>Platinum</div><div>Harmonic</div><div>Divergence</div>
+    <div>Mastery (follows mode)</div><div>Warzone</div><div>Multi­player</div><div>DMZ</div><div>Military</div>
+    <div class="nav">Back</div><div>Pyroclast</div><div>Special</div><div>Mode</div><div class="nav">Forward</div>
+  </div>
+  <div class="legend"><span class="l1">Gun 1</span><span class="l2">Gun 2</span><span class="l3">Stream Deck page keys</span></div>
+  <p>The Pick weapon menu uses every other Camo Grind key on the page, so a full page of Camo Grind keys gives you the biggest menu.</p>
+</section>
+
+<section id="first-run">
+  <div class="sec-head"><span class="num">03</span><h2>First run on the tracker page</h2></div>
+  <p>Spend five minutes here once, and the keys do the rest.</p>
+  <ol class="steps">
+    <li><div><strong>Pick your mode</strong>: Warzone, Multiplayer or DMZ. It only changes which challenge targets you see, and you can switch any time with the Mode key.</div></li>
+    <li><div><strong>Tick off what you've already earned.</strong> Find each weapon (search, or filter by class), then tick its Military camos, specials, Gold, Platinum and Harmonic Break. Camo Grind works out what's next and what's still locked, e.g. Platinum unlocks once every gun in that class has Gold.</div></li>
+    <li><div><strong>Pick your gun.</strong> Press <strong>1st</strong> on the weapon you're grinding, and <strong>2nd</strong> if you're levelling a second gun alongside it. Or use a Pick weapon key.</div></li>
+    <li><div><strong>Close the page if you like.</strong> With the OBS overlay open, your keys keep working without it.</div></li>
+  </ol>
+  <p style="margin-top:18px">Made a mistake? <strong>Undo</strong> reverses the last press, and you can fix any counter or tick on the page.</p>
+</section>
+
+<section id="obs">
+  <div class="sec-head"><span class="num">04</span><h2>Add the overlay to OBS</h2></div>
+  <ol class="steps">
+    <li><div>In OBS, add a <strong>Browser</strong> source.</div></li>
+    <li><div>Untick <strong>Local file</strong> and paste an address from the table below.</div></li>
+    <li><div>Set the width and height to the size listed. Use the two-gun size if you grind a second gun.</div></li>
+    <li><div>Click OK and place it on your scene.</div></li>
+  </ol>
+  <div class="tbl" style="margin-top:18px"><table>
+    <thead><tr><th>Style</th><th>Address</th><th>One gun</th><th>Two guns</th><th>What it shows</th></tr></thead>
+    <tbody>
+      <tr><td>Card</td><td class="addr"><code>http://127.0.0.1:39150/?overlay&amp;style=card</code><button class="copy" type="button">Copy</button></td><td>560 × 380</td><td>560 × 470</td><td>Lower third with the camo ladder, counter and camo picture</td></tr>
+      <tr><td>Strip</td><td class="addr"><code>http://127.0.0.1:39150/?overlay&amp;style=strip</code><button class="copy" type="button">Copy</button></td><td>1280 × 84</td><td>1280 × 166</td><td>Slim bar across the bottom of the screen</td></tr>
+      <tr><td>Badge</td><td class="addr"><code>http://127.0.0.1:39150/?overlay&amp;style=badge</code><button class="copy" type="button">Copy</button></td><td>300 × 460</td><td>620 × 470</td><td>Big camo picture, weapon and counter</td></tr>
+      <tr><td>Completion</td><td class="addr"><code>http://127.0.0.1:39150/?overlay&amp;style=complete</code><button class="copy" type="button">Copy</button></td><td>420 × 840</td><td>420 × 840</td><td>Completionist, mastery and prestige progress</td></tr>
+      <tr><td>Board</td><td class="addr"><code>http://127.0.0.1:39150/?overlay&amp;style=board</code><button class="copy" type="button">Copy</button></td><td>380 × 510</td><td>380 × 510</td><td>Account totals, good for breaks</td></tr>
+    </tbody>
+  </table></div>
+  <p>Sizes are in pixels. The tracker page lists the same addresses, so you can copy them from there too.</p>
+  <p>The overlay updates the instant you press a key, and it counts as an open page, so your keys work all stream without the tracker page open. You can add several styles at once: each is its own browser source.</p>
+</section>
+
+<section id="pictures">
+  <div class="sec-head"><span class="num">05</span><h2>Camo pictures <span style="color:var(--mute);font-weight:500">(optional)</span></h2></div>
+  <p>Camo Grind can't include the game's camo artwork, so every camo starts with a stand-in pattern in a matching colour. To show the real camos, add your own screenshots.</p>
+  <ol class="steps">
+    <li><div>Screenshot each camo in game and crop it to a square.</div></li>
+    <li><div>Save it as a PNG or JPG named after the camo, e.g. <code>Gold.png</code>, <code>Night Ops.png</code>, <code>Raster Aux.png</code>. Capitals, spaces and punctuation don't matter.</div></li>
+    <li><div>Put them in the camos folder: <code>Documents\Camo Grind\Camos</code> on Windows, <code>Documents/Camo Grind/Camos</code> on Mac. Or pick any folder in <strong>Camos folder</strong> in a key's settings; sub-folders are searched too.</div></li>
+  </ol>
+  <p style="margin-top:18px">The key settings show how many pictures were found. A new picture replaces its stand-in within about 30 seconds.</p>
+  <p>For the camos every gun shares, use these names: <code>Military 1</code> to <code>Military 8</code>, <code>Gold</code>, <code>Platinum</code>, <code>Harmonic Break</code>, <code>Divergence</code>, and the mastery and prestige camo names as they appear in game.</p>
+</section>
+
+<section id="look">
+  <div class="sec-head"><span class="num">06</span><h2>Make it yours</h2></div>
+  <p>Every key's settings have a <strong>Look</strong> section. Changes apply to all your Camo Grind keys and the OBS overlays at once.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Setting</th><th>What it changes</th><th>Default</th></tr></thead>
+    <tbody>
+      <tr><td>Glow (gun 1)</td><td>Gun 1 and the accent colour on keys and overlays. Pick a preset or Custom for any colour</td><td>Pilot blue</td></tr>
+      <tr><td>Gun 2</td><td>Gun 2's colour on keys and overlays</td><td>White</td></tr>
+      <tr><td>Overlay text</td><td>Text colour on the overlays</td><td>Off-white</td></tr>
+      <tr><td>Overlay panel</td><td>Background colour behind the overlays</td><td>Black</td></tr>
+      <tr><td>Panel opacity</td><td>How see-through that background is, 0–100%</td><td>86%</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><p><strong>Tip:</strong> pick a gun 2 colour from the opposite side of the colour wheel to your glow, so you can tell the guns apart at a glance. Orange goes with blue, magenta with lime.</p></div>
+</section>
+
+<section id="updates">
+  <div class="sec-head"><span class="num">07</span><h2>Updates and your progress</h2></div>
+  <p><strong>Weapons and challenges update by themselves.</strong> When a season adds weapons, Camo Grind downloads the new game data within 6 hours, or when Stream Deck restarts. Open pages and overlays refresh on their own, and your progress is kept. The key settings show which data update you have under <strong>Game</strong>. If you're offline, it keeps using the copy it already has.</p>
+  <p><strong>Your progress is saved on your PC by the plugin</strong>, so the tracker page, your keys and every overlay always match. It lives in <code>%APPDATA%\CamoGrind</code> on Windows and <code>~/.config/CamoGrind</code> on Mac. Each game gets its own save, so next year's game won't mix with this one.</p>
+  <p><strong>Moving to a new PC, or want a backup?</strong> On the tracker page, press <strong>Copy save code</strong> and keep the code somewhere safe. On the new PC, paste it in and press <strong>Load code</strong>.</p>
+</section>
+
+<section id="help">
+  <div class="sec-head"><span class="num">08</span><h2>Troubleshooting</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Dashed keys, warning on press</td><td>Nothing is open for the keys to talk to. Open the tracker page (<strong>Open Camo Grind</strong> in any key's settings), or make sure the OBS overlay source is in your scene.</td></tr>
+      <tr><td>Tracker page won't load</td><td>Restart the Stream Deck app. Check nothing else on your PC uses port 39150, and allow Stream Deck through your firewall if asked.</td></tr>
+      <tr><td>Overlay blank after an update</td><td>In OBS, right-click the browser source → <strong>Properties</strong> → <strong>Refresh cache of current page</strong>.</td></tr>
+      <tr><td>Stand-in instead of my screenshot</td><td>Check the file is named after the camo (e.g. <code>Night Ops.png</code>) and sits in the camos folder shown in the key settings. Give it 30 seconds.</td></tr>
+      <tr><td>Weapon menu shows only a few guns</td><td>The menu uses your other Camo Grind keys on that page. Press the <strong>More</strong> key in the menu to see the next set, or add more Camo Grind keys to the page.</td></tr>
+      <tr><td>A challenge target looks wrong</td><td>Check the Mode key is on the mode you're playing. Targets differ between Warzone, Multiplayer and DMZ.</td></tr>
+      <tr><td>A press counted twice or on the wrong gun</td><td>Press <strong>Undo</strong>. It reverses the last press, whichever key made it.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <a class="brand" href="#top"><img src="img/logo.png" alt="">Camo Grind</a>
+      <span>Free, made by itsCRA1G · <a href="https://ko-fi.com/itscra1g" target="_blank" rel="noopener">Say thanks on Ko-fi</a></span>
+    </div>
+    <p>Camo Grind is a fan-made tool. It is not affiliated with, endorsed by or sponsored by Activision or Call of Duty. Call of Duty and Modern Warfare are trademarks of Activision Publishing, Inc. Camo and weapon names are used only to identify them in the game.</p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll(".copy").forEach(function(b){
+  b.addEventListener("click",function(){
+    var t=b.previousElementSibling.textContent;
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy"},1500)};
+    if(navigator.clipboard){navigator.clipboard.writeText(t).then(done,function(){sel(b.previousElementSibling)})}else sel(b.previousElementSibling);
+  });
+});
+function sel(el){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r)}
+// highlight the section in view
+var links=[].slice.call(document.querySelectorAll(".bar nav a"));
+if("IntersectionObserver" in window){
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)})}})},{rootMargin:"-40% 0px -55% 0px"});
+  document.querySelectorAll("main section").forEach(function(s){io.observe(s)});
+}
+</script>
+</body>
+</html>
