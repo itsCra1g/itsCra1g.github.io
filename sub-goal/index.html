@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sub Goal: free sub goal bar for OBS</title>
+<meta name="description" content="A free sub goal bar for OBS by itsCRA1G. Counts Twitch and Kick subs through Streamer.bot, with chat commands to set the goal.">
+<meta property="og:title" content="Sub Goal: free sub goal bar for OBS">
+<meta property="og:description" content="A live sub goal bar for Twitch and Kick, powered by Streamer.bot. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --warn:#FFB020;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:48px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
+  radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.20),transparent 60%),
+  radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.16),transparent 60%),
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:16/9;max-width:100%}
+.stage:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 2px,transparent 2px 4px);pointer-events:none}
+.stage .tag{position:absolute;left:14px;top:12px;font:700 11px var(--text);letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.stage iframe{position:absolute;left:4%;top:16%;width:84%;border:0;background:transparent;aspect-ratio:var(--ar,760/130);height:auto}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:30px 0 10px}
+p{margin:0 0 14px;max-width:46em}
+ol.steps,ul.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+.steps ul{margin:6px 0 0;padding-left:20px}.steps ul li{margin:0 0 3px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.note.warn{border-left-color:var(--warn)}
+.code{background:var(--tile);border:1px solid var(--edge);border-radius:14px;margin:12px 0 18px}
+.code .top{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--edge)}
+.code .top span{font:600 13px var(--mono);color:var(--mute);margin-right:auto}
+.code .c{color:#6B7689}.code .s{color:#3DDC97}
+.code pre{margin:0;padding:16px;overflow:auto;max-height:420px;font:13.5px/1.55 var(--mono);color:var(--body)}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn:hover{background:#8CC4FF;color:#000}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}
+.btn.ghost:hover{border-color:var(--acc)}
+.style-grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.style-grid{grid-template-columns:1fr}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.ctl .lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.tin{width:100%;font:15px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px}
+.tin:focus,.copy input:focus{outline:2px solid var(--acc);outline-offset:1px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--acc)}
+details{max-width:46em;margin-top:6px}
+summary{cursor:pointer;font-weight:600;color:var(--fg);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 100px;gap:8px;margin-top:10px}
+.prev .cap{font-size:13px;color:var(--mute);margin:10px 0 0}
+.prev .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
+.sg{--g:#4DA3FF;--gr:77,163,255;position:absolute;left:20px;top:20px;font-family:var(--text);color:#E8ECF2;
+  --o:.95;background:linear-gradient(135deg,rgba(17,19,24,var(--o)),rgba(8,9,12,var(--o)));border:1px solid rgba(var(--gr),.38);
+  box-shadow:0 0 0 1px rgba(0,0,0,calc(.6*var(--o))),0 0 16px -3px rgba(var(--gr),.5),0 8px 16px -8px rgba(0,0,0,calc(.85*var(--o)));
+  text-shadow:0 1px 3px rgba(0,0,0,calc(.9 - .9*var(--o)));
+  transition:opacity .3s ease,transform .3s ease,box-shadow .3s,border-color .3s}
+.sg.off{opacity:0;transform:translateY(10px)}
+.sg.hit{box-shadow:0 0 0 1px rgba(0,0,0,calc(.6*var(--o))),0 0 24px 2px rgba(var(--gr),.9),0 8px 16px -8px rgba(0,0,0,calc(.85*var(--o)));border-color:rgba(var(--gr),.9)}
+.sg .lab,.sg .fill{transition:color .3s,width .9s cubic-bezier(.2,.9,.2,1)}
+.sg .lab{transition:opacity .2s;color:var(--g);font:700 13px var(--text);letter-spacing:3px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.sg .cnt{font:700 30px/1 var(--display);color:#F2F5F9;font-variant-numeric:tabular-nums;white-space:nowrap;transition:transform .25s}
+.sg .cnt small{font-size:.62em;color:#8A94A6;font-weight:700}
+.sg.hit .cnt{transform:scale(1.12)}
+.sg .trk{position:relative;height:14px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.sg .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:99px;background:linear-gradient(90deg,rgba(var(--gr),.75),var(--g));box-shadow:0 0 14px rgba(var(--gr),.85);transition:width .9s cubic-bezier(.2,.9,.2,1)}
+.sg.done .fill:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);background-size:200% 100%;animation:shine 1.8s linear infinite}
+@keyframes shine{from{background-position:150% 0}to{background-position:-50% 0}}
+.sg .lab.thx{color:#fff}.sg .lab.fade{opacity:0}
+.sg .xpop{position:absolute;right:18px;top:-6px;font:700 17px var(--text);color:#fff;background:rgba(var(--gr),.9);color:#000;padding:4px 10px;border-radius:99px;opacity:0;transform:translateY(8px);pointer-events:none;white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis}
+.sg .pop.go{animation:pop 2.6s ease forwards}
+@keyframes pop{0%{opacity:0;transform:translateY(10px)}12%{opacity:1;transform:translateY(-14px)}80%{opacity:1;transform:translateY(-18px)}100%{opacity:0;transform:translateY(-26px)}}
+.sg.l-bar{width:720px;height:90px;border-radius:20px;padding:14px 20px 16px;display:flex;flex-direction:column;justify-content:space-between}
+.sg.l-bar .top{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.sg.l-pill{height:48px;width:520px;border-radius:999px;padding:0 20px;display:flex;align-items:center;gap:14px}
+.sg.l-pill .top{display:contents}
+.sg.l-pill .lab{flex:0 1 auto;letter-spacing:2px;order:1;max-width:150px}
+.sg.l-pill .trk{flex:1;height:10px;order:2}
+.sg.l-pill .cnt{font-size:20px;order:3}
+.sg.l-pill .pop{top:auto;bottom:40px;right:12px;font-size:14px}
+</style>
+</head>
+<body>
+<div id="ovr"><div id="sg" class="sg l-bar off">
+  <div class="top"><div class="lab" id="lab">Sub goal</div><div class="cnt" id="num">0<small> / 10</small></div></div>
+  <div class="trk"><div class="fill" id="fill"></div></div>
+</div></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Sub Goal</a>
+  <nav><a href="#sb">Streamer.bot</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#chat">Commands</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
+    <h1>A sub goal bar for Twitch and Kick.</h1>
+    <p class="lead">It counts subs, resubs and gift subs from both platforms through Streamer.bot, thanks each one as it lands and celebrates when you hit the goal. Mods set the goal from chat.</p>
+    <div class="chips"><span class="chip">Twitch + Kick combined</span><span class="chip">Gift subs counted once</span><span class="chip">Chat commands</span><span class="chip">Twitch purple / Kick green flash</span><span class="chip">Adjustable background</span></div>
+  </div>
+  <div class="stage"><span class="tag">Preview</span><iframe id="heroFrame" title="Overlay preview" tabindex="-1"></iframe></div>
+</div></div>
+
+<main class="wrap">
+  <section id="sb">
+    <div class="sec-head"><span class="num">1</span><h2>Add it to Streamer.bot</h2></div>
+    <p>Streamer.bot does the counting and sends each new total to the overlay. You need <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> 1.0 or later, connected to Twitch, Kick or both.</p>
+    <h3>Turn on the WebSocket server</h3>
+    <ol class="steps">
+      <li>In Streamer.bot, open <strong>Servers/Clients → WebSocket Server</strong>.</li>
+      <li>Tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Leave the address as <code>127.0.0.1</code> and port <code>8080</code> unless you've changed them.</li>
+    </ol>
+    <h3>The Sub Goal action</h3>
+    <ol class="steps">
+      <li>In <strong>Actions</strong>, right-click and pick <strong>Add</strong>. Name it exactly <strong>Sub Goal</strong>, because the overlay asks for it by name.</li>
+      <li>Right-click <strong>Triggers</strong> and add each of these:
+        <ul><li><strong>Twitch → Subscriptions:</strong> Subscription, Resubscription, Gift Subscription</li>
+        <li><strong>Kick → Subscriptions:</strong> Subscription, Resubscription, Gift Subscription, Mass Gift Subscription</li></ul>
+        Skip the Twitch <em>Gift Bomb</em> trigger: each sub in a gift bomb already arrives as its own Gift Subscription.</li>
+      <li>Right-click <strong>Sub-Actions</strong> and pick <strong>Core → C# → Execute C# Code</strong>. Paste this code over everything, press <strong>Compile</strong>, then <strong>Save and Compile</strong>.</li>
+    </ol>
+    <div class="code"><div class="top"><span>SubGoal.cs</span><a class="btn ghost" href="SubGoal.cs" download>Download</a><button class="btn" data-copy="src1">Copy code</button></div><pre id="src1"><span class="c">// Sub Goal for Streamer.bot, free from itsCRA1G (itscra1g.github.io/sub-goal)</span>
+<span class="c">// Counts Twitch and Kick subs for the Sub Goal overlay, and handles the chat commands.</span>
+using System;
+using System.Collections.Generic;
+
+public class CPHInline
+{
+<span class="c">    // ===== Change these to suit your stream =====</span>
+
+<span class="c">    // The goal to start with. Change it any time in chat with !setgoal 20</span>
+    private const int StartingGoal = 10;
+
+<span class="c">    // Chat replies. {count} = subs so far, {goal} = the goal, {left} = subs still needed.</span>
+    private const string StatusReply = <span class="s">"Sub goal: {count}/{goal}. {left} to go!"</span>;
+    private const string GoalReachedReply = <span class="s">"Sub goal: {count}/{goal}. Goal reached, thank you!"</span>;
+    private const string SetReply = <span class="s">"Sub goal updated: {count}/{goal}."</span>;
+
+<span class="c">    // Post in chat when the goal is reached? Leave empty "" for no message.</span>
+    private const string GoalReachedChat = <span class="s">"WE DID IT! The sub goal of {goal} is complete. Thank you all!"</span>;
+
+<span class="c">    // ===== Nothing to change below here =====</span>
+
+    private const string VarCount = <span class="s">"subgoal_count"</span>;
+    private const string VarGoal = <span class="s">"subgoal_goal"</span>;
+    private const string VarSeen = <span class="s">"subgoal_seen"</span>;
+
+    public bool Execute()
+    {
+        string mode = Arg(<span class="s">"mode"</span>, <span class="s">""</span>);
+        if (mode == <span class="s">"sync"</span>) { Broadcast(<span class="s">"sync"</span>, <span class="s">""</span>, 0, <span class="s">""</span>); return true; }
+        if (mode == <span class="s">"reset"</span>) { SetCount(0); Broadcast(<span class="s">"reset"</span>, <span class="s">""</span>, 0, <span class="s">""</span>); return true; }
+
+        if (args.ContainsKey(<span class="s">"command"</span>)) return Command();
+
+<span class="c">        // Kick mass gift: one event listing every recipient.</span>
+        if (args.ContainsKey(<span class="s">"recipient.0.userId"</span>) || args.ContainsKey(<span class="s">"recipient.0.userName"</span>))
+        {
+            int added = 0;
+            for (int i = 0; i &lt; 500; i++)
+            {
+                string id = Arg(<span class="s">"recipient."</span> + i + <span class="s">".userId"</span>, Arg(<span class="s">"recipient."</span> + i + <span class="s">".userName"</span>, <span class="s">""</span>));
+                if (id == <span class="s">""</span>) break;
+                if (FirstTime(<span class="s">"kick:"</span> + id)) added++;
+            }
+            Add(added, Arg(<span class="s">"user"</span>, <span class="s">"Someone"</span>), <span class="s">"gift"</span>, <span class="s">"kick"</span>);
+            return true;
+        }
+
+<span class="c">        // Kick single gift.</span>
+        if (args.ContainsKey(<span class="s">"recipient.userId"</span>) || args.ContainsKey(<span class="s">"recipient.userName"</span>))
+        {
+            string id = Arg(<span class="s">"recipient.userId"</span>, Arg(<span class="s">"recipient.userName"</span>, <span class="s">""</span>));
+            if (id == <span class="s">""</span> || FirstTime(<span class="s">"kick:"</span> + id)) Add(1, Arg(<span class="s">"user"</span>, <span class="s">"Someone"</span>), <span class="s">"gift"</span>, <span class="s">"kick"</span>);
+            return true;
+        }
+
+<span class="c">        // Twitch gift sub (fires once for every sub in a gift bomb too).</span>
+        if (args.ContainsKey(<span class="s">"recipientId"</span>) || args.ContainsKey(<span class="s">"recipientUserName"</span>))
+        {
+            string id = Arg(<span class="s">"recipientId"</span>, Arg(<span class="s">"recipientUserName"</span>, <span class="s">""</span>));
+            string gifter = Arg(<span class="s">"anonymous"</span>, <span class="s">"False"</span>).ToLower() == <span class="s">"true"</span> ? <span class="s">"Anonymous"</span> : Arg(<span class="s">"user"</span>, <span class="s">"Someone"</span>);
+            if (id == <span class="s">""</span> || FirstTime(<span class="s">"twitch:"</span> + id)) Add(1, gifter, <span class="s">"gift"</span>, <span class="s">"twitch"</span>);
+            return true;
+        }
+
+<span class="c">        // New sub or resub, on either platform.</span>
+        Add(1, Arg(<span class="s">"user"</span>, <span class="s">"Someone"</span>), <span class="s">"sub"</span>, Platform());
+        return true;
+    }
+
+    private bool Command()
+    {
+        string cmd = Arg(<span class="s">"command"</span>, <span class="s">""</span>).ToLower().TrimStart('!');
+        int n;
+        bool hasNumber = int.TryParse(Arg(<span class="s">"input0"</span>, <span class="s">""</span>), out n) &amp;&amp; n &gt;= 0;
+
+        if (cmd == <span class="s">"subgoal"</span>) { Reply(Fill(Count() &gt;= Goal() ? GoalReachedReply : StatusReply)); return true; }
+        if (!IsMod()) return true;
+
+        if (cmd == <span class="s">"setgoal"</span> &amp;&amp; hasNumber &amp;&amp; n &gt; 0) { CPH.SetGlobalVar(VarGoal, n, true); }
+        else if (cmd == <span class="s">"setsubs"</span> &amp;&amp; hasNumber) { SetCount(n); }
+        else if (cmd == <span class="s">"resetsubs"</span>) { SetCount(0); }
+        else { Reply(<span class="s">"Try !setgoal 20, !setsubs 5 or !resetsubs"</span>); return true; }
+
+        Broadcast(<span class="s">"set"</span>, <span class="s">""</span>, 0, <span class="s">""</span>);
+        Reply(Fill(SetReply));
+        return true;
+    }
+
+    private void Add(int added, string user, string kind, string platform)
+    {
+        if (added &lt;= 0) return;
+        int before = Count();
+        SetCount(before + added);
+        Broadcast(kind, user, added, platform);
+        if (before &lt; Goal() &amp;&amp; Count() &gt;= Goal() &amp;&amp; GoalReachedChat != <span class="s">""</span>)
+        {
+            CPH.SendMessage(Fill(GoalReachedChat));
+            try { CPH.SendKickMessage(Fill(GoalReachedChat)); } catch (Exception) { }
+        }
+    }
+
+    private int Count() { return CPH.GetGlobalVar&lt;int&gt;(VarCount, true); }
+    private void SetCount(int n) { CPH.SetGlobalVar(VarCount, n, true); }
+    private int Goal()
+    {
+        int g = CPH.GetGlobalVar&lt;int&gt;(VarGoal, true);
+        return g &gt; 0 ? g : StartingGoal;
+    }
+
+    private void Broadcast(string kind, string user, int added, string platform)
+    {
+        string json = <span class="s">"{\"subgoal\":{\"count\":"</span> + Count() + <span class="s">",\"goal\":"</span> + Goal() +
+            <span class="s">",\"event\":\""</span> + Esc(kind) + <span class="s">"\",\"user\":\""</span> + Esc(user) + <span class="s">"\",\"added\":"</span> + added +
+            <span class="s">",\"platform\":\""</span> + Esc(platform) + <span class="s">"\"}}"</span>;
+        CPH.WebsocketBroadcastJson(json);
+    }
+
+<span class="c">    // Each gifted sub can arrive twice on Kick (single + mass), so count each recipient once a minute.</span>
+    private bool FirstTime(string id)
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        string seen = CPH.GetGlobalVar&lt;string&gt;(VarSeen, false) ?? <span class="s">""</span>;
+        var keep = new List&lt;string&gt;();
+        bool found = false;
+        foreach (string entry in seen.Split(';'))
+        {
+            int at = entry.LastIndexOf('@');
+            if (at &lt; 1) continue;
+            long t;
+            if (!long.TryParse(entry.Substring(at + 1), out t) || now - t &gt; 60) continue;
+            if (entry.Substring(0, at) == id) found = true;
+            keep.Add(entry);
+        }
+        if (!found) keep.Add(id + <span class="s">"@"</span> + now);
+        CPH.SetGlobalVar(VarSeen, string.Join(<span class="s">";"</span>, keep), false);
+        return !found;
+    }
+
+    private bool IsMod()
+    {
+        if (Arg(<span class="s">"isModerator"</span>, <span class="s">"False"</span>).ToLower() == <span class="s">"true"</span>) return true;
+        if (Arg(<span class="s">"isBroadcaster"</span>, <span class="s">"False"</span>).ToLower() == <span class="s">"true"</span>) return true;
+        string me = Arg(<span class="s">"broadcastUserName"</span>, Arg(<span class="s">"broadcastUser"</span>, <span class="s">""</span>)).ToLower();
+        return me != <span class="s">""</span> &amp;&amp; me == Arg(<span class="s">"userName"</span>, Arg(<span class="s">"user"</span>, <span class="s">""</span>)).ToLower();
+    }
+
+<span class="c">    // Which platform a sub came from: "twitch" or "kick".</span>
+    private string Platform()
+    {
+        string where = (Arg(<span class="s">"userType"</span>, <span class="s">""</span>) + Arg(<span class="s">"broadcastingService"</span>, <span class="s">""</span>) + Arg(<span class="s">"__source"</span>, <span class="s">""</span>) + Arg(<span class="s">"triggerName"</span>, <span class="s">""</span>)).ToLower();
+        return where.Contains(<span class="s">"kick"</span>) ? <span class="s">"kick"</span> : <span class="s">"twitch"</span>;
+    }
+
+    private void Reply(string msg)
+    {
+        string where = (Arg(<span class="s">"userType"</span>, <span class="s">""</span>) + Arg(<span class="s">"commandSource"</span>, <span class="s">""</span>) + Arg(<span class="s">"broadcastingService"</span>, <span class="s">""</span>)).ToLower();
+        if (where.Contains(<span class="s">"kick"</span>)) CPH.SendKickMessage(msg);
+        else CPH.SendMessage(msg);
+    }
+
+    private string Fill(string s)
+    {
+        int c = Count(), g = Goal();
+        return s.Replace(<span class="s">"{count}"</span>, c.ToString()).Replace(<span class="s">"{goal}"</span>, g.ToString()).Replace(<span class="s">"{left}"</span>, Math.Max(0, g - c).ToString());
+    }
+
+    private string Arg(string key, string fallback)
+    {
+        object v;
+        if (args.TryGetValue(key, out v) &amp;&amp; v != null &amp;&amp; v.ToString().Length &gt; 0) return v.ToString();
+        return fallback;
+    }
+
+    private static string Esc(string s)
+    {
+        return (s ?? <span class="s">""</span>).Replace(<span class="s">"\\"</span>, <span class="s">"\\\\"</span>).Replace(<span class="s">"\""</span>, <span class="s">"\\\""</span>).Replace(<span class="s">"\n"</span>, <span class="s">" "</span>).Replace(<span class="s">"\r"</span>, <span class="s">" "</span>);
+    }
+}</pre></div>
+    <h3>Chat commands</h3>
+    <ol class="steps">
+      <li>Open the <strong>Commands</strong> tab and add four commands: <code>!subgoal</code>, <code>!setgoal</code>, <code>!setsubs</code> and <code>!resetsubs</code>. Tick Twitch and Kick as sources for each.</li>
+      <li>Back in the Sub Goal action, add a trigger <strong>Core → Commands → Command Triggered</strong> for each of the four.</li>
+    </ol>
+    <p>The code checks who's asking, so only mods and you can change the goal, even if a command is open to everyone.</p>
+    <h3>Reset each stream (optional)</h3>
+    <ol class="steps">
+      <li>Add another action called <strong>Sub Goal Reset</strong>, with a <strong>Stream Offline</strong> trigger for each platform you stream on.</li>
+      <li>Give it an <strong>Execute C# Code</strong> sub-action with this code. Skip this action if you want the count to carry over between streams.</li>
+    </ol>
+    <div class="code"><div class="top"><span>SubGoalReset.cs</span><a class="btn ghost" href="SubGoalReset.cs" download>Download</a><button class="btn" data-copy="src2">Copy code</button></div><pre id="src2"><span class="c">// Sub Goal reset for Streamer.bot, free from itsCRA1G (itscra1g.github.io/sub-goal)</span>
+<span class="c">// Put this on Stream Offline triggers to start the count from 0 each stream.</span>
+using System;
+
+public class CPHInline
+{
+    public bool Execute()
+    {
+        CPH.SetGlobalVar(<span class="s">"subgoal_count"</span>, 0, true);
+        int goal = CPH.GetGlobalVar&lt;int&gt;(<span class="s">"subgoal_goal"</span>, true);
+        if (goal &lt;= 0) goal = 10;
+        CPH.WebsocketBroadcastJson(<span class="s">"{\"subgoal\":{\"count\":0,\"goal\":"</span> + goal + <span class="s">",\"event\":\"reset\",\"user\":\"\",\"added\":0}}"</span>);
+        return true;
+    }
+}</pre></div>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">2</span><h2>Style it</h2></div>
+    <div class="style-grid">
+      <div class="ctl">
+        <div><div class="lbl">Layout</div><div class="seg" id="layoutSeg"><button data-v="bar" aria-pressed="true">Bar</button><button data-v="pill" aria-pressed="false">Compact</button></div></div>
+        <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Title</div><input class="tin" id="title" maxlength="40" value="Sub goal"></div>
+        <div><div class="lbl">Background <span id="opV" style="color:var(--fg)">95%</span></div><input type="range" id="op" min="0" max="100" step="5" value="95" style="width:100%;accent-color:var(--acc)" aria-label="Background opacity"></div>
+        <div class="tog" style="display:flex;flex-direction:column;gap:10px"><label><input type="checkbox" id="optNames" checked>Thank each sub by name</label>
+        <label><input type="checkbox" id="optPf" checked>Flash Twitch purple or Kick green on new subs</label></div>
+        <details><summary>Streamer.bot connection (only if you changed it)</summary>
+          <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
+          <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
+        </details>
+      </div>
+      <div class="prev">
+        <div class="stage"><span class="tag">Preview</span><iframe id="prevFrame" title="Overlay preview" tabindex="-1"></iframe></div>
+        <div class="row"><button class="btn ghost" data-test="sub-twitch">Test Twitch sub</button><button class="btn ghost" data-test="sub-kick">Test Kick sub</button><button class="btn ghost" data-test="gift-twitch">Test 5 gift subs</button><button class="btn ghost" data-test="reset">Reset preview</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">3</span><h2>Add it to OBS</h2></div>
+    <p>Your overlay link, with your style built in:</p>
+    <div class="copy"><input id="obsUrl" readonly aria-label="OBS link"><button class="btn" data-copy="obsUrl">Copy</button></div>
+    <ol class="steps">
+      <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+      <li>Paste the link into <strong>URL</strong> and set the size to <strong id="obsSize">760 × 130</strong>.</li>
+      <li>Press OK. The bar appears as soon as it reaches Streamer.bot, so make sure Streamer.bot is running.</li>
+      <li>Test it: in Streamer.bot, right-click the Sub Goal action's Subscription trigger and pick <strong>Test Trigger</strong>.</li>
+    </ol>
+    <p>Changed the style? Copy the new link and paste it over the old one.</p>
+  </section>
+
+  <section id="chat">
+    <div class="sec-head"><span class="num">4</span><h2>Chat commands</h2></div>
+    <div class="tw"><table>
+      <tr><th>Command</th><th>Who</th><th>What it does</th></tr>
+      <tr><td><code>!subgoal</code></td><td>Everyone</td><td>Replies with the count, like <em>Sub goal: 7/10. 3 to go!</em></td></tr>
+      <tr><td><code>!setgoal 20</code></td><td>Mods and you</td><td>Sets the goal.</td></tr>
+      <tr><td><code>!setsubs 5</code></td><td>Mods and you</td><td>Sets the count, handy for subs that came in before you set it up.</td></tr>
+      <tr><td><code>!resetsubs</code></td><td>Mods and you</td><td>Puts the count back to 0.</td></tr>
+    </table></div>
+    <p>To change the chat replies or the starting goal, edit the lines at the top of the Sub Goal code.</p>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>Nothing shows in OBS</td><td>Check Streamer.bot is running and its WebSocket server is started. The bar stays hidden until it connects. If you changed the address, port or set a password, enter them in step 2 and copy the link again.</td></tr>
+      <tr><td>The bar shows but doesn't move</td><td>Check the action is called exactly <strong>Sub Goal</strong> and is enabled, and that its triggers are added. Try Test Trigger.</td></tr>
+      <tr><td>Gift subs count twice</td><td>Remove the Twitch <em>Gift Bomb</em> trigger if you added it.</td></tr>
+      <tr><td>The count is wrong</td><td>Fix it from chat with <code>!setsubs</code>.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot, Twitch or Kick.</div></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var GLOWS=[["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+var SIZES={bar:[760,130],pill:[560,88]};
+var BASE=location.origin+location.pathname;
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+function overlay(){
+  var sg=document.getElementById("sg"),ovr=document.getElementById("ovr");
+  var $=function(id){return document.getElementById(id)};
+  var cfg,count=0,goal=10,seen=false,ws=null,hitT,doneT,demoT,live=false;
+  function read(){
+    var p=new URLSearchParams(location.hash.slice(1));
+    var g=(p.get("g")||"4DA3FF").replace(/[^0-9a-fA-F]/g,"").slice(0,6);if(g.length!==6)g="4DA3FF";
+    var o=parseInt(p.get("o"),10);if(isNaN(o))o=95;o=Math.max(0,Math.min(100,o));
+    cfg={o:o,pf:p.get("pf")!=="0",l:SIZES[p.get("l")]?p.get("l"):"bar",g:g,t:p.get("t")||"Sub goal",n:p.get("n")!=="0",h:p.get("h")||"127.0.0.1",p:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1"};
+    sg.className="sg l-"+cfg.l+(seen?"":" off")+(count>=goal&&seen?" done":"");
+    sg.style.setProperty("--o",cfg.o/100);if(!flashT)glow(cfg.g);
+    if(!doneT)$("lab").textContent=cfg.t;
+    fit();
+  }
+  var flashT=null,PF={twitch:"9146FF",kick:"53FC18"};
+  function glow(h){sg.style.setProperty("--g","#"+h);sg.style.setProperty("--gr",hx2rgb(h))}
+  function flash(pl){if(!cfg.pf||!PF[pl])return;clearTimeout(flashT);glow(PF[pl]);flashT=setTimeout(function(){flashT=null;glow(cfg.g)},2800)}
+  function fit(){var s=SIZES[cfg.l];ovr.style.transform="scale("+Math.min(innerWidth/s[0],innerHeight/s[1])+")";ovr.style.width=s[0]+"px";ovr.style.height=s[1]+"px"}
+  addEventListener("resize",fit);
+  addEventListener("hashchange",function(){var d=cfg.demo;read();if(cfg.demo!==d)start()});
+  function render(){
+    $("num").innerHTML="";$("num").appendChild(document.createTextNode(count));
+    var sm=document.createElement("small");sm.textContent=" / "+goal;$("num").appendChild(sm);
+    $("fill").style.width=Math.min(100,goal?count/goal*100:0)+"%";
+    sg.classList.toggle("done",count>=goal);
+  }
+  function apply(d){
+    var before=count,wasDone=count>=goal&&seen;
+    count=Math.max(0,parseInt(d.count,10)||0);goal=Math.max(1,parseInt(d.goal,10)||1);
+    if(!seen){seen=true;sg.classList.remove("off")}
+    render();
+    var added=parseInt(d.added,10)||0;
+    if(added>0&&(d.event==="sub"||d.event==="gift")){
+      flash(d.platform);clearTimeout(hitT);sg.classList.add("hit");hitT=setTimeout(function(){sg.classList.remove("hit")},900);
+      if(cfg.n&&d.user)thank(d.event,d.user,added);
+    }
+    if(!wasDone&&count>=goal&&before<goal&&added>0){q=q.filter(function(x){return !x.goal});q.push({text:"Goal reached!",ms:10000,goal:true});if(!busy)nextSay()}
+  }
+  var q=[],busy=false;
+  function txt(it){return it.kind==="gift"?"+"+it.n+(it.n>1?" gifted by ":" gift from ")+it.user:"+"+it.n+" "+it.user}
+  function thank(kind,user,n){
+    var last=q.length?q[q.length-1]:null;
+    if(last&&!last.goal&&last.kind===kind&&last.user===user&&kind==="gift"){last.n+=n;last.text=txt(last)}
+    else if(cur&&!cur.goal&&cur.kind==="gift"&&kind==="gift"&&cur.user===user){cur.n+=n;cur.text=txt(cur);setLab(cur.text,true,true)}
+    else{var it={kind:kind,user:user,n:n,ms:2600};it.text=txt(it);q.push(it);var th=q.filter(function(x){return !x.goal});if(th.length>4)q.splice(q.indexOf(th[0]),1)}
+    if(!busy)nextSay();
+  }
+  var cur=null;
+  var labT="";function setLab(t,white,instant){var l=$("lab");labT=t;if(instant){if(!l.classList.contains("fade"))l.textContent=t;return}l.classList.add("fade");setTimeout(function(){l.textContent=labT;l.classList.toggle("thx",!!white);l.classList.remove("fade")},200)}
+  function nextSay(){
+    var it=q.shift();cur=it||null;if(!it){busy=false;doneT=null;setLab(cfg.t,false);return}
+    busy=true;doneT=1;setLab(it.text,!it.goal);setTimeout(nextSay,it.ms);
+  }
+  async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
+  function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+  function subscribe(){
+    if(live)return;live=true;
+    send({request:"Subscribe",id:"sg-sub",events:{General:["Custom"]}});
+    send({request:"DoAction",id:"sg-sync",action:{name:"Sub Goal"},args:{mode:"sync"}});
+  }
+  function connect(){
+    live=false;
+    try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.p+"/")}catch(e){setTimeout(connect,5000);return}
+    var helloT=setTimeout(subscribe,1500);
+    ws.onmessage=async function(e){
+      var m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.request==="Hello"){clearTimeout(helloT);
+        if(m.authentication&&cfg.pw){var a=m.authentication;var secret=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"sg-auth",authentication:await sha(secret+a.challenge)})}
+        else subscribe();return}
+      if(m.id==="sg-auth"){subscribe();return}
+      if(m.event&&m.event.source==="General"&&m.event.type==="Custom"){
+        var d=m.data;if(typeof d==="string"){try{d=JSON.parse(d)}catch(x){return}}
+        if(d&&d.data&&d.data.subgoal)d=d.data;
+        if(d&&d.subgoal)apply(d.subgoal);
+      }
+    };
+    ws.onclose=function(){clearTimeout(helloT);live=false;setTimeout(connect,3000)};
+    ws.onerror=function(){try{ws.close()}catch(x){}};
+  }
+  var NAMES=["NightOwl","Kezza_TV","pixelpete","Morag","LateShift"];var ni=0;
+  function demo(kind){
+    if(kind==="reset"){apply({count:6,goal:10,event:"set",added:0});return}
+    var pl=kind.split("-")[1]||"twitch";kind=kind.split("-")[0];
+    var n=kind==="gift"?5:1;var c=count+n;
+    apply({count:c,goal:goal,event:kind,user:NAMES[ni++%NAMES.length],added:n,platform:pl});
+  }
+  addEventListener("message",function(e){if(cfg.demo&&e.data&&e.data.sgTest)demo(e.data.sgTest)});
+  function start(){
+    clearInterval(demoT);if(ws){ws.onclose=null;try{ws.close()}catch(x){}}
+    if(cfg.demo){apply({count:6,goal:10,event:"set",added:0});if(cfg.auto)return;return}
+    connect();
+  }
+  read();start();
+  var p0=new URLSearchParams(location.hash.slice(1));
+  if(cfg.demo&&p0.get("auto")==="1"){demoT=setInterval(function(){if(count>=goal+1)apply({count:5,goal:10,event:"set",added:0});else demo((Math.random()<.25?"gift":"sub")+(Math.random()<.5?"-kick":"-twitch"))},2600)}
+}
+
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={l:"bar",g:"4DA3FF",t:"Sub goal",n:1,pf:1,o:95,h:"127.0.0.1",p:"8080"};
+  try{var sv=JSON.parse(ls("sg_style")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  $("title").value=S.t;$("host").value=S.h;$("port").value=S.p;
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){
+    var el=$(b.dataset.copy),t=el.value!==undefined&&el.tagName==="INPUT"?el.value:el.innerText.trim(),o=b.textContent;
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){sel(el)});else sel(el);
+  })});
+  function sel(el){if(el.select){el.select()}else{var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r)}try{document.execCommand("copy")}catch(e){}}
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  $("layoutSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.l=b.dataset.v;sync()}});
+  $("optNames").addEventListener("change",function(){S.n=this.checked?1:0;sync()});
+  $("optPf").addEventListener("change",function(){S.pf=this.checked?1:0;sync()});
+  $("op").addEventListener("input",function(){S.o=parseInt(this.value,10);sync()});
+  ["title","host","port","pw"].forEach(function(id){$(id).addEventListener("input",function(){if(id==="title")S.t=this.value;if(id==="host")S.h=this.value.trim();if(id==="port")S.p=this.value.trim();sync()})});
+  document.querySelectorAll("[data-test]").forEach(function(b){b.addEventListener("click",function(){$("prevFrame").contentWindow.postMessage({sgTest:b.dataset.test},"*")})});
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");p.set("l",S.l);p.set("g",S.g);if(S.t&&S.t!=="Sub goal")p.set("t",S.t);if(!S.n)p.set("n","0");if(!S.pf)p.set("pf","0");if(S.o!==95)p.set("o",String(S.o));
+    if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw);
+    for(var k in extra)p.set(k,extra[k]);return p.toString()}
+  function frame(el,h,l){var sz=SIZES[l];el.style.setProperty("--ar",sz[0]+"/"+sz[1]);var u=BASE+"#"+h;if(!el.dataset.on){el.src=u;el.dataset.on=1}else el.contentWindow.location.replace(u)}
+  function sync(){
+    var store={};for(var k in S)store[k]=S[k];ls("sg_style",JSON.stringify(store));
+    $("layoutSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.l)});
+    sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    nm.textContent=(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("optNames").checked=!!S.n;$("optPf").checked=!!S.pf;$("op").value=S.o;$("opV").textContent=S.o+"%";
+    frame($("prevFrame"),hash({demo:"1"}),S.l);
+    $("obsUrl").value=BASE+"#"+hash({});
+    var sz=SIZES[S.l];$("obsSize").textContent=sz[0]+" × "+sz[1];
+  }
+  frame($("heroFrame"),"ov=1&demo=1&auto=1&l=bar&g=4DA3FF","bar");
+  sync();
+}
+})();
+</script>
+</body>
+</html>

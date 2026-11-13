@@ -1,0 +1,179 @@
+// Sub Goal for Streamer.bot, free from itsCRA1G (itscra1g.github.io/sub-goal)
+// Counts Twitch and Kick subs for the Sub Goal overlay, and handles the chat commands.
+using System;
+using System.Collections.Generic;
+
+public class CPHInline
+{
+    // ===== Change these to suit your stream =====
+
+    // The goal to start with. Change it any time in chat with !setgoal 20
+    private const int StartingGoal = 10;
+
+    // Chat replies. {count} = subs so far, {goal} = the goal, {left} = subs still needed.
+    private const string StatusReply = "Sub goal: {count}/{goal}. {left} to go!";
+    private const string GoalReachedReply = "Sub goal: {count}/{goal}. Goal reached, thank you!";
+    private const string SetReply = "Sub goal updated: {count}/{goal}.";
+
+    // Post in chat when the goal is reached? Leave empty "" for no message.
+    private const string GoalReachedChat = "WE DID IT! The sub goal of {goal} is complete. Thank you all!";
+
+    // ===== Nothing to change below here =====
+
+    private const string VarCount = "subgoal_count";
+    private const string VarGoal = "subgoal_goal";
+    private const string VarSeen = "subgoal_seen";
+
+    public bool Execute()
+    {
+        string mode = Arg("mode", "");
+        if (mode == "sync") { Broadcast("sync", "", 0, ""); return true; }
+        if (mode == "reset") { SetCount(0); Broadcast("reset", "", 0, ""); return true; }
+
+        if (args.ContainsKey("command")) return Command();
+
+        // Kick mass gift: one event listing every recipient.
+        if (args.ContainsKey("recipient.0.userId") || args.ContainsKey("recipient.0.userName"))
+        {
+            int added = 0;
+            for (int i = 0; i < 500; i++)
+            {
+                string id = Arg("recipient." + i + ".userId", Arg("recipient." + i + ".userName", ""));
+                if (id == "") break;
+                if (FirstTime("kick:" + id)) added++;
+            }
+            Add(added, Arg("user", "Someone"), "gift", "kick");
+            return true;
+        }
+
+        // Kick single gift.
+        if (args.ContainsKey("recipient.userId") || args.ContainsKey("recipient.userName"))
+        {
+            string id = Arg("recipient.userId", Arg("recipient.userName", ""));
+            if (id == "" || FirstTime("kick:" + id)) Add(1, Arg("user", "Someone"), "gift", "kick");
+            return true;
+        }
+
+        // Twitch gift sub (fires once for every sub in a gift bomb too).
+        if (args.ContainsKey("recipientId") || args.ContainsKey("recipientUserName"))
+        {
+            string id = Arg("recipientId", Arg("recipientUserName", ""));
+            string gifter = Arg("anonymous", "False").ToLower() == "true" ? "Anonymous" : Arg("user", "Someone");
+            if (id == "" || FirstTime("twitch:" + id)) Add(1, gifter, "gift", "twitch");
+            return true;
+        }
+
+        // New sub or resub, on either platform.
+        Add(1, Arg("user", "Someone"), "sub", Platform());
+        return true;
+    }
+
+    private bool Command()
+    {
+        string cmd = Arg("command", "").ToLower().TrimStart('!');
+        int n;
+        bool hasNumber = int.TryParse(Arg("input0", ""), out n) && n >= 0;
+
+        if (cmd == "subgoal") { Reply(Fill(Count() >= Goal() ? GoalReachedReply : StatusReply)); return true; }
+        if (!IsMod()) return true;
+
+        if (cmd == "setgoal" && hasNumber && n > 0) { CPH.SetGlobalVar(VarGoal, n, true); }
+        else if (cmd == "setsubs" && hasNumber) { SetCount(n); }
+        else if (cmd == "resetsubs") { SetCount(0); }
+        else { Reply("Try !setgoal 20, !setsubs 5 or !resetsubs"); return true; }
+
+        Broadcast("set", "", 0, "");
+        Reply(Fill(SetReply));
+        return true;
+    }
+
+    private void Add(int added, string user, string kind, string platform)
+    {
+        if (added <= 0) return;
+        int before = Count();
+        SetCount(before + added);
+        Broadcast(kind, user, added, platform);
+        if (before < Goal() && Count() >= Goal() && GoalReachedChat != "")
+        {
+            CPH.SendMessage(Fill(GoalReachedChat));
+            try { CPH.SendKickMessage(Fill(GoalReachedChat)); } catch (Exception) { }
+        }
+    }
+
+    private int Count() { return CPH.GetGlobalVar<int>(VarCount, true); }
+    private void SetCount(int n) { CPH.SetGlobalVar(VarCount, n, true); }
+    private int Goal()
+    {
+        int g = CPH.GetGlobalVar<int>(VarGoal, true);
+        return g > 0 ? g : StartingGoal;
+    }
+
+    private void Broadcast(string kind, string user, int added, string platform)
+    {
+        string json = "{\"subgoal\":{\"count\":" + Count() + ",\"goal\":" + Goal() +
+            ",\"event\":\"" + Esc(kind) + "\",\"user\":\"" + Esc(user) + "\",\"added\":" + added +
+            ",\"platform\":\"" + Esc(platform) + "\"}}";
+        CPH.WebsocketBroadcastJson(json);
+    }
+
+    // Each gifted sub can arrive twice on Kick (single + mass), so count each recipient once a minute.
+    private bool FirstTime(string id)
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        string seen = CPH.GetGlobalVar<string>(VarSeen, false) ?? "";
+        var keep = new List<string>();
+        bool found = false;
+        foreach (string entry in seen.Split(';'))
+        {
+            int at = entry.LastIndexOf('@');
+            if (at < 1) continue;
+            long t;
+            if (!long.TryParse(entry.Substring(at + 1), out t) || now - t > 60) continue;
+            if (entry.Substring(0, at) == id) found = true;
+            keep.Add(entry);
+        }
+        if (!found) keep.Add(id + "@" + now);
+        CPH.SetGlobalVar(VarSeen, string.Join(";", keep), false);
+        return !found;
+    }
+
+    private bool IsMod()
+    {
+        if (Arg("isModerator", "False").ToLower() == "true") return true;
+        if (Arg("isBroadcaster", "False").ToLower() == "true") return true;
+        string me = Arg("broadcastUserName", Arg("broadcastUser", "")).ToLower();
+        return me != "" && me == Arg("userName", Arg("user", "")).ToLower();
+    }
+
+    // Which platform a sub came from: "twitch" or "kick".
+    private string Platform()
+    {
+        string where = (Arg("userType", "") + Arg("broadcastingService", "") + Arg("__source", "") + Arg("triggerName", "")).ToLower();
+        return where.Contains("kick") ? "kick" : "twitch";
+    }
+
+    private void Reply(string msg)
+    {
+        string where = (Arg("userType", "") + Arg("commandSource", "") + Arg("broadcastingService", "")).ToLower();
+        if (where.Contains("kick")) CPH.SendKickMessage(msg);
+        else CPH.SendMessage(msg);
+    }
+
+    private string Fill(string s)
+    {
+        int c = Count(), g = Goal();
+        return s.Replace("{count}", c.ToString()).Replace("{goal}", g.ToString()).Replace("{left}", Math.Max(0, g - c).ToString());
+    }
+
+    private string Arg(string key, string fallback)
+    {
+        object v;
+        if (args.TryGetValue(key, out v) && v != null && v.ToString().Length > 0) return v.ToString();
+        return fallback;
+    }
+
+    private static string Esc(string s)
+    {
+        return (s ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", " ").Replace("\r", " ");
+    }
+}
