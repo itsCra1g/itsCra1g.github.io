@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Socials: free social media rotator for OBS</title>
+<meta name="description" content="A free social media rotator for OBS by itsCRA1G. Cycles through your Twitch, Kick, YouTube, TikTok, Discord and more, in brand colours or your own glow.">
+<meta property="og:title" content="Socials: free social media rotator for OBS">
+<meta property="og:description" content="Show your socials on stream, one at a time. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --warn:#FFB020; --bad:#FF4D4D;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:48px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
+  radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.20),transparent 60%),
+  radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.16),transparent 60%),
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:16/9;max-width:100%}
+.stage:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 2px,transparent 2px 4px);pointer-events:none}
+.stage .tag{position:absolute;left:14px;top:12px;font:700 11px var(--text);letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.stage iframe{position:absolute;left:4%;bottom:8%;width:72%;border:0;background:transparent;aspect-ratio:var(--ar,640/104);height:auto}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn:hover{background:#8CC4FF;color:#000}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}
+.btn.ghost:hover{border-color:var(--acc)}
+.list{display:flex;flex-direction:column;gap:8px;max-width:46em}
+.item{display:grid;grid-template-columns:44px 170px minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:12px;padding:8px}
+.item .ico{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:rgba(var(--pr),.16)}
+.item .ico svg{width:22px;height:22px;fill:var(--pc)}
+.item select,.item input,.tin{font:15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:9px 10px;min-width:0;width:100%}
+.item input::placeholder{color:#5d6676}
+.item .acts{display:flex;gap:4px}
+.ib{width:34px;height:34px;border-radius:8px;border:1px solid var(--edge2);background:var(--tile2);color:var(--body);cursor:pointer;font:700 14px var(--text)}
+.ib:hover{border-color:var(--acc);color:var(--fg)}.ib:disabled{opacity:.3;cursor:default;border-color:var(--edge2)}
+.ib.del:hover{border-color:var(--bad);color:var(--bad)}
+.item .prevlink{grid-column:2/-1;font:13px var(--mono);color:var(--mute);margin-top:-2px;padding-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:640px){.item{grid-template-columns:44px minmax(0,1fr) auto}.item input{grid-column:1/-1}.item .prevlink{grid-column:1/-1}}
+.style-grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.style-grid{grid-template-columns:1fr}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.ctl .lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.ctl .lbl b{color:var(--fg);font-weight:700}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw button.brandc{background:conic-gradient(#9146FF 0 25%,#53FC18 0 50%,#FF0000 0 75%,#FE2C55 0)}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.prev .cap{font-size:13px;color:var(--mute);margin:10px 0 0}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
+.so{--g:#4DA3FF;--gr:77,163,255;--o:.95;position:absolute;left:20px;top:20px;font-family:var(--text);color:#E8ECF2;
+  background:linear-gradient(135deg,rgba(17,19,24,var(--o)),rgba(8,9,12,var(--o)));border:1px solid rgba(var(--gr),.42);
+  box-shadow:0 0 0 1px rgba(0,0,0,calc(.6*var(--o))),0 0 16px -3px rgba(var(--gr),.55),0 8px 16px -8px rgba(0,0,0,calc(.85*var(--o)));
+  text-shadow:0 1px 3px rgba(0,0,0,calc(.9 - .9*var(--o)));
+  display:flex;align-items:center;overflow:hidden;
+  transition:opacity .35s ease,transform .35s ease,border-color .5s,box-shadow .5s,width .45s cubic-bezier(.2,.9,.2,1)}
+.so.off{opacity:0;transform:translateY(12px)}
+.so .ic{flex:0 0 auto;display:grid;place-items:center;background:rgba(var(--gr),.16);transition:background .5s}
+.so .ic svg{fill:var(--g);transition:fill .5s;filter:drop-shadow(0 0 6px rgba(var(--gr),.55))}
+.so .tx{min-width:0;display:flex;flex-direction:column;white-space:nowrap}
+.so .vb{color:var(--g);font:700 12px var(--text);letter-spacing:2.5px;text-transform:uppercase;transition:color .5s}
+.so .hd{font:700 26px/1.15 var(--display);color:#F2F5F9;overflow:hidden;text-overflow:ellipsis}
+.so .sw2{transition:opacity .28s,transform .28s}
+.so.chg .sw2{opacity:0;transform:translateY(8px)}
+.so.chg .ic svg{transform:scale(.6) rotate(-12deg);opacity:0}
+.so .ic svg{transition:transform .28s,opacity .28s,fill .5s}
+.so.l-bar{height:64px;border-radius:16px;padding:8px 22px 8px 8px;gap:14px;max-width:600px}
+.so.l-bar .ic{width:48px;height:48px;border-radius:11px}.so.l-bar .ic svg{width:26px;height:26px}
+.so.l-pill{height:46px;border-radius:999px;padding:0 20px 0 7px;gap:10px;max-width:460px}
+.so.l-pill .ic{width:34px;height:34px;border-radius:50%}.so.l-pill .ic svg{width:18px;height:18px}
+.so.l-pill .vb{display:none}.so.l-pill .hd{font-size:19px}
+.so .dots{display:flex;gap:4px;margin-left:10px;flex:0 0 auto;align-self:center}
+.so .dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.18);transition:background .3s}
+.so .dots i.on{background:var(--g)}
+.so.l-pill .dots{display:none}
+</style>
+</head>
+<body>
+<div id="ovr"><div id="so" class="so l-bar off">
+  <div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="ip" d=""/></svg></div>
+  <div class="tx sw2"><div class="vb" id="vb">&nbsp;</div><div class="hd" id="hd">&nbsp;</div></div>
+  <div class="dots" id="dots"></div>
+</div></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Socials</a>
+  <nav><a href="#list">Your socials</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
+    <h1>Show your socials, one at a time.</h1>
+    <p class="lead">A rotator that cycles through where people can find you, in each platform's own colours or your glow. Leave it running, or have it pop up every few minutes.</p>
+    <div class="chips"><span class="chip">14 platforms</span><span class="chip">Brand colours</span><span class="chip">Pop-up mode</span><span class="chip">No sign-in needed</span></div>
+  </div>
+  <div class="stage"><span class="tag">Preview</span><iframe id="heroFrame" title="Overlay preview" tabindex="-1"></iframe></div>
+</div></div>
+
+<main class="wrap">
+  <section id="list">
+    <div class="sec-head"><span class="num">1</span><h2>Add your socials</h2></div>
+    <p>Pick a platform and type your username, without the @. They show in this order, and the arrows move them up and down.</p>
+    <div class="list" id="items"></div>
+    <div style="margin-top:12px"><button class="btn ghost" id="addBtn">+ Add a platform</button></div>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">2</span><h2>Style it</h2></div>
+    <div class="style-grid">
+      <div class="ctl">
+        <div><div class="lbl">Layout</div><div class="seg" id="layoutSeg"><button data-v="bar" aria-pressed="true">Bar</button><button data-v="pill" aria-pressed="false">Compact</button></div></div>
+        <div><div class="lbl">Show as</div><div class="seg" id="fmtSeg"><button data-v="link" aria-pressed="true">twitch.tv/name</button><button data-v="at" aria-pressed="false">@name</button></div></div>
+        <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Background <b id="opV">95%</b></div><input type="range" id="op" min="0" max="100" step="5" value="95" aria-label="Background opacity"></div>
+        <div><div class="lbl">Each platform shows for <b id="secV">6 seconds</b></div><input type="range" id="sec" min="3" max="20" step="1" value="6" aria-label="Seconds per platform"></div>
+        <div><div class="lbl">Show <b id="evV">all the time</b></div><input type="range" id="ev" min="0" max="30" step="1" value="0" aria-label="Pop up every so many minutes"></div>
+      </div>
+      <div class="prev">
+        <div class="stage"><span class="tag">Preview</span><iframe id="prevFrame" title="Overlay preview" tabindex="-1"></iframe></div>
+        <p class="cap" id="prevCap">The preview always shows, even in pop-up mode.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">3</span><h2>Add it to OBS</h2></div>
+    <p>Your overlay link, with your socials and style built in:</p>
+    <div class="copy"><input id="obsUrl" readonly aria-label="OBS link"><button class="btn" data-copy="obsUrl">Copy</button></div>
+    <ol class="steps">
+      <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+      <li>Paste the link into <strong>URL</strong> and set the size to <strong id="obsSize">640 × 104</strong>.</li>
+      <li>Press OK. Resize it on your scene as you like and it keeps its shape.</li>
+    </ol>
+    <p>Changed something? Copy the new link and paste it over the old one. This page remembers your list on this browser, so you can come back and tweak it.</p>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>Nothing shows in OBS</td><td>Check you added at least one platform with a username before copying the link. In pop-up mode it's hidden between rounds, so wait or set Show to <em>all the time</em> to check.</td></tr>
+      <tr><td>A username looks wrong</td><td>Type it without the @ or the web address, just the name. For Discord, use your invite code (the bit after discord.gg/). For Website, type the address, like <em>mysite.com</em>.</td></tr>
+      <tr><td>Long names get cut off</td><td>Use the Bar layout, which has more room, or shorten the name if you can.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Platform logos from Simple Icons (CC0); each belongs to its owner. Not affiliated with any of the platforms shown.</div></footer>
+</div>
+
+<script>
+var PLAT={"twitch":{"n":"Twitch","v":"Follow on Twitch","l":"twitch.tv/{h}","a":"@{h}","c":"9146FF","p":"M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"},"kick":{"n":"Kick","v":"Follow on Kick","l":"kick.com/{h}","a":"@{h}","c":"53FC18","p":"M1.333 0h8v5.333H12V2.667h2.667V0h8v8H20v2.667h-2.667v2.666H20V16h2.667v8h-8v-2.667H12v-2.666H9.333V24h-8Z"},"youtube":{"n":"YouTube","v":"Subscribe on YouTube","l":"youtube.com/@{h}","a":"@{h}","c":"FF0000","p":"M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"},"tiktok":{"n":"TikTok","v":"Follow on TikTok","l":"tiktok.com/@{h}","a":"@{h}","c":"FE2C55","p":"M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"},"x":{"n":"X","v":"Follow on X","l":"x.com/{h}","a":"@{h}","c":"FFFFFF","p":"M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"},"instagram":{"n":"Instagram","v":"Follow on Instagram","l":"instagram.com/{h}","a":"@{h}","c":"FF0069","p":"M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"},"discord":{"n":"Discord","v":"Join the Discord","l":"discord.gg/{h}","a":"discord.gg/{h}","c":"5865F2","p":"M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"},"facebook":{"n":"Facebook","v":"Follow on Facebook","l":"facebook.com/{h}","a":"@{h}","c":"0866FF","p":"M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"},"threads":{"n":"Threads","v":"Follow on Threads","l":"threads.net/@{h}","a":"@{h}","c":"FFFFFF","p":"M18.263 11.097c-.03-3.486-1.92-5.586-5.111-5.586-2.13 0-3.922.963-4.863 2.499l2.062 1.438c.535-.843 1.272-1.543 2.628-1.543 1.528 0 2.318.85 2.544 2.431a15 15 0 0 0-2.236-.173c-4.125 0-6.068 1.867-6.068 4.336s1.943 3.99 4.804 3.99c3.139 0 5.013-2.115 5.781-4.735.798.361 1.348 1.204 1.348 2.47 0 3.387-3.907 5.232-7.22 5.232-4.885 0-8.077-3.207-8.077-8.424 0-6.392 4.223-10.487 9.9-10.487 3.808 0 5.69 1.671 6.97 3.914l2.108-1.475C21.44 2.078 18.331 0 13.663 0 6.227 0 1.168 5.277 1.168 12.934c0 7 4.953 11.066 10.856 11.066 4.878 0 9.809-2.846 9.809-7.716 0-2.545-1.46-4.231-3.569-5.187m-6.33 4.855c-1.077 0-2.026-.512-2.026-1.453 0-1.483 1.822-1.934 3.606-1.934.678 0 1.34.045 1.927.173-.422 1.927-1.671 3.215-3.508 3.214Z"},"bluesky":{"n":"Bluesky","v":"Follow on Bluesky","l":"bsky.app/profile/{h}","a":"@{h}","c":"1185FE","p":"M5.202 2.857C7.954 4.922 10.913 9.11 12 11.358c1.087-2.247 4.046-6.436 6.798-8.501C20.783 1.366 24 .213 24 3.883c0 .732-.42 6.156-.667 7.037-.856 3.061-3.978 3.842-6.755 3.37 4.854.826 6.089 3.562 3.422 6.299-5.065 5.196-7.28-1.304-7.847-2.97-.104-.305-.152-.448-.153-.327 0-.121-.05.022-.153.327-.568 1.666-2.782 8.166-7.847 2.97-2.667-2.737-1.432-5.473 3.422-6.3-2.777.473-5.899-.308-6.755-3.369C.42 10.04 0 4.615 0 3.883c0-3.67 3.217-2.517 5.202-1.026"},"snapchat":{"n":"Snapchat","v":"Add on Snapchat","l":"snapchat.com/add/{h}","a":"@{h}","c":"FFFC00","p":"M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.569-1.273.988-3.146 1.271-.059.091-.12.375-.164.57-.029.179-.074.36-.134.553-.076.271-.27.405-.555.405h-.03c-.135 0-.313-.031-.538-.074-.36-.075-.765-.135-1.273-.135-.3 0-.599.015-.913.074-.6.104-1.123.464-1.723.884-.853.599-1.826 1.288-3.294 1.288-.06 0-.119-.015-.18-.015h-.149c-1.468 0-2.427-.675-3.279-1.288-.599-.42-1.107-.779-1.707-.884-.314-.045-.629-.074-.928-.074-.54 0-.958.089-1.272.149-.211.043-.391.074-.54.074-.374 0-.523-.224-.583-.42-.061-.192-.09-.389-.135-.567-.046-.181-.105-.494-.166-.57-1.918-.222-2.95-.642-3.189-1.226-.031-.063-.052-.15-.055-.225-.015-.243.165-.465.42-.509 3.264-.54 4.73-3.879 4.791-4.02l.016-.029c.18-.345.224-.645.119-.869-.195-.434-.884-.658-1.332-.809-.121-.029-.24-.074-.346-.119-1.107-.435-1.257-.93-1.197-1.273.09-.479.674-.793 1.168-.793.146 0 .27.029.383.074.42.194.789.3 1.104.3.234 0 .384-.06.465-.105l-.046-.569c-.098-1.626-.225-3.651.307-4.837C7.392 1.077 10.739.807 11.727.807l.419-.015h.06z"},"patreon":{"n":"Patreon","v":"Support on Patreon","l":"patreon.com/{h}","a":"patreon.com/{h}","c":"FF424D","p":"M22.957 7.21c-.004-3.064-2.391-5.576-5.191-6.482-3.478-1.125-8.064-.962-11.384.604C2.357 3.231 1.093 7.391 1.046 11.54c-.039 3.411.302 12.396 5.369 12.46 3.765.047 4.326-4.804 6.068-7.141 1.24-1.662 2.836-2.132 4.801-2.618 3.376-.836 5.678-3.501 5.673-7.031Z"},"kofi":{"n":"Ko-fi","v":"Support on Ko-fi","l":"ko-fi.com/{h}","a":"ko-fi.com/{h}","c":"FF6433","p":"M11.351 2.715c-2.7 0-4.986.025-6.83.26C2.078 3.285 0 5.154 0 8.61c0 3.506.182 6.13 1.585 8.493 1.584 2.701 4.233 4.182 7.662 4.182h.83c4.209 0 6.494-2.234 7.637-4a9.5 9.5 0 0 0 1.091-2.338C21.792 14.688 24 12.22 24 9.208v-.415c0-3.247-2.13-5.507-5.792-5.87-1.558-.156-2.65-.208-6.857-.208m0 1.947c4.208 0 5.09.052 6.571.182 2.624.311 4.13 1.584 4.13 4v.39c0 2.156-1.792 3.844-3.87 3.844h-.935l-.156.649c-.208 1.013-.597 1.818-1.039 2.546-.909 1.428-2.545 3.064-5.922 3.064h-.805c-2.571 0-4.831-.883-6.078-3.195-1.09-2-1.298-4.155-1.298-7.506 0-2.181.857-3.402 3.012-3.714 1.533-.233 3.559-.26 6.39-.26m6.547 2.287c-.416 0-.65.234-.65.546v2.935c0 .311.234.545.65.545 1.324 0 2.051-.754 2.051-2s-.727-2.026-2.052-2.026m-10.39.182c-1.818 0-3.013 1.48-3.013 3.142 0 1.533.858 2.857 1.949 3.897.727.701 1.87 1.429 2.649 1.896a1.47 1.47 0 0 0 1.507 0c.78-.467 1.922-1.195 2.623-1.896 1.117-1.039 1.974-2.364 1.974-3.897 0-1.662-1.247-3.142-3.039-3.142-1.065 0-1.792.545-2.338 1.298-.493-.753-1.246-1.298-2.312-1.298"},"web":{"n":"Website","v":"Visit the website","l":"{h}","a":"{h}","c":"4DA3FF","p":"M12 2a10 10 0 100 20 10 10 0 000-20zm6.93 6h-2.95a15.6 15.6 0 00-1.38-3.56A8.03 8.03 0 0118.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14a8.2 8.2 0 010-4h3.38a16.5 16.5 0 000 4H4.26zm.81 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.99 7.99 0 015.07 16zm2.95-8H5.07a7.99 7.99 0 014.33-3.56A15.6 15.6 0 008.02 8zM12 19.96A14.1 14.1 0 0110.09 16h3.82A14.1 14.1 0 0112 19.96zM14.34 14H9.66a14.7 14.7 0 010-4h4.68a14.7 14.7 0 010 4zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14a16.5 16.5 0 000-4h3.38a8.2 8.2 0 010 4h-3.38z"}};
+(function(){
+"use strict";
+var ORDER=["twitch","kick","youtube","tiktok","x","instagram","discord","facebook","threads","bluesky","snapchat","patreon","kofi","web"];
+var GLOWS=[["brand","Brand colours"],["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+var SIZES={bar:[640,104],pill:[500,86]};
+var BASE=location.origin+location.pathname;
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+function clean(h,p){h=String(h||"").trim().replace(/^https?:\/\//i,"").replace(/^www\./i,"");if(p!=="web"){h=h.split(/[?#]/)[0];if(h.indexOf("/")>=0){var seg=h.split("/").filter(Boolean);h=seg.length?seg[seg.length-1]:""}h=h.replace(/^@/,"")}return h.slice(0,60)}
+function show(p,h,fmt){var P=PLAT[p];if(!P)return h;return (fmt==="at"?P.a:P.l).replace("{h}",h)}
+function enc(list){return list.map(function(x){return x.p+":"+encodeURIComponent(x.h)}).join(",")}
+function dec(s){return (s||"").split(",").map(function(x){var i=x.indexOf(":");return i<1?null:{p:x.slice(0,i),h:decodeURIComponent(x.slice(i+1))}}).filter(function(x){return x&&PLAT[x.p]&&x.h})}
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+function overlay(){
+  var so=document.getElementById("so"),ovr=document.getElementById("ovr"),$=function(i){return document.getElementById(i)};
+  var cfg,i=-1,tm=null,shown=0;
+  function read(){
+    var p=new URLSearchParams(location.hash.slice(1));
+    var o=parseInt(p.get("o"),10);if(isNaN(o))o=95;
+    var g=(p.get("g")||"brand");if(g!=="brand"&&!/^[0-9a-fA-F]{6}$/.test(g))g="brand";
+    cfg={list:dec(p.get("s")),l:SIZES[p.get("l")]?p.get("l"):"bar",f:p.get("f")==="at"?"at":"link",g:g,o:Math.max(0,Math.min(100,o)),
+      t:Math.max(3,Math.min(30,parseInt(p.get("t"),10)||6)),e:Math.max(0,Math.min(60,parseInt(p.get("e"),10)||0)),demo:p.get("demo")==="1"};
+    so.className="so l-"+cfg.l+" off";so.style.setProperty("--o",cfg.o/100);
+    var d=$("dots");d.innerHTML="";cfg.list.forEach(function(){d.appendChild(document.createElement("i"))});
+    fit();
+  }
+  function fit(){var s=SIZES[cfg.l];ovr.style.transform="scale("+Math.min(innerWidth/s[0],innerHeight/s[1])+")";ovr.style.width=s[0]+"px";ovr.style.height=s[1]+"px"}
+  addEventListener("resize",fit);
+  function glow(h){so.style.setProperty("--g","#"+h);so.style.setProperty("--gr",hx2rgb(h))}
+  function put(k){
+    var it=cfg.list[k],P=PLAT[it.p];
+    glow(cfg.g==="brand"?P.c:cfg.g);
+    $("ip").setAttribute("d",P.p);$("vb").textContent=P.v;$("hd").textContent=show(it.p,it.h,cfg.f);
+    [].forEach.call($("dots").children,function(el,j){el.classList.toggle("on",j===k)});
+  }
+  function step(){
+    clearTimeout(tm);if(!cfg.list.length){so.classList.add("off");return}
+    var popup=cfg.e>0&&!cfg.demo;
+    if(popup&&shown>=cfg.list.length){shown=0;so.classList.add("off");tm=setTimeout(step,cfg.e*60000);return}
+    i=(i+1)%cfg.list.length;shown++;
+    if(so.classList.contains("off")){put(i);so.classList.remove("off")}
+    else{so.classList.add("chg");setTimeout(function(){put(i);so.classList.remove("chg")},280)}
+    tm=setTimeout(step,cfg.t*1000);
+  }
+  addEventListener("hashchange",function(){clearTimeout(tm);read();i=-1;shown=0;step()});
+  read();step();
+}
+
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={list:[{p:"twitch",h:""},{p:"tiktok",h:""},{p:"youtube",h:""},{p:"discord",h:""}],l:"bar",f:"link",g:"brand",o:95,t:6,e:0};
+  try{var sv=JSON.parse(ls("so_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  var box=$("items");
+  function draw(){
+    box.innerHTML="";
+    S.list.forEach(function(it,k){
+      var P=PLAT[it.p];
+      var row=document.createElement("div");row.className="item";row.style.setProperty("--pc","#"+P.c);row.style.setProperty("--pr",hx2rgb(P.c));
+      var ic=document.createElement("div");ic.className="ico";ic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path></path></svg>';ic.querySelector("path").setAttribute("d",P.p);
+      var sel=document.createElement("select");sel.setAttribute("aria-label","Platform");
+      ORDER.forEach(function(p){var o=document.createElement("option");o.value=p;o.textContent=PLAT[p].n;if(p===it.p)o.selected=true;sel.appendChild(o)});
+      sel.addEventListener("change",function(){it.p=sel.value;draw();sync()});
+      var inp=document.createElement("input");inp.value=it.h;inp.setAttribute("aria-label",P.n+" username");inp.spellcheck=false;inp.autocomplete="off";
+      inp.placeholder=it.p==="discord"?"invite code":it.p==="web"?"yoursite.com":"username";
+      var pl=document.createElement("div");pl.className="prevlink";
+      function pv(){pl.textContent=it.h?show(it.p,it.h,S.f):" "}
+      inp.addEventListener("input",function(){it.h=clean(inp.value,it.p);pv();sync()});
+      var acts=document.createElement("div");acts.className="acts";
+      [["↑","Move up",-1],["↓","Move down",1]].forEach(function(a){var b=document.createElement("button");b.className="ib";b.type="button";b.textContent=a[0];b.title=a[1];b.setAttribute("aria-label",a[1]);
+        var j=k+a[2];b.disabled=j<0||j>=S.list.length;b.addEventListener("click",function(){var t=S.list[j];S.list[j]=S.list[k];S.list[k]=t;draw();sync()});acts.appendChild(b)});
+      var del=document.createElement("button");del.className="ib del";del.type="button";del.textContent="✕";del.title="Remove";del.setAttribute("aria-label","Remove "+P.n);
+      del.addEventListener("click",function(){S.list.splice(k,1);draw();sync()});acts.appendChild(del);
+      row.appendChild(ic);row.appendChild(sel);row.appendChild(inp);row.appendChild(acts);row.appendChild(pl);pv();
+      box.appendChild(row);
+    });
+  }
+  $("addBtn").addEventListener("click",function(){
+    var used=S.list.map(function(x){return x.p});var p=ORDER.find(function(x){return used.indexOf(x)<0})||"web";
+    S.list.push({p:p,h:""});draw();sync();box.lastChild.querySelector("input").focus();
+  });
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){
+    var el=$(b.dataset.copy),o=b.textContent,done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select();
+  })});
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);if(g[0]==="brand")b.className="brandc";else b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  $("layoutSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.l=b.dataset.v;sync()}});
+  $("fmtSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.f=b.dataset.v;draw();sync()}});
+  $("op").addEventListener("input",function(){S.o=+this.value;sync()});
+  $("sec").addEventListener("input",function(){S.t=+this.value;sync()});
+  $("ev").addEventListener("input",function(){S.e=+this.value;sync()});
+  var DEMO=[{p:"twitch",h:"yourname"},{p:"kick",h:"yourname"},{p:"tiktok",h:"yourname"},{p:"discord",h:"yourinvite"}];
+  function hash(list,extra){var p=new URLSearchParams();p.set("ov","1");p.set("s",enc(list));p.set("l",S.l);if(S.f!=="link")p.set("f",S.f);p.set("g",S.g);
+    if(S.o!==95)p.set("o",String(S.o));if(S.t!==6)p.set("t",String(S.t));for(var k in extra)p.set(k,extra[k]);return p.toString()}
+  function frame(el,h,l){var sz=SIZES[l];el.style.setProperty("--ar",sz[0]+"/"+sz[1]);var u=BASE+"#"+h;if(!el.dataset.on){el.src=u;el.dataset.on=1}else el.contentWindow.location.replace(u)}
+  var pvT=null;
+  function sync(){
+    ls("so_cfg",JSON.stringify(S));
+    $("layoutSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.l)});
+    $("fmtSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.f)});
+    sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    nm.textContent=(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("op").value=S.o;$("opV").textContent=S.o+"%";$("sec").value=S.t;$("secV").textContent=S.t+" seconds";
+    $("ev").value=S.e;$("evV").textContent=S.e?"every "+S.e+(S.e===1?" minute":" minutes"):"all the time";
+    var real=S.list.filter(function(x){return x.h});
+    clearTimeout(pvT);pvT=setTimeout(function(){frame($("prevFrame"),hash(real.length?real:DEMO,{demo:"1"}),S.l)},250);
+    var ex={};if(S.e)ex.e=String(S.e);
+    $("obsUrl").value=real.length?BASE+"#"+hash(real,ex):"Add at least one username in step 1";
+    var sz=SIZES[S.l];$("obsSize").textContent=sz[0]+" × "+sz[1];
+  }
+  frame($("heroFrame"),"ov=1&demo=1&l=bar&g=brand&t=3&s="+enc([{p:"twitch",h:"yourname"},{p:"kick",h:"yourname"},{p:"youtube",h:"yourname"},{p:"tiktok",h:"yourname"},{p:"discord",h:"yourinvite"}]),"bar");
+  draw();sync();
+}
+})();
+</script>
+</body>
+</html>
