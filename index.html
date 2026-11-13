@@ -3,37 +3,71 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>itsCRA1G tools</title>
-<meta name="description" content="Free Stream Deck tools for streamers by itsCRA1G.">
-<link rel="icon" href="camo-grind/img/logo.png">
+<title>itsCRA1G: free tools for streamers</title>
+<meta name="description" content="Free tools and resources for streamers by itsCRA1G: Stream Deck plugins, OBS overlays and Streamer.bot actions.">
+<meta property="og:title" content="itsCRA1G: free tools for streamers">
+<meta property="og:description" content="Stream Deck plugins, OBS overlays and Streamer.bot actions. Free.">
+<link rel="icon" href="pilot-logo.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
-:root{--bg:#000;--tile:#0B0C0F;--edge:#1C2028;--fg:#E8ECF2;--body:#C3CAD5;--mute:#8A94A6;--acc:#4DA3FF;color-scheme:dark}
+:root{--bg:#000;--tile:#0B0C0F;--tile2:#111318;--edge:#1C2028;--edge2:#2A303B;--fg:#E8ECF2;--body:#C3CAD5;--mute:#8A94A6;--acc:#4DA3FF;--acc-soft:rgba(77,163,255,.14);color-scheme:dark}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 Inter,system-ui,sans-serif}
-.wrap{max-width:900px;margin:0 auto;padding:72px max(20px,env(safe-area-inset-right,0px)) 60px max(20px,env(safe-area-inset-left,0px))}
+a{color:var(--acc)}
+.wrap{max-width:980px;margin:0 auto;padding:72px max(20px,env(safe-area-inset-right,0px)) 60px max(20px,env(safe-area-inset-left,0px))}
 .eyebrow{font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
-h1{font:700 clamp(36px,6vw,54px)/1.05 "Space Grotesk",Inter,sans-serif;color:var(--fg);margin:10px 0 14px}
-.lead{font-size:18px;max-width:34em;margin:0 0 40px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.card{display:flex;gap:16px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:20px;padding:18px;color:inherit;text-decoration:none}
-a.card:hover{border-color:var(--acc)}
-.card img{width:72px;height:72px;flex:0 0 auto}
-.card h2{font:700 20px "Space Grotesk",Inter,sans-serif;color:var(--fg);margin:0 0 2px}
+h1{font:700 clamp(36px,6vw,56px)/1.05 "Space Grotesk",Inter,sans-serif;color:var(--fg);margin:10px 0 14px;text-wrap:balance}
+.lead{font-size:18px;max-width:34em;margin:0 0 20px}
+.jump{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.jump a{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 12px;border-radius:999px;text-decoration:none}
+.jump a:hover{border-color:var(--acc)}
+section{margin-top:52px}
+.sh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--edge);padding-bottom:10px;margin-bottom:16px}
+h2{font:700 24px "Space Grotesk",Inter,sans-serif;color:var(--fg);margin:0}
+.sh span{font-size:13px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{display:flex;gap:16px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:20px;padding:18px;color:inherit;text-decoration:none;min-width:0}
+a.card:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-soft),0 20px 50px -30px var(--acc)}
+.card img{width:72px;height:72px;flex:0 0 auto;border-radius:16px}
+.card h3{font:700 20px "Space Grotesk",Inter,sans-serif;color:var(--fg);margin:0 0 2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .card p{margin:0;font-size:14px}
+.badge{font:700 10.5px Inter,sans-serif;letter-spacing:1.2px;text-transform:uppercase;color:var(--acc);background:var(--acc-soft);border-radius:6px;padding:2px 6px}
+.badge.new{color:#000;background:var(--acc)}
 .soon{opacity:.6}
-footer{margin-top:48px;font-size:13.5px;color:var(--mute)}footer a{color:var(--acc)}
+.empty{background:transparent;border-style:dashed}
+.ico{width:72px;height:72px;flex:0 0 auto;border-radius:16px;background:var(--tile2);border:1px solid var(--edge2);display:grid;place-items:center;font:700 22px "Space Grotesk",sans-serif;color:var(--acc)}
+footer{margin-top:56px;font-size:13.5px;color:var(--mute)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">itsCRA1G</div>
-  <h1>Free Stream Deck tools for streamers.</h1>
-  <p class="lead">Built for my own streams, shared with yours.</p>
-  <div class="grid">
-    <a class="card" href="camo-grind/"><img src="camo-grind/img/logo.png" alt=""><div><h2>Camo Grind</h2><p>Track your Call of Duty camo grind from your Stream Deck and show it on stream. Setup guide →</p></div></a>
-    <div class="card soon"><img src="pilot-logo.png" alt=""><div><h2>Pilot</h2><p>Your stream's cockpit: live stats, alerts and go-live on your Stream Deck. Coming soon.</p></div></div>
-  </div>
-  <footer>Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. Not affiliated with Elgato or Activision.</footer>
+  <h1>Free tools for streamers.</h1>
+  <p class="lead">Stream Deck plugins, OBS overlays and Streamer.bot actions I've built for my own streams, shared for yours. All free.</p>
+  <nav class="jump"><a href="#deck">Stream Deck plugins</a><a href="#overlays">OBS overlays</a><a href="#sb">Streamer.bot actions</a></nav>
+
+  <section id="deck">
+    <div class="sh"><h2>Stream Deck plugins</h2><span>From the Elgato Marketplace</span></div>
+    <div class="grid">
+      <a class="card" href="camo-grind/"><img src="camo-grind/img/logo.png" alt=""><div><h3>Camo Grind</h3><p>Track your Call of Duty camo grind from your Stream Deck and show it on stream. Setup guide →</p></div></a>
+      <div class="card soon"><img src="pilot-logo.png" alt=""><div><h3>Pilot <span class="badge">Coming soon</span></h3><p>Your stream's cockpit: live stats, alerts and go-live on your Stream Deck.</p></div></div>
+    </div>
+  </section>
+
+  <section id="overlays">
+    <div class="sh"><h2>OBS overlays</h2><span>Browser sources, nothing to install</span></div>
+    <div class="grid">
+      <a class="card" href="now-playing/"><img src="now-playing/img/logo.png" alt=""><div><h3>Now Playing <span class="badge new">New</span></h3><p>Show the song you're playing on Spotify, with album art, a progress bar and your own glow colour. Set it up →</p></div></a>
+    </div>
+  </section>
+
+  <section id="sb">
+    <div class="sh"><h2>Streamer.bot actions</h2><span>Import and go</span></div>
+    <div class="grid">
+      <div class="card empty soon"><div class="ico">SB</div><div><h3>On the way</h3><p>Chat commands, raid welcomes and stream automations, ready to import into Streamer.bot.</p></div></div>
+    </div>
+  </section>
+
+  <footer>Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. Not affiliated with Elgato, Activision, Spotify or Streamer.bot.</footer>
 </div>
 </body>
 </html>

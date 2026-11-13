@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Now Playing: free Spotify overlay for OBS</title>
+<meta name="description" content="A free Now Playing overlay for OBS by itsCRA1G. Shows the song you're playing on Spotify, with album art, a progress bar and your own glow colour.">
+<meta property="og:title" content="Now Playing: free Spotify overlay for OBS">
+<meta property="og:description" content="Show the song you're playing on Spotify, on stream. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --warn:#FFB020; --bad:#FF4D4D; --ok:#3DDC97;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+img{max-width:100%}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display);letter-spacing:.2px}
+.brand img{width:34px;height:34px;border-radius:9px}
+.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.bar nav::-webkit-scrollbar{display:none}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:48px;align-items:center}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
+  radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.20),transparent 60%),
+  radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.16),transparent 60%),
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:16/9;max-width:100%}
+.stage:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 2px,transparent 2px 4px);pointer-events:none}
+.stage .tag{position:absolute;left:14px;top:12px;font:700 11px var(--text);letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.stage iframe{position:absolute;left:4%;bottom:6%;width:72%;border:0;background:transparent;aspect-ratio:var(--ar,680/220);height:auto}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 18px var(--display);color:var(--fg);margin:28px 0 8px}
+p{margin:0 0 14px;max-width:44em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}ol.steps li{margin:0 0 8px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.note{display:flex;gap:12px;background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.note.warn{border-left-color:var(--warn)}
+.note b{color:var(--fg)}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.copy input:focus,.field input:focus{outline:2px solid var(--acc);outline-offset:1px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:11px 16px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}
+.btn.ghost:hover{border-color:var(--acc)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.field{display:flex;flex-direction:column;gap:6px;max-width:46em;margin:6px 0 12px}
+.field label{font-size:13px;font-weight:700;color:var(--fg);letter-spacing:.3px}
+.field input{font:15px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.status{font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.status:before{content:"";width:9px;height:9px;border-radius:50%;background:var(--mute)}
+.status.ok{color:var(--ok)}.status.ok:before{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.status.bad{color:var(--bad)}.status.bad:before{background:var(--bad)}
+.style-grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.style-grid{grid-template-columns:1fr}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.ctl .lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw button.art{background:conic-gradient(#FF6FB5,#FFB020,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5)}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.tog{display:flex;flex-direction:column;gap:10px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--acc)}
+.prev .stage iframe{width:84%}
+.prev .cap{font-size:13px;color:var(--mute);margin:10px 0 0}
+.locked{opacity:.5}
+.size{font:600 14px var(--text);color:var(--fg)}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+.tw{overflow-x:auto}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay mode ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
+.np{--g:#4DA3FF;--gr:77,163,255;position:absolute;left:20px;top:20px;font-family:var(--text);color:#E8ECF2;
+  background:linear-gradient(135deg,rgba(17,19,24,.95),rgba(8,9,12,.95));border:1px solid rgba(var(--gr),.38);
+  box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 16px -3px rgba(var(--gr),.5),0 8px 16px -8px rgba(0,0,0,.85);
+  transition:opacity .45s ease,transform .45s ease,border-color .8s,box-shadow .8s;display:flex;align-items:center;overflow:hidden}
+.np.off{opacity:0;transform:translateY(14px)}
+.np .art{position:relative;flex:0 0 auto;background:#14171d;overflow:hidden}
+.np .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .5s}
+.np .art .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--g);font:700 44px var(--display)}
+.np .txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.np .eye{display:flex;align-items:center;gap:10px;color:var(--g);font:700 13px var(--text);letter-spacing:3px;text-transform:uppercase;transition:color .8s}
+.np .eq{display:inline-flex;align-items:flex-end;gap:3px;height:14px}
+.np .eq i{width:3px;height:100%;background:var(--g);border-radius:2px;transform-origin:bottom;animation:eq 1s ease-in-out infinite;transition:background .8s}
+.np .eq i:nth-child(2){animation-delay:-.35s}.np .eq i:nth-child(3){animation-delay:-.7s}.np .eq i:nth-child(4){animation-delay:-.15s}
+.np.paused .eq i{animation-play-state:paused;transform:scaleY(.25)}
+@keyframes eq{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+.np .mq{overflow:hidden;white-space:nowrap}
+.np .mq span{display:inline-block;will-change:transform}
+.np .mq.run span{animation:mq var(--dur,10s) ease-in-out infinite}
+@keyframes mq{0%,18%{transform:translateX(0)}50%,68%{transform:translateX(var(--dx))}100%{transform:translateX(0)}}
+.np .t{font:700 30px/1.15 var(--display);letter-spacing:-.3px;color:#F2F5F9}
+.np .ar{font:500 21px/1.2 var(--text);color:#AEB6C4;margin-top:4px}
+.np .pr{display:flex;align-items:center;gap:12px;font:700 14px var(--text);color:#C3CAD5;font-variant-numeric:tabular-nums}
+.np .trk{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.np .trk b{display:block;height:100%;width:0;border-radius:99px;background:var(--g);box-shadow:0 0 12px rgba(var(--gr),.8);transition:background .8s}
+.np .swap{transition:opacity .25s,transform .25s}
+.np.chg .swap{opacity:0;transform:translateY(6px)}
+.np.noart .art{display:none}
+.np.noprog .pr,.np.noprog .trk{display:none}
+/* card */
+.np.l-card{width:640px;height:180px;border-radius:24px;padding:18px;gap:22px}
+.np.l-card .art{width:144px;height:144px;border-radius:16px}
+.np.l-card .eye{margin-bottom:10px}
+.np.l-card .pr{margin-top:auto}
+.np.l-card .txt{height:144px}
+/* bar */
+.np.l-bar{width:680px;height:80px;border-radius:16px;padding:10px 16px 10px 10px;gap:14px}
+.np.l-bar .art{width:60px;height:60px;border-radius:10px}
+.np.l-bar .eye{display:none}
+.np.l-bar .t{font-size:22px}
+.np.l-bar .ar{font-size:16px;margin-top:2px}
+.np.l-bar .pr{position:absolute;left:0;right:0;bottom:0;gap:0}
+.np.l-bar .pr span{display:none}
+.np.l-bar .trk{height:3px;border-radius:0;background:rgba(255,255,255,.06)}
+.np.l-bar .trk b{border-radius:0}
+.np.l-bar .eqx{display:inline-flex;margin-left:auto;flex:0 0 auto}
+/* minimal */
+.np.l-min{height:48px;max-width:560px;border-radius:999px;padding:0 22px 0 18px;gap:12px;width:auto}
+.np.l-min .art,.np.l-min .pr,.np.l-min .eye>span:not(.eq){display:none}
+.np.l-min .mq{text-overflow:ellipsis}.np.l-min .mq span{display:inline}
+.np.l-min .eye{flex:0 0 auto;letter-spacing:0}
+.np.l-min .txt{flex-direction:row;align-items:baseline;gap:10px;min-width:0}
+.np.l-min .swap{display:flex;align-items:baseline;gap:10px;min-width:0;flex:1}
+.np.l-min .t{font-size:19px;flex:0 1 auto;min-width:0}
+.np.l-min .ar{font-size:16px;margin:0;flex:0 1 auto;min-width:0}
+.np.l-min .ar span:before{content:"\2014\00a0"}
+.np .eqx{display:none}
+.np .msg{display:none}
+.np.err .txt{display:none}.np.err .msg{display:block;font:600 20px/1.4 var(--text);color:#E8ECF2;padding:0 10px}
+.np.err .msg b{color:var(--g)}
+.np.err .art,.np.err .eqx{display:none}
+</style>
+</head>
+<body>
+<div id="ovr"><div id="np" class="np l-card off">
+  <div class="art"><div class="ph">&#9835;</div><img id="a1" alt=""><img id="a2" alt="" style="opacity:0"></div>
+  <div class="txt">
+    <div class="eye"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Now playing</span></div>
+    <div class="swap"><div class="mq t"><span id="t">&nbsp;</span></div><div class="mq ar"><span id="ar">&nbsp;</span></div></div>
+    <div class="pr"><span id="c">0:00</span><div class="trk"><b id="f"></b></div><span id="d">0:00</span></div>
+  </div>
+  <span class="eq eqx" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+  <div class="msg">Now Playing lost its Spotify link.<br>Reconnect at <b>itscra1g.github.io/now-playing</b></div>
+</div></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Now Playing</a>
+  <nav><a href="#make">Spotify app</a><a href="#connect">Connect</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
+      <h1>Show what's playing on Spotify, on stream.</h1>
+      <p class="lead">Album art, a live progress bar and your own glow colour. Long titles scroll, it fades out when you pause, and it runs in a browser source with nothing to install.</p>
+      <div class="chips"><span class="chip">3 layouts</span><span class="chip">7 glow colours</span><span class="chip">Match album art</span><span class="chip">Podcasts too</span></div>
+    </div>
+    <div class="stage" id="heroStage"><span class="tag">Preview</span><iframe id="heroFrame" title="Overlay preview" tabindex="-1"></iframe></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section id="make">
+    <div class="sec-head"><span class="num">1</span><h2>Make your Spotify app</h2></div>
+    <p>Spotify lets each app connect only a handful of accounts, so everyone makes their own. It's free and takes about two minutes, and you only do it once.</p>
+    <ol class="steps">
+      <li>Open the <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">Spotify Developer Dashboard</a> and log in with the Spotify account you stream music from.</li>
+      <li>Press <strong>Create app</strong>. Call it anything (say, <em>My Now Playing</em>) and add any short description.</li>
+      <li>Under <strong>Redirect URIs</strong>, paste this address exactly and press <strong>Add</strong>:</li>
+    </ol>
+    <div class="copy"><input id="redir" readonly aria-label="Redirect URI"><button class="btn ghost" data-copy="redir">Copy</button></div>
+    <ol class="steps" start="4">
+      <li>Under <strong>Which API/SDKs are you planning to use?</strong>, tick <strong>Web API</strong>. Agree to the terms and press <strong>Save</strong>.</li>
+      <li>On the app's page, copy the <strong>Client ID</strong>. You'll paste it in step 2.</li>
+    </ol>
+    <div class="note warn"><div><b>Spotify Premium needed.</b> Spotify only lets Premium accounts own a developer app. That's their rule, not ours.</div></div>
+  </section>
+
+  <section id="connect">
+    <div class="sec-head"><span class="num">2</span><h2>Connect Spotify</h2></div>
+    <p>Paste your Client ID and press Connect. Spotify asks you to allow access, and the overlay can only see what's playing. It can't control your music or see anything else.</p>
+    <div class="field"><label for="cid">Client ID</label><input id="cid" autocomplete="off" spellcheck="false" placeholder="32 letters and numbers from your Spotify app"></div>
+    <div class="row"><button class="btn" id="connectBtn">Connect Spotify</button><span class="status" id="connStatus">Not connected</span></div>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">3</span><h2>Style it</h2></div>
+    <div class="style-grid">
+      <div class="ctl">
+        <div><div class="lbl">Layout</div><div class="seg" id="layoutSeg">
+          <button data-v="card" aria-pressed="true">Card</button><button data-v="bar" aria-pressed="false">Bar</button><button data-v="min" aria-pressed="false">Minimal</button>
+        </div></div>
+        <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Show</div><div class="tog">
+          <label><input type="checkbox" id="optArt" checked>Album art</label>
+          <label><input type="checkbox" id="optProg" checked>Progress bar</label>
+          <label><input type="checkbox" id="optHide" checked>Hide when music is paused</label>
+        </div></div>
+      </div>
+      <div class="prev">
+        <div class="stage"><span class="tag" id="prevTag">Preview · demo song</span><iframe id="prevFrame" title="Overlay preview" tabindex="-1"></iframe></div>
+        <p class="cap" id="prevCap">Connect Spotify to preview it with your own music.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">4</span><h2>Add it to OBS</h2></div>
+    <div id="obsLocked"><p class="locked">Connect Spotify in step 2 and your OBS link appears here.</p></div>
+    <div id="obsReady" hidden>
+      <p>This is your overlay link, with your style built in:</p>
+      <div class="copy"><input id="obsUrl" readonly aria-label="OBS link" type="password"><button class="btn ghost" id="showBtn">Show</button><button class="btn" data-copy="obsUrl">Copy</button></div>
+      <div class="note warn"><div><b>Keep this link private.</b> It's hidden here in case you're live. Anyone with it could see what you're listening to, so don't paste it in chat or show it on stream.</div></div>
+      <ol class="steps">
+        <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+        <li>Paste the link into <strong>URL</strong>.</li>
+        <li>Set the size to <span class="size" id="obsSize">680 × 220</span>. Resize it on your scene as you like and it keeps its shape.</li>
+        <li>Press OK and play a song.</li>
+      </ol>
+      <p>Changed the style? Copy the new link and paste it over the old one in the browser source.</p>
+    </div>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>Spotify says <strong>INVALID_CLIENT: Invalid redirect URI</strong></td><td>The redirect URI in your Spotify app doesn't match. Copy it again from step 1, add it in the app's settings and save.</td></tr>
+      <tr><td>Spotify says the <strong>user isn't registered</strong></td><td>You logged in with a different Spotify account from the one that owns the app. Log in with the owner, or add the other account under <strong>User Management</strong> in the app.</td></tr>
+      <tr><td>Nothing shows in OBS</td><td>Play a song: it stays hidden while nothing is playing, and while paused if you ticked that. Check the browser source size matches step 4.</td></tr>
+      <tr><td>It says <strong>lost its Spotify link</strong></td><td>Come back here, connect again (it's one click), and paste the new link into your browser source.</td></tr>
+      <tr><td>The glow doesn't match the album art</td><td>Some covers won't share their colours with the browser. It falls back to Pilot blue for those.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Spotify.</div></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var GLOWS=[["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"],["art","Match album art"]];
+var SIZES={card:[680,220],bar:[720,120],min:[600,88]};
+var ACC="https://accounts.spotify.com",API="https://api.spotify.com/v1";
+var BASE=location.origin+location.pathname;
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return null}}
+function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}}
+function hx2rgb(h){h=h.replace("#","");return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function hp(){return new URLSearchParams(location.hash.slice(1))}
+
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+/* =================== OVERLAY =================== */
+function overlay(){
+  var np=document.getElementById("np"),ovr=document.getElementById("ovr");
+  var $=function(id){return document.getElementById(id)};
+  var cfg,at=null,exp=0,timer=null,tick=null,cur=null,base=0,baseAt=0,dur=0,playing=false,hideT=null,fails=0,errShown=false,artOn=1,lastArt="";
+  function read(){
+    var p=hp();
+    cfg={cid:p.get("c")||"",l:SIZES[p.get("l")]?p.get("l"):"card",g:(p.get("g")||"4DA3FF").replace("#",""),a:p.get("a")!=="0",pr:p.get("p")!=="0",h:p.get("h")!=="0",rt:p.get("rt")||"",at:p.get("at")||"",demo:p.get("demo")==="1"};
+    np.className="np l-"+cfg.l+(cfg.a?"":" noart")+(cfg.pr?"":" noprog")+(np.classList.contains("off")?" off":"");
+    if(cfg.g!=="art")glow(cfg.g);else glow("4DA3FF");
+    fit();
+  }
+  function glow(hex){np.style.setProperty("--g","#"+hex);np.style.setProperty("--gr",hx2rgb(hex))}
+  function fit(){var s=SIZES[cfg.l];var k=Math.min(innerWidth/s[0],innerHeight/s[1]);ovr.style.transform="scale("+k+")";ovr.style.width=s[0]+"px";ovr.style.height=s[1]+"px"}
+  addEventListener("resize",function(){fit();marq()});
+  addEventListener("hashchange",function(){var was=cfg.demo,wat=cfg.at;read();if(cfg.demo!==was||cfg.at!==wat){start()}else if(cur){paint(cur,true)}});
+
+  function show(on){
+    clearTimeout(hideT);
+    if(on){np.classList.remove("off")}
+    else hideT=setTimeout(function(){np.classList.add("off")},cfg.demo?0:2500);
+  }
+  function fmt(ms){ms=Math.max(0,ms|0);var s=Math.floor(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+  function prog(){
+    if(!cur)return;var p=playing?base+(Date.now()-baseAt):base;if(dur)p=Math.min(p,dur);
+    $("f").style.width=(dur?p/dur*100:0)+"%";$("c").textContent=fmt(p);$("d").textContent=fmt(dur);
+  }
+  function marq(){
+    ["t","ar"].forEach(function(id){
+      var sp=$(id),box=sp.parentNode;box.classList.remove("run");
+      var over=sp.scrollWidth-box.clientWidth;
+      if(over>4&&cfg.l!=="min"){box.style.setProperty("--dx",(-over-8)+"px");box.style.setProperty("--dur",Math.max(8,over/22+6)+"s");box.classList.add("run")}
+    });
+  }
+  function setArt(url){
+    if(url===lastArt)return;lastArt=url;
+    var a1=$("a1"),a2=$("a2");var front=artOn?a1:a2,back=artOn?a2:a1;
+    if(!url){front.style.opacity=0;back.style.opacity=0;if(cfg.g==="art")glow("4DA3FF");return}
+    var im=new Image();im.crossOrigin="anonymous";
+    im.onload=function(){back.src=url;back.style.opacity=1;front.style.opacity=0;artOn=!artOn;if(cfg.g==="art")artGlow(im)};
+    im.onerror=function(){var j=new Image();j.onload=function(){back.src=url;back.style.opacity=1;front.style.opacity=0;artOn=!artOn};j.src=url;if(cfg.g==="art")glow("4DA3FF")};
+    im.src=url;
+  }
+  function artGlow(im){
+    try{
+      var c=document.createElement("canvas");c.width=c.height=24;var x=c.getContext("2d");x.drawImage(im,0,0,24,24);
+      var d=x.getImageData(0,0,24,24).data,best=null,bs=-1;
+      var bins={};
+      for(var i=0;i<d.length;i+=4){
+        var r=d[i],g=d[i+1],b=d[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),sat=mx?(mx-mn)/mx:0;
+        if(mx<50)continue;var key=(r>>5)+","+(g>>5)+","+(b>>5);var w=sat*sat*(mx/255);
+        var e=bins[key]||(bins[key]={r:0,g:0,b:0,w:0,n:0});e.r+=r;e.g+=g;e.b+=b;e.w+=w;e.n++;
+      }
+      for(var k in bins){if(bins[k].w>bs){bs=bins[k].w;best=bins[k]}}
+      if(!best||bs<.5){glow("E8ECF2");return}
+      var R=best.r/best.n,G=best.g/best.n,B=best.b/best.n,M=Math.max(R,G,B);var f=235/M;
+      glow([R,G,B].map(function(v){return Math.round(Math.min(255,v*f)).toString(16).padStart(2,"0")}).join(""));
+    }catch(e){glow("4DA3FF")}
+  }
+  function paint(it,force){
+    var had=!!cur,changed=force||!cur||cur.id!==it.id;cur=it;dur=it.dur;
+    if(changed){
+      np.classList.add("chg");
+      setTimeout(function(){
+        $("t").textContent=it.title||"Unknown";$("ar").textContent=it.by||"";
+        np.classList.remove("chg");marq();
+      },had&&!force?250:0);
+      if(cfg.a)setArt(it.art||"");
+    }
+    prog();
+  }
+  function state(p){
+    np.classList.remove("err");errShown=false;
+    if(!p||!p.item){playing=false;np.classList.add("paused");show(false);return}
+    var it=p.item,ep=it.type==="episode";
+    var imgs=ep?(it.images||(it.show&&it.show.images)||[]):((it.album&&it.album.images)||[]);
+    var art=imgs.length?(imgs.find?imgs.find(function(x){return x.width&&x.width<=320})||imgs[0]:imgs[0]).url:"";
+    var by=ep?(it.show&&it.show.name)||"":(it.artists||[]).map(function(a){return a.name}).join(", ");
+    playing=!!p.is_playing;base=p.progress_ms||0;baseAt=Date.now();
+    np.classList.toggle("paused",!playing);
+    paint({id:it.id||it.uri||it.name,title:it.name,by:by,art:art,dur:it.duration_ms||0});
+    if(playing||!cfg.h)show(true);else show(false);
+  }
+  function lost(){if(errShown)return;errShown=true;np.classList.add("err");np.classList.remove("off");setTimeout(function(){if(errShown)np.classList.add("off")},20000)}
+
+  async function refresh(){
+    if(cfg.at){at=cfg.at;exp=Date.now()+50*60e3;return true}
+    var K="np_rt_"+cfg.cid,cands=[],s=ls(K);if(s)cands.push(s);if(cfg.rt&&cfg.rt!==s)cands.push(cfg.rt);
+    for(var i=0;i<cands.length;i++){
+      var r;try{r=await fetch(ACC+"/api/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({grant_type:"refresh_token",refresh_token:cands[i],client_id:cfg.cid})})}catch(e){return null}
+      if(r.ok){var j=await r.json();at=j.access_token;exp=Date.now()+(j.expires_in||3600)*1000-60e3;ls(K,j.refresh_token||cands[i]);return true}
+      if(r.status>=500)return null;
+    }
+    return false;
+  }
+  async function poll(){
+    var next=3000;
+    try{
+      if(!at||Date.now()>exp){var ok=await refresh();if(ok===false){at=null;lost();next=60000;return}if(ok===null){next=15000;return}}
+      var r=await fetch(API+"/me/player/currently-playing?additional_types=episode",{headers:{Authorization:"Bearer "+at}});
+      if(r.status===204){state(null)}
+      else if(r.status===401){at=null;if(cfg.at){demoMode();return}next=500}
+      else if(r.status===429){next=Math.max(5,+r.headers.get("Retry-After")||30)*1000}
+      else if(r.ok){state(await r.json());fails=0}
+      else{fails++;next=Math.min(60000,3000*fails)}
+    }catch(e){fails++;next=Math.min(60000,3000*fails)}
+    finally{if(!cfg.demo){clearTimeout(timer);timer=setTimeout(poll,next)}}
+  }
+  var DEMO=[
+    {id:"d1",name:"Signal Fires",by:"The Late Shift",c:["#1d4ed8","#38bdf8"],d:214000},
+    {id:"d2",name:"A Really Quite Long Song Title That Scrolls Along",by:"Neon Arcade, Pilot Light",c:["#7c3aed","#f472b6"],d:187000}
+  ];
+  function demoArt(c){return "data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c[0]+'"/><stop offset="1" stop-color="'+c[1]+'"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><circle cx="50" cy="50" r="26" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3"/><circle cx="50" cy="50" r="5" fill="#fff" fill-opacity=".8"/></svg>')}
+  var demoI=0,demoT=null;
+  function demoMode(){
+    clearTimeout(timer);clearInterval(demoT);
+    function put(){var d=DEMO[demoI%DEMO.length];state({is_playing:true,progress_ms:d.d*.38,item:{id:d.id,name:d.name,duration_ms:d.d,artists:d.by.split(", ").map(function(n){return{name:n}}),album:{images:[{url:demoArt(d.c),width:300}]}}})}
+    put();demoT=setInterval(function(){demoI++;put()},9000);
+  }
+  function start(){
+    clearTimeout(timer);clearInterval(demoT);cur=null;lastArt="";at=null;
+    if(cfg.demo)return demoMode();
+    if(!cfg.cid||(!cfg.rt&&!cfg.at&&!ls("np_rt_"+cfg.cid))){lost();return}
+    poll();
+  }
+  read();
+  clearInterval(tick);tick=setInterval(prog,500);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(marq);
+  start();
+}
+
+/* =================== SETUP =================== */
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={l:"card",g:"4DA3FF",a:1,p:1,h:1};
+  try{var sv=JSON.parse(ls("np_style")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  var tok=null;try{tok=JSON.parse(ss("np_tok")||"null")}catch(e){}
+  if(tok&&Date.now()>tok.exp)tok=null;
+  $("redir").value=BASE;
+  $("cid").value=ls("np_cid")||"";
+
+  document.querySelectorAll("[data-copy]").forEach(function(b){
+    b.addEventListener("click",function(){
+      var inp=$(b.dataset.copy),done=function(){var o=b.textContent;b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(inp.value).then(done,function(){sel(inp)});else sel(inp);
+    });
+  });
+  function sel(inp){var t=inp.type;inp.type="text";inp.select();try{document.execCommand("copy")}catch(e){}inp.type=t}
+  $("showBtn").addEventListener("click",function(){var i=$("obsUrl");var h=i.type==="password";i.type=h?"text":"password";this.textContent=h?"Hide":"Show"});
+
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);if(g[0]==="art")b.className="art";else b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.g=b.dataset.v;sync()});
+  $("layoutSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.l=b.dataset.v;sync()});
+  [["optArt","a"],["optProg","p"],["optHide","h"]].forEach(function(x){$(x[0]).addEventListener("change",function(){S[x[1]]=this.checked?1:0;sync()})});
+
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(extra.c)p.set("c",extra.c);p.set("l",S.l);p.set("g",S.g);if(!S.a)p.set("a","0");if(!S.p)p.set("p","0");if(!S.h)p.set("h","0");for(var k in extra)if(k!=="c")p.set(k,extra[k]);return p.toString()}
+  function frame(el,h){var u=BASE+"#"+h;var sz=SIZES[S.l];el.style.setProperty("--ar",sz[0]+"/"+sz[1]);if(!el.dataset.on){el.src=u;el.dataset.on=1}else el.contentWindow.location.replace(u)}
+  function sync(){
+    ls("np_style",JSON.stringify(S));
+    $("layoutSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.l)});
+    sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    nm.textContent=(GLOWS.find(function(g){return g[0]===S.g})||["","" ])[1];
+    $("optArt").checked=!!S.a;$("optProg").checked=!!S.p;$("optHide").checked=!!S.h;
+    var live=tok&&Date.now()<tok.exp;
+    frame($("prevFrame"),hash(live?{c:tok.cid,at:tok.at,h:"0"}:{demo:"1"}));
+    $("prevTag").textContent=live?"Preview · your Spotify":"Preview · demo song";
+    $("prevCap").textContent=live?"Showing what's playing on your Spotify now. Nothing playing? It shows when you press play.":"Connect Spotify to preview it with your own music.";
+    var sz=SIZES[S.l];$("obsSize").textContent=sz[0]+" × "+sz[1];
+    if(tok&&tok.rt){$("obsReady").hidden=false;$("obsLocked").hidden=true;$("obsUrl").value=BASE+"#"+hash({c:tok.cid,rt:tok.rt})}
+    else{$("obsReady").hidden=true;$("obsLocked").hidden=false}
+  }
+  function status(t,c){var s=$("connStatus");s.textContent=t;s.className="status"+(c?" "+c:"")}
+
+  function rnd(n){var a=new Uint8Array(n);crypto.getRandomValues(a);var c="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~",s="";a.forEach(function(b){s+=c[b%c.length]});return s}
+  async function chal(v){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(v));return btoa(String.fromCharCode.apply(null,new Uint8Array(d))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+  $("connectBtn").addEventListener("click",async function(){
+    var cid=$("cid").value.trim();
+    if(!/^[0-9a-f]{32}$/i.test(cid)){status("That doesn't look like a Client ID. It's 32 letters and numbers.","bad");$("cid").focus();return}
+    ls("np_cid",cid);var v=rnd(64),st=rnd(16);ls("np_cv",v);ls("np_st",st);
+    var u=new URL(ACC+"/authorize");
+    u.search=new URLSearchParams({client_id:cid,response_type:"code",redirect_uri:BASE,scope:"user-read-currently-playing user-read-playback-state",code_challenge_method:"S256",code_challenge:await chal(v),state:st}).toString();
+    location.href=u.toString();
+  });
+
+  async function back(){
+    var q=new URLSearchParams(location.search);
+    if(!q.has("code")&&!q.has("error"))return false;
+    history.replaceState(null,"",BASE+"#style");
+    if(q.get("error")){status(q.get("error")==="access_denied"?"You said no on Spotify's page. Press Connect to try again.":"Spotify said: "+q.get("error"),"bad");return true}
+    if(q.get("state")!==ls("np_st")){status("That sign-in didn't match. Press Connect to try again.","bad");return true}
+    var cid=ls("np_cid");status("Connecting…");
+    try{
+      var r=await fetch(ACC+"/api/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({client_id:cid,grant_type:"authorization_code",code:q.get("code"),redirect_uri:BASE,code_verifier:ls("np_cv")||""})});
+      var j=await r.json();
+      if(!r.ok||!j.access_token){status("Spotify wouldn't connect"+(j.error_description?": "+j.error_description:"")+". Check the Client ID and redirect URI.","bad");return true}
+      tok={cid:cid,at:j.access_token,rt:j.refresh_token||"",exp:Date.now()+(j.expires_in||3600)*1000-60e3};
+      ss("np_tok",JSON.stringify(tok));ls("np_cv",null);ls("np_st",null);
+      var m=await fetch(API+"/me/player/currently-playing",{headers:{Authorization:"Bearer "+tok.at}});
+      if(m.status===403){status("Connected, but Spotify blocked this account. See “user isn't registered” below.","bad")}
+      else status("Connected","ok");
+    }catch(e){status("Couldn't reach Spotify. Check your connection and try again.","bad")}
+    return true;
+  }
+  if(tok)status("Connected","ok");
+  frame($("heroFrame"),"ov=1&demo=1&l=card&g=4DA3FF");
+  $("heroFrame").style.setProperty("--ar","680/220");
+  back().then(function(did){sync();if(did&&tok)setTimeout(function(){$("style").scrollIntoView()},50)});
+}
+})();
+</script>
+</body>
+</html>
