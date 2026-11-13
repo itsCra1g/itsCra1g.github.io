@@ -114,7 +114,7 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
 .np{--g:#4DA3FF;--gr:77,163,255;position:absolute;left:20px;top:20px;font-family:var(--text);color:#E8ECF2;
   background:linear-gradient(135deg,rgba(17,19,24,.95),rgba(8,9,12,.95));border:1px solid rgba(var(--gr),.38);
   box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 16px -3px rgba(var(--gr),.5),0 8px 16px -8px rgba(0,0,0,.85);
-  transition:opacity .45s ease,transform .45s ease,border-color .8s,box-shadow .8s;display:flex;align-items:center;overflow:hidden}
+  transition:opacity .25s ease,transform .25s ease,border-color .8s,box-shadow .8s;display:flex;align-items:center;overflow:hidden}
 .np.off{opacity:0;transform:translateY(14px)}
 .np .art{position:relative;flex:0 0 auto;background:#14171d;overflow:hidden}
 .np .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .5s}
@@ -317,7 +317,7 @@ function overlay(){
   function show(on){
     clearTimeout(hideT);
     if(on){np.classList.remove("off")}
-    else hideT=setTimeout(function(){np.classList.add("off")},cfg.demo?0:2500);
+    else hideT=setTimeout(function(){np.classList.add("off")},cfg.demo?0:400);
   }
   function fmt(ms){ms=Math.max(0,ms|0);var s=Math.floor(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
   function prog(){
@@ -393,7 +393,7 @@ function overlay(){
     return false;
   }
   async function poll(){
-    var next=3000;
+    var next=1500;
     try{
       if(!at||Date.now()>exp){var ok=await refresh();if(ok===false){at=null;lost();next=60000;return}if(ok===null){next=15000;return}}
       var r=await fetch(API+"/me/player/currently-playing?additional_types=episode",{headers:{Authorization:"Bearer "+at}});
