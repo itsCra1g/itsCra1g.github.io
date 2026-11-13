@@ -82,6 +82,9 @@ textarea.tin{resize:vertical;min-height:96px;line-height:1.5}
 .sw{display:flex;gap:8px;flex-wrap:wrap}
 .sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
 .sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
 .sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
 .look{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;max-width:46em}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
@@ -327,6 +330,8 @@ function setup(){
   $("addBtn").addEventListener("click",function(){var used=S.list.map(function(x){return x.p});var p=ORDER.find(function(x){return used.indexOf(x)<0})||"web";S.list.push({p:p,h:""});draw();sync();box.lastChild.querySelector("input").focus()});
   var sw=$("glowSw");
   GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
   var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
   sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
   $("bgSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.bg=b.dataset.v;sync()}});
@@ -358,7 +363,8 @@ function setup(){
   function sync(){
     ls("sc_cfg",JSON.stringify(S));
     sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
-    nm.textContent=(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
     $("bgSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.bg)});
     $("fmtSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.f)});
     ["start","brb","end"].forEach(function(k){$("u-"+k).value=BASE+"#"+hash(k)});
