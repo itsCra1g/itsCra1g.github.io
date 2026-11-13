@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discord Live: free go-live post for Streamer.bot</title>
+<meta name="description" content="A free Streamer.bot action by itsCRA1G that posts to your Discord when you go live on Twitch or Kick, with your title, game, links and a stream preview.">
+<meta property="og:title" content="Discord Live: free go-live post for Streamer.bot">
+<meta property="og:description" content="Tell your Discord when you go live on Twitch or Kick. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --warn:#FFB020; --bad:#FF4D4D; --ok:#3DDC97;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:44px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,58px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.note.warn{border-left-color:var(--warn)}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn:hover{background:#8CC4FF;color:#000}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}
+.btn.ghost:hover{border-color:var(--acc)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.tin,select.tin{font:15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:9px 10px;min-width:0;width:100%}
+.tin.mono{font-family:var(--mono);font-size:14px}
+.tin:focus{outline:2px solid var(--acc);outline-offset:1px}
+.tin.bad{border-color:var(--bad)}
+.grid2{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.ctl{display:flex;flex-direction:column;gap:16px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:7px}
+.lbl b{color:var(--fg)}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--acc)}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.sticky{position:sticky;top:84px}
+/* discord preview */
+.dc{background:#313338;border-radius:14px;padding:18px 18px 20px;font:15px/1.375 "gg sans","Noto Sans",Inter,"Helvetica Neue",Arial,sans-serif;color:#dbdee1;border:1px solid #1e1f22}
+.dc .hd{display:flex;gap:14px}
+.dc .av{width:40px;height:40px;border-radius:50%;flex:0 0 auto;background:linear-gradient(135deg,#5865F2,#4DA3FF);display:grid;place-items:center;color:#fff;font:700 16px var(--text)}
+.dc .nm{font-weight:600;color:#f2f3f5}.dc .bot{font:700 10px var(--text);background:#5865F2;color:#fff;border-radius:3px;padding:1px 4px;margin-left:6px;vertical-align:2px}
+.dc .tm{font-size:12px;color:#949ba4;margin-left:6px}
+.dc .ct{margin-top:2px;white-space:pre-wrap;word-wrap:break-word}
+.dc .men{background:rgba(88,101,242,.3);color:#c9cdfb;border-radius:3px;padding:0 2px;font-weight:500}
+.dc .em{margin-top:8px;display:grid;max-width:432px;background:#2b2d31;border-left:4px solid var(--ec,#4DA3FF);border-radius:4px;padding:10px 14px 14px 12px;gap:8px}
+.dc .et{font-weight:600;color:#00a8fc;font-size:16px;word-wrap:break-word}
+.dc .ed{font-size:14px;white-space:pre-wrap;word-wrap:break-word}
+.dc .ed a{color:#00a8fc;text-decoration:none}
+.dc .ei{border-radius:4px;overflow:hidden;aspect-ratio:16/9;background:
+  radial-gradient(60% 70% at 30% 40%,rgba(145,70,255,.55),transparent 70%),radial-gradient(50% 60% at 75% 65%,rgba(77,163,255,.45),transparent 70%),#0e0f13;display:grid;place-items:center;color:rgba(255,255,255,.7);font:700 13px var(--text);letter-spacing:2px;text-transform:uppercase}
+.dc .ef{font-size:12px;color:#b5bac1}
+.code{background:var(--tile);border:1px solid var(--edge);border-radius:14px;margin:12px 0 18px}
+.code .top{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--edge);flex-wrap:wrap}
+.code .top span{font:600 13px var(--mono);color:var(--mute);margin-right:auto}
+.code pre{margin:0;padding:16px;overflow:auto;max-height:420px;font:13px/1.55 var(--mono);color:var(--body)}
+.code pre.blur{filter:blur(5px);user-select:none}
+.status{font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.status.ok{color:var(--ok)}.status.bad{color:var(--bad)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Discord Live</a>
+  <nav><a href="#hook">Webhook</a><a href="#post">Your post</a><a href="#sb">Streamer.bot</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free Streamer.bot action · by itsCRA1G</div>
+    <h1>Tell your Discord when you go live.</h1>
+    <p class="lead">The moment you go live on Twitch or Kick, Streamer.bot posts to your Discord with your stream title, game, links and a live preview. Build your post here, test it, then paste the code in.</p>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">One post per stream</span><span class="chip">Ping a role</span><span class="chip">Live preview image</span></div>
+  </div>
+  <div class="dc" aria-label="Example Discord post">
+    <div class="hd"><div class="av">S</div><div style="min-width:0"><span class="nm">Stream Alerts</span><span class="bot">APP</span><span class="tm">Today at 19:00</span>
+      <div class="ct"><span class="men">@here</span> YourName is live! Come hang out</div>
+      <div class="em" style="--ec:#4DA3FF"><div class="et">Road to 50 | Ranked grind</div><div class="ed">Playing <b>Call of Duty: Warzone</b>
+
+<a>Watch on Twitch</a>  ·  <a>Watch on Kick</a></div><div class="ei">Stream preview</div><div class="ef">Live now</div></div>
+    </div></div>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <section id="hook">
+    <div class="sec-head"><span class="num">1</span><h2>Make a Discord webhook</h2></div>
+    <p>A webhook is a link that lets Streamer.bot post into one of your channels. You need to be able to manage the server.</p>
+    <ol class="steps">
+      <li>In Discord, open <strong>Server Settings → Integrations → Webhooks</strong> and press <strong>New Webhook</strong>.</li>
+      <li>Give it a name and picture (that's who the post comes from), and pick the channel to post in, like <em>#going-live</em>.</li>
+      <li>Press <strong>Copy Webhook URL</strong> and paste it below.</li>
+    </ol>
+    <div class="note warn"><strong>Keep the webhook private.</strong> Anyone with it can post in that channel. This page doesn't store it or send it anywhere except Discord when you press Send test post.</div>
+  </section>
+
+  <section id="post">
+    <div class="sec-head"><span class="num">2</span><h2>Build your post</h2></div>
+    <div class="grid2">
+      <div class="ctl">
+        <div><div class="lbl">Webhook URL</div><input class="tin mono" id="hookUrl" type="password" autocomplete="off" spellcheck="false" placeholder="https://discord.com/api/webhooks/…"><div class="hint" id="hookHint">Not saved anywhere, so paste it again if you reload.</div></div>
+        <div><div class="lbl">Channel name</div><input class="tin" id="name" maxlength="40" placeholder="YourName"></div>
+        <div><div class="lbl">Where you stream (usernames)</div><div class="three"><input class="tin" id="tw" placeholder="Twitch" aria-label="Twitch username"><input class="tin" id="kk" placeholder="Kick" aria-label="Kick username"><input class="tin" id="yt" placeholder="YouTube" aria-label="YouTube handle"></div><div class="hint">Leave a box empty if you don't stream there. YouTube is a link only; it can't trigger the post.</div></div>
+        <div><div class="lbl">Ping</div><select class="tin" id="ping"><option value="">Nobody</option><option value="@here">@here (people online)</option><option value="@everyone">@everyone</option><option value="role">A role…</option></select>
+          <input class="tin mono" id="role" placeholder="Role ID, like 112233445566778899" style="margin-top:8px" hidden><div class="hint" id="roleHint" hidden>Turn on <strong>Developer Mode</strong> in Discord (User Settings → Advanced), then right-click the role in Server Settings → Roles and pick <strong>Copy Role ID</strong>.</div></div>
+        <div><div class="lbl">Message</div><input class="tin" id="msg" maxlength="300"><div class="hint">You can use <code>{channel}</code> <code>{game}</code> <code>{title}</code> <code>{link}</code></div></div>
+        <div><div class="lbl">Card title</div><input class="tin" id="etitle" maxlength="200"><div class="hint"><code>{title}</code> is your stream title.</div></div>
+        <div><div class="lbl">Card colour</div><div class="sw" id="glowSw"></div></div>
+        <div class="tog"><label><input type="checkbox" id="img" checked>Show a preview of the stream</label></div>
+        <div><div class="lbl">Wait before posting <b id="delayV">60 seconds</b></div><input type="range" id="delay" min="0" max="180" step="15" value="60" aria-label="Seconds to wait"><div class="hint">A short wait gives Twitch time to make the preview image and pick up your title.</div></div>
+      </div>
+      <div class="sticky">
+        <div class="lbl">Preview</div>
+        <div class="dc" id="pv"></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap"><button class="btn" id="testBtn" disabled>Send test post</button><span class="status" id="testStatus">Paste your webhook to send a test.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sb">
+    <div class="sec-head"><span class="num">3</span><h2>Add it to Streamer.bot</h2></div>
+    <p>Here's your code, with everything above filled in. It contains your webhook, so it's blurred until you paste one, and you shouldn't share it.</p>
+    <div class="code"><div class="top"><span>DiscordLive.cs</span><button class="btn ghost" id="showCode" disabled>Show</button><button class="btn" id="copyCode" disabled>Copy code</button></div><pre id="code" class="blur"></pre></div>
+    <ol class="steps">
+      <li>In Streamer.bot's <strong>Actions</strong> tab, right-click and pick <strong>Add</strong>. Call it <em>Discord Live</em>.</li>
+      <li>Right-click <strong>Triggers</strong> and add <strong>Twitch → Channel → Stream Online</strong>. If you stream on Kick, also add <strong>Kick → Channel → Stream Online</strong>.</li>
+      <li>Right-click <strong>Sub-Actions</strong>, pick <strong>Core → C# → Execute C# Code</strong>, paste the code over everything, press <strong>Compile</strong>, then <strong>Save and Compile</strong>.</li>
+    </ol>
+    <div class="note">Streaming to Twitch and Kick at once? Both triggers fire, but it only posts once in any 10 minutes, with links to both.</div>
+    <div class="note warn"><strong>Testing:</strong> use <em>Send test post</em> on this page. Streamer.bot's <em>Test Trigger</em> works too, but it counts as going live, so a real stream in the next 10 minutes won't post.</div>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>The test post fails</td><td>Copy the webhook URL again from Discord. If the webhook was deleted, make a new one.</td></tr>
+      <tr><td>Nothing posts when I go live</td><td>Check the action is enabled and has the Stream Online triggers. Streamer.bot's log (in its <em>logs</em> folder) shows a "Discord Live" line if Discord refused the post.</td></tr>
+      <tr><td>The role ping doesn't notify</td><td>Check the role ID, and that the role is allowed to be mentioned (Server Settings → Roles → the role → <em>Allow anyone to @mention</em>).</td></tr>
+      <tr><td>The preview image is blank</td><td>Twitch takes a minute or so to make it. Raise the wait to 90 or 120 seconds.</td></tr>
+      <tr><td>The title says "YourName is live"</td><td>Your Streamer.bot version couldn't fetch the Twitch title, so it used that instead. Put your own words in <em>Card title</em>.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Discord, Twitch, Kick or Streamer.bot.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var TPL="// Discord Live for Streamer.bot, free from itsCRA1G (itscra1g.github.io/discord-live)\n// Triggers: Twitch > Channel > Stream Online, and Kick > Channel > Stream Online.\n// Keep this code private: it contains your Discord webhook.\nusing System;\nusing System.Net.Http;\nusing System.Text;\n\npublic class CPHInline\n{\n    // ===== Your settings (made on the setup page) =====\n    private const string WebhookUrl = \"%%WEBHOOK%%\";\n    private const string ChannelName = \"%%NAME%%\";\n    private const string TwitchName = \"%%TWITCH%%\";   // leave empty if you don't stream there\n    private const string KickName = \"%%KICK%%\";\n    private const string YouTubeName = \"%%YOUTUBE%%\";\n    private const string Ping = \"%%PING%%\";           // \"\", \"@here\", \"@everyone\" or \"<@&ROLE_ID>\"\n    private const string Message = \"%%MESSAGE%%\";     // {channel} {game} {title} {link}\n    private const string EmbedTitle = \"%%ETITLE%%\";\n    private const int Colour = %%COLOUR%%;\n    private const bool ShowPreviewImage = %%IMAGE%%;\n    private const int DelaySeconds = %%DELAY%%;       // wait so the title and preview image are ready\n    private const int CooldownMinutes = 10;           // one post per stream, even when Twitch and Kick both go live\n\n    // ===== Nothing to change below here =====\n\n    private static readonly HttpClient http = new HttpClient();\n\n    public bool Execute()\n    {\n        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();\n        long last = CPH.GetGlobalVar<long>(\"discordlive_last\", true);\n        if (now - last < CooldownMinutes * 60) { CPH.LogInfo(\"Discord Live: already posted for this stream\"); return true; }\n        CPH.SetGlobalVar(\"discordlive_last\", now, true);\n\n        if (DelaySeconds > 0) CPH.Wait(DelaySeconds * 1000);\n\n        string game = Arg(\"game\", Arg(\"category.name\", \"\"));\n        string title = Arg(\"title\", \"\");\n        if (TwitchName != \"\" && (title == \"\" || game == \"\")) TwitchInfo(ref title, ref game);\n        if (title == \"\") title = ChannelName + \" is live\";\n\n        string link = TwitchName != \"\" ? \"https://twitch.tv/\" + TwitchName.ToLower() : KickName != \"\" ? \"https://kick.com/\" + KickName.ToLower() : \"\";\n        var watch = new StringBuilder();\n        if (TwitchName != \"\") watch.Append(\"[Watch on Twitch](https://twitch.tv/\" + TwitchName.ToLower() + \")\");\n        if (KickName != \"\") watch.Append((watch.Length > 0 ? \"  \u00b7  \" : \"\") + \"[Watch on Kick](https://kick.com/\" + KickName.ToLower() + \")\");\n        if (YouTubeName != \"\") watch.Append((watch.Length > 0 ? \"  \u00b7  \" : \"\") + \"[Watch on YouTube](https://youtube.com/@\" + YouTubeName + \"/live)\");\n\n        string content = Fill(Message, game, title, link);\n        if (Ping != \"\") content = Ping + \" \" + content;\n\n        var e = new StringBuilder();\n        e.Append(\"{\\\"title\\\":\" + J(Fill(EmbedTitle, game, title, link)));\n        if (link != \"\") e.Append(\",\\\"url\\\":\" + J(link));\n        string desc = (game != \"\" ? \"Playing **\" + game + \"**\\n\\n\" : \"\") + watch.ToString();\n        if (desc != \"\") e.Append(\",\\\"description\\\":\" + J(desc));\n        e.Append(\",\\\"color\\\":\" + Colour);\n        if (ShowPreviewImage && TwitchName != \"\")\n            e.Append(\",\\\"image\\\":{\\\"url\\\":\" + J(\"https://static-cdn.jtvnw.net/previews-ttv/live_user_\" + TwitchName.ToLower() + \"-1280x720.jpg?t=\" + now) + \"}\");\n        else if (ShowPreviewImage && Arg(\"category.thumbnail\", \"\") != \"\")\n            e.Append(\",\\\"thumbnail\\\":{\\\"url\\\":\" + J(Arg(\"category.thumbnail\", \"\")) + \"}\");\n        e.Append(\",\\\"footer\\\":{\\\"text\\\":\\\"Live now\\\"},\\\"timestamp\\\":\" + J(DateTime.UtcNow.ToString(\"o\")) + \"}\");\n\n        string body = \"{\\\"content\\\":\" + J(content) +\n            \",\\\"allowed_mentions\\\":{\\\"parse\\\":[\\\"everyone\\\",\\\"roles\\\"]},\\\"embeds\\\":[\" + e.ToString() + \"]}\";\n        try\n        {\n            var res = http.PostAsync(WebhookUrl, new StringContent(body, Encoding.UTF8, \"application/json\")).Result;\n            if (!res.IsSuccessStatusCode) CPH.LogWarn(\"Discord Live: Discord said \" + (int)res.StatusCode + \" \" + res.Content.ReadAsStringAsync().Result);\n        }\n        catch (Exception ex) { CPH.LogWarn(\"Discord Live: couldn't post (\" + ex.Message + \")\"); }\n        return true;\n    }\n\n    // Ask Streamer.bot for the Twitch title and game, if this version can.\n    private void TwitchInfo(ref string title, ref string game)\n    {\n        try\n        {\n            var m = CPH.GetType().GetMethod(\"TwitchGetExtendedUserInfoByLogin\");\n            if (m == null) return;\n            object info = m.Invoke(CPH, new object[] { TwitchName });\n            if (info == null) return;\n            if (title == \"\") title = Read(info, \"ChannelTitle\");\n            if (game == \"\") game = Read(info, \"Game\");\n        }\n        catch (Exception) { }\n    }\n\n    private static string Read(object o, string name)\n    {\n        var p = o.GetType().GetProperty(name);\n        if (p != null) return (p.GetValue(o, null) ?? \"\").ToString();\n        var f = o.GetType().GetField(name);\n        return f != null ? (f.GetValue(o) ?? \"\").ToString() : \"\";\n    }\n\n    private string Fill(string s, string game, string title, string link)\n    {\n        return s.Replace(\"{channel}\", ChannelName).Replace(\"{game}\", game == \"\" ? \"something\" : game)\n                .Replace(\"{title}\", title).Replace(\"{link}\", link);\n    }\n\n    private string Arg(string key, string fallback)\n    {\n        object v;\n        if (args.TryGetValue(key, out v) && v != null && v.ToString().Length > 0) return v.ToString();\n        return fallback;\n    }\n\n    private static string J(string s)\n    {\n        var sb = new StringBuilder(\"\\\"\");\n        foreach (char c in s ?? \"\")\n        {\n            if (c == '\"') sb.Append(\"\\\\\\\"\");\n            else if (c == '\\\\') sb.Append(\"\\\\\\\\\");\n            else if (c == '\\n') sb.Append(\"\\\\n\");\n            else if (c == '\\r') { }\n            else if (c < 32) sb.Append(\"\\\\u\" + ((int)c).ToString(\"x4\"));\n            else sb.Append(c);\n        }\n        return sb.Append(\"\\\"\").ToString();\n    }\n}\n";
+var GLOWS=[["4DA3FF","Pilot blue"],["9146FF","Twitch purple"],["53FC18","Kick green"],["5865F2","Discord blurple"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"]];
+var $=function(id){return document.getElementById(id)};
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+var S={name:"",tw:"",kk:"",yt:"",ping:"@here",role:"",msg:"{channel} is live! Come hang out",et:"{title}",g:"4DA3FF",img:1,delay:60};
+try{var sv=JSON.parse(ls("dl_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+var hook="",shown=false;
+function user(s){s=String(s||"").trim().replace(/^https?:\/\//i,"").replace(/^www\./i,"");if(s.indexOf("/")>=0){var a=s.split("/").filter(Boolean);s=a[a.length-1]||""}return s.replace(/^@/,"").slice(0,40)}
+function validHook(u){return /^https:\/\/(?:(?:ptb|canary)\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+$/.test(u.trim())}
+function pingText(){if(S.ping==="role")return /^\d{5,25}$/.test(S.role)?"<@&"+S.role+">":"";return S.ping}
+function fill(s,v){return s.replace(/\{channel\}/g,v.channel).replace(/\{game\}/g,v.game).replace(/\{title\}/g,v.title).replace(/\{link\}/g,v.link)}
+function sample(){var ch=S.name||"YourName";var link=S.tw?"https://twitch.tv/"+S.tw.toLowerCase():S.kk?"https://kick.com/"+S.kk.toLowerCase():"";
+  return {channel:ch,game:"Call of Duty: Warzone",title:"Road to 50 | Ranked grind",link:link}}
+function watch(){var w=[];if(S.tw)w.push(["Watch on Twitch","https://twitch.tv/"+S.tw.toLowerCase()]);if(S.kk)w.push(["Watch on Kick","https://kick.com/"+S.kk.toLowerCase()]);if(S.yt)w.push(["Watch on YouTube","https://youtube.com/@"+S.yt+"/live"]);return w}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function cs(s){return String(s).replace(/\\/g,"\\\\").replace(/"/g,'\\"').replace(/\r?\n/g,"\\n")}
+function render(){
+  var v=sample(),p=pingText(),msg=fill(S.msg,v),w=watch();
+  var pingHtml=p?'<span class="men">'+(S.ping==="role"?"@Live Ping":esc(p))+"</span> ":"";
+  var d='<div class="hd"><div class="av">'+esc((S.name||"S").charAt(0).toUpperCase())+'</div><div style="min-width:0"><span class="nm">Your webhook</span><span class="bot">APP</span><span class="tm">Today at 19:00</span>'+
+    '<div class="ct">'+pingHtml+esc(msg)+'</div><div class="em" style="--ec:#'+S.g+'"><div class="et">'+esc(fill(S.et,v)||v.title)+'</div>'+
+    '<div class="ed">Playing <b>'+esc(v.game)+'</b>'+(w.length?"\n\n"+w.map(function(x){return '<a href="'+esc(x[1])+'" target="_blank" rel="noopener">'+esc(x[0])+"</a>"}).join("  ·  "):"")+'</div>'+
+    (S.img&&S.tw?'<div class="ei">Stream preview</div>':"")+'<div class="ef">Live now</div></div></div></div>';
+  $("pv").innerHTML=d;
+}
+function code(){
+  var r={WEBHOOK:hook.trim(),NAME:S.name||"My channel",TWITCH:S.tw,KICK:S.kk,YOUTUBE:S.yt,PING:pingText(),MESSAGE:S.msg,ETITLE:S.et||"{title}",COLOUR:String(parseInt(S.g,16)),IMAGE:S.img?"true":"false",DELAY:String(S.delay)};
+  var s=TPL;for(var k in r){var val=(k==="COLOUR"||k==="IMAGE"||k==="DELAY")?r[k]:cs(r[k]);s=s.split("%%"+k+"%%").join(val)}
+  return s;
+}
+function sync(){
+  ls("dl_cfg",JSON.stringify(S));
+  var ok=validHook(hook);
+  $("hookUrl").classList.toggle("bad",hook.length>0&&!ok);
+  $("hookHint").textContent=hook.length>0&&!ok?"That doesn't look like a Discord webhook URL.":"Not saved anywhere, so paste it again if you reload.";
+  $("testBtn").disabled=!ok;$("showCode").disabled=!ok;$("copyCode").disabled=!ok;
+  if(!ok){$("testStatus").textContent="Paste your webhook to send a test.";$("testStatus").className="status"}
+  $("role").hidden=S.ping!=="role";$("roleHint").hidden=S.ping!=="role";
+  $("delayV").textContent=S.delay?S.delay+" seconds":"no wait";
+  var isC=!GLOWS.some(function(g){return g[0]===S.g});
+  sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+  cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+  nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+  $("code").textContent=ok?code():code().replace(/WebhookUrl = ".*?";/,'WebhookUrl = "paste your webhook in step 2";');
+  $("code").classList.toggle("blur",!(ok&&shown));
+  render();
+}
+var sw=$("glowSw");
+GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
+var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
+sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+$("name").value=S.name;$("tw").value=S.tw;$("kk").value=S.kk;$("yt").value=S.yt;$("ping").value=S.ping;$("role").value=S.role;$("msg").value=S.msg;$("etitle").value=S.et;$("img").checked=!!S.img;$("delay").value=S.delay;
+$("hookUrl").addEventListener("input",function(){hook=this.value.trim();sync()});
+$("name").addEventListener("input",function(){S.name=this.value.trim();sync()});
+[["tw","tw"],["kk","kk"],["yt","yt"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=user(this.value);sync()})});
+$("ping").addEventListener("change",function(){S.ping=this.value;sync()});
+$("role").addEventListener("input",function(){S.role=this.value.replace(/\D/g,"");sync()});
+$("msg").addEventListener("input",function(){S.msg=this.value;sync()});
+$("etitle").addEventListener("input",function(){S.et=this.value;sync()});
+$("img").addEventListener("change",function(){S.img=this.checked?1:0;sync()});
+$("delay").addEventListener("input",function(){S.delay=+this.value;sync()});
+$("showCode").addEventListener("click",function(){shown=!shown;this.textContent=shown?"Hide":"Show";sync()});
+$("copyCode").addEventListener("click",function(){var b=this,t=code();var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy code"},1500)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){shown=true;sync()});else{shown=true;sync()}});
+$("testBtn").addEventListener("click",async function(){
+  var st=$("testStatus"),v=sample(),w=watch(),p=pingText();st.className="status";st.textContent="Sending…";
+  var embed={title:"[TEST] "+(fill(S.et,v)||v.title),color:parseInt(S.g,16),description:"Playing **"+v.game+"**"+(w.length?"\n\n"+w.map(function(x){return "["+x[0]+"]("+x[1]+")"}).join("  ·  "):""),footer:{text:"Test post from Discord Live · itscra1g.github.io"},timestamp:new Date().toISOString()};
+  if(v.link)embed.url=v.link;
+  var body={content:(p?p+" ":"")+fill(S.msg,v),allowed_mentions:{parse:[]},embeds:[embed]};
+  try{var r=await fetch(hook+"?wait=true",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(r.ok){st.className="status ok";st.textContent="Sent! Check your Discord channel. (Pings are switched off for tests.)"}
+    else{var t="";try{t=(await r.json()).message||""}catch(e){}st.className="status bad";st.textContent="Discord said no"+(t?": "+t:" ("+r.status+")")+". Check the webhook URL."}}
+  catch(e){st.className="status bad";st.textContent="Couldn't reach Discord. Check your connection and the webhook URL."}
+});
+sync();
+})();
+</script>
+</body>
+</html>
