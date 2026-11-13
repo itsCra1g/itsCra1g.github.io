@@ -49,6 +49,7 @@ code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px so
 .code{position:relative;background:var(--tile);border:1px solid var(--edge);border-radius:14px;margin:12px 0 18px}
 .code .top{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--edge)}
 .code .top span{font:600 13px var(--mono);color:var(--mute);margin-right:auto}
+.code pre.imp{white-space:pre-wrap;word-break:break-all;max-height:140px;font-size:12px;color:var(--mute)}
 .code pre{margin:0;padding:16px;overflow:auto;max-height:520px;font:13.5px/1.55 var(--mono);color:var(--body)}
 .code .c{color:#6B7689}.code .s{color:#3DDC97}.code .k{color:#B57BFF}
 .btn{font:700 13px var(--text);color:#000;background:var(--acc);border:0;border-radius:9px;padding:8px 13px;cursor:pointer;text-decoration:none}
@@ -66,7 +67,7 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
 <body>
 <header class="bar"><div class="wrap">
   <a class="brand" href="../"><span class="ico">SB</span>Raid Welcome</a>
-  <nav><a href="#code">Code</a><a href="#setup">Set up</a><a href="#edit">Make it yours</a><a href="#help">Help</a></nav>
+  <nav><a href="#import">Import</a><a href="#code">By hand</a><a href="#edit">Make it yours</a><a href="#help">Help</a></nav>
   <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
 </div></header>
 
@@ -87,9 +88,26 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
 </div></div>
 
 <main class="wrap">
+  <section id="import">
+    <div class="sec-head"><span class="num">1</span><h2>Import it</h2></div>
+    <p>The quickest way: one string brings in the whole action, with its Raid trigger and code already set up.</p>
+    <div class="code">
+      <div class="top"><span>Raid Welcome import string</span><button class="btn" id="copyImp">Copy import string</button></div>
+      <pre id="imp" class="imp">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</pre>
+    </div>
+    <ol class="steps">
+      <li>In Streamer.bot, press <strong>Import</strong> in the top bar.</li>
+      <li>Paste the string into the <strong>Import String</strong> box. You'll see <em>Raid Welcome</em> listed under Actions.</li>
+      <li>Press <strong>Import</strong>. The action appears in your Actions list, in a group called <em>Raid</em>.</li>
+      <li>Test it: right-click its Raid trigger and pick <strong>Test Trigger</strong>.</li>
+    </ol>
+    <div class="note warn"><strong>For the Twitch shoutout,</strong> the account that sends your chat messages must be a moderator in your channel. If you use a separate bot account, type <code>/mod yourbotname</code> in your chat.</div>
+    <p>To change the messages, open the action, double-click its <strong>Execute C# Code</strong> step and see <a href="#edit">Make it yours</a>.</p>
+  </section>
+
   <section id="code">
-    <div class="sec-head"><span class="num">1</span><h2>Get the code</h2></div>
-    <p>Copy it here, or download the file. You'll paste it into Streamer.bot in step 2.</p>
+    <div class="sec-head"><span class="num">2</span><h2>Or set it up by hand</h2></div>
+    <p>Prefer to build it yourself? Copy the code here, or download the file, then follow the steps below.</p>
     <div class="code">
       <div class="top"><span>RaidWelcome.cs</span><a class="btn ghost" href="RaidWelcome.cs" download>Download</a><button class="btn" id="copyBtn">Copy code</button></div>
       <pre id="src"><span class="c">// Raid Welcome for Streamer.bot, free from itsCRA1G (itscra1g.github.io/raid-welcome)</span>
@@ -178,19 +196,20 @@ public class CPHInline
 }
 </pre>
     </div>
-  </section>
+  
 
-  <section id="setup">
-    <div class="sec-head"><span class="num">2</span><h2>Set it up in Streamer.bot</h2></div>
+  <div id="setup">
+    <h3 style="font:700 19px var(--display);color:var(--fg);margin:28px 0 10px">Set it up in Streamer.bot</h3>
     <ol class="steps">
       <li>Open the <strong>Actions</strong> tab, right-click in the Actions list and pick <strong>Add</strong>. Call it <em>Raid Welcome</em> and press OK.</li>
       <li>In the <strong>Triggers</strong> box, right-click and pick <strong>Twitch → Channel → Raid</strong>. Leave its settings as they are and press OK.</li>
       <li>In the <strong>Sub-Actions</strong> box, right-click and pick <strong>Core → C# → Execute C# Code</strong>.</li>
-      <li>Delete everything in the code window, paste the code from step 1, then press <strong>Compile</strong>. It should say <em>Compiled successfully</em>.</li>
+      <li>Delete everything in the code window, paste the code from above, then press <strong>Compile</strong>. It should say <em>Compiled successfully</em>.</li>
       <li>Press <strong>Save and Compile</strong>, and make sure the action is ticked as enabled.</li>
     </ol>
     <div class="note"><strong>Test it without waiting for a raid:</strong> right-click the Raid trigger and pick <strong>Test Trigger</strong>. Your bot posts the messages in your chat.</div>
     <div class="note warn"><strong>For the Twitch shoutout,</strong> the account that sends your chat messages must be a moderator in your channel. If you use a separate bot account, type <code>/mod yourbotname</code> in your chat.</div>
+  </div>
   </section>
 
   <section id="edit">
@@ -221,12 +240,13 @@ public class CPHInline
 
 <footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot or Twitch.</div></footer>
 <script>
-document.getElementById("copyBtn").addEventListener("click",function(){
-  var b=this,t=document.getElementById("src").innerText;
-  function done(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy code"},1500)}
+function wire(btn,pre,label){document.getElementById(btn).addEventListener("click",function(){
+  var b=this,t=document.getElementById(pre).innerText.trim();
+  function done(){b.textContent="Copied";setTimeout(function(){b.textContent=label},1500)}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,sel);else sel();
-  function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById("src"));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand("copy");done()}catch(e){}}
-});
+  function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById(pre));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand("copy");done()}catch(e){}}
+});}
+wire("copyBtn","src","Copy code");wire("copyImp","imp","Copy import string");
 </script>
 </body>
 </html>
