@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raid Welcome: free Streamer.bot action</title>
+<meta name="description" content="A free Streamer.bot action by itsCRA1G: welcomes raiders with a rotating message, posts a shoutout with their link and sends Twitch's own shoutout.">
+<meta property="og:title" content="Raid Welcome: free Streamer.bot action">
+<meta property="og:description" content="Welcome raiders, shout them out and send a Twitch shoutout, automatically.">
+<link rel="icon" href="../pilot-logo.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#000;--tile:#0B0C0F;--tile2:#111318;--edge:#1C2028;--edge2:#2A303B;--fg:#E8ECF2;--body:#C3CAD5;--mute:#8A94A6;--acc:#4DA3FF;--acc-soft:rgba(77,163,255,.14);--warn:#FFB020;
+--display:"Space Grotesk",Inter,system-ui,sans-serif;--text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand .ico{width:34px;height:34px;border-radius:9px;background:var(--tile2);border:1px solid var(--edge2);display:grid;place-items:center;font:700 13px var(--display);color:var(--acc)}
+.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:760px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:60px 44px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:44px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,58px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.chat{background:var(--tile);border:1px solid var(--edge);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;font-size:14.5px;box-shadow:0 30px 80px -40px var(--acc)}
+.chat .hd{font:700 11px var(--text);letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--edge);padding-bottom:10px}
+.msg b{color:#B57BFF}.msg .bot{color:var(--acc)}.msg.sys{background:rgba(181,123,255,.12);border-left:3px solid #B57BFF;padding:8px 10px;border-radius:8px;color:var(--fg)}
+.msg .lnk{color:var(--acc);text-decoration:underline}
+main section{padding-block:48px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}ol.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.code{position:relative;background:var(--tile);border:1px solid var(--edge);border-radius:14px;margin:12px 0 18px}
+.code .top{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--edge)}
+.code .top span{font:600 13px var(--mono);color:var(--mute);margin-right:auto}
+.code pre{margin:0;padding:16px;overflow:auto;max-height:520px;font:13.5px/1.55 var(--mono);color:var(--body)}
+.code .c{color:#6B7689}.code .s{color:#3DDC97}.code .k{color:#B57BFF}
+.btn{font:700 13px var(--text);color:#000;background:var(--acc);border:0;border-radius:9px;padding:8px 13px;cursor:pointer;text-decoration:none}
+.btn:hover{background:#8CC4FF;color:#000}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.note.warn{border-left-color:var(--warn)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><span class="ico">SB</span>Raid Welcome</a>
+  <nav><a href="#code">Code</a><a href="#setup">Set up</a><a href="#edit">Make it yours</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free Streamer.bot action · by itsCRA1G</div>
+    <h1>Welcome every raid, automatically.</h1>
+    <p class="lead">When someone raids you on Twitch, it posts a welcome, drops a shoutout with their link a few seconds later and sends Twitch's own shoutout too.</p>
+    <div class="chips"><span class="chip">Rotating messages</span><span class="chip">Never repeats twice</span><span class="chip">Twitch shoutout</span><span class="chip">Minimum raid size</span></div>
+  </div>
+  <div class="chat" aria-label="Example chat">
+    <div class="hd">Stream chat</div>
+    <div class="msg sys"><b>CoolStreamer</b> is raiding with a party of 12.</div>
+    <div class="msg"><span class="bot">YourBot</span>: RAID! CoolStreamer just landed with 12 viewers. Make yourselves at home, everyone!</div>
+    <div class="msg"><span class="bot">YourBot</span>: Go show CoolStreamer some love, they were live just now: <span class="lnk">twitch.tv/coolstreamer</span></div>
+    <div class="msg sys">YourBot gave a shoutout to <b>CoolStreamer</b>.</div>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <section id="code">
+    <div class="sec-head"><span class="num">1</span><h2>Get the code</h2></div>
+    <p>Copy it here, or download the file. You'll paste it into Streamer.bot in step 2.</p>
+    <div class="code">
+      <div class="top"><span>RaidWelcome.cs</span><a class="btn ghost" href="RaidWelcome.cs" download>Download</a><button class="btn" id="copyBtn">Copy code</button></div>
+      <pre id="src"><span class="c">// Raid Welcome for Streamer.bot, free from itsCRA1G (itscra1g.github.io/raid-welcome)</span>
+<span class="c">// Trigger: Twitch &gt; Channel &gt; Raid. Sub-action: Core &gt; C# &gt; Execute C# Code.</span>
+using System;
+
+public class CPHInline
+{
+<span class="c">    // ===== Change these to suit your stream =====</span>
+
+<span class="c">    // Welcome messages. One is picked at random each raid, never the same twice in a row.</span>
+<span class="c">    // {user} = the raider's name, {viewers} = how many they brought.</span>
+    private static readonly string[] Welcomes = new[]
+    {
+        <span class="s">"Welcome in, raiders! Huge thanks to {user} for bringing {viewers} people over. Grab a seat and say hi!"</span>,
+        <span class="s">"RAID! {user} just landed with {viewers} viewers. Make yourselves at home, everyone!"</span>,
+        <span class="s">"Look who it is! {user} and {viewers} friends have arrived. Thanks so much for the raid!"</span>
+    };
+
+<span class="c">    // Shoutout lines, posted a few seconds after the welcome. {link} = the raider's channel.</span>
+    private static readonly string[] Shoutouts = new[]
+    {
+        <span class="s">"Go show {user} some love, they were live just now: {link}"</span>,
+        <span class="s">"{user} is a top streamer, give them a follow: {link}"</span>,
+        <span class="s">"Check out {user} over at {link}"</span>
+    };
+
+<span class="c">    // Raids smaller than this are ignored. 1 = welcome every raid.</span>
+    private const int MinViewers = 1;
+
+<span class="c">    // Seconds to wait between the welcome and the shoutout line.</span>
+    private const int ShoutoutDelaySeconds = 3;
+
+<span class="c">    // Also send Twitch's own /shoutout? Your bot account must be a mod for this.</span>
+    private const bool NativeShoutout = true;
+
+<span class="c">    // ===== Nothing to change below here =====</span>
+
+    public bool Execute()
+    {
+        string user = Arg(<span class="s">"user"</span>, Arg(<span class="s">"userName"</span>, <span class="s">"someone"</span>));
+        string login = Arg(<span class="s">"userName"</span>, user).ToLower();
+        int viewers = 0;
+        int.TryParse(Arg(<span class="s">"viewers"</span>, <span class="s">"0"</span>), out viewers);
+
+        if (viewers &lt; MinViewers)
+            return true;
+
+        string welcome = Pick(Welcomes, <span class="s">"raidwelcome_lastWelcome"</span>)
+            .Replace(<span class="s">"{user}"</span>, user)
+            .Replace(<span class="s">"{viewers}"</span>, viewers.ToString());
+        CPH.SendMessage(welcome);
+
+        CPH.Wait(ShoutoutDelaySeconds * 1000);
+
+        string shout = Pick(Shoutouts, <span class="s">"raidwelcome_lastShout"</span>)
+            .Replace(<span class="s">"{user}"</span>, user)
+            .Replace(<span class="s">"{link}"</span>, <span class="s">"https://twitch.tv/"</span> + login);
+        CPH.SendMessage(shout);
+
+        if (NativeShoutout)
+        {
+            try { CPH.TwitchSendShoutoutByLogin(login); }
+            catch (Exception e) { CPH.LogInfo(<span class="s">"Raid Welcome: Twitch shoutout skipped ("</span> + e.Message + <span class="s">")"</span>); }
+        }
+        return true;
+    }
+
+    private string Arg(string key, string fallback)
+    {
+        object v;
+        if (args.TryGetValue(key, out v) &amp;&amp; v != null &amp;&amp; v.ToString().Length &gt; 0)
+            return v.ToString();
+        return fallback;
+    }
+
+    private string Pick(string[] list, string varName)
+    {
+        if (list.Length == 1) return list[0];
+        int last = CPH.GetGlobalVar&lt;int&gt;(varName, false);
+        int i;
+        do { i = new Random().Next(list.Length); } while (i == last - 1);
+        CPH.SetGlobalVar(varName, i + 1, false);
+        return list[i];
+    }
+}
+</pre>
+    </div>
+  </section>
+
+  <section id="setup">
+    <div class="sec-head"><span class="num">2</span><h2>Set it up in Streamer.bot</h2></div>
+    <ol class="steps">
+      <li>Open the <strong>Actions</strong> tab, right-click in the Actions list and pick <strong>Add</strong>. Call it <em>Raid Welcome</em> and press OK.</li>
+      <li>In the <strong>Triggers</strong> box, right-click and pick <strong>Twitch → Channel → Raid</strong>. Leave its settings as they are and press OK.</li>
+      <li>In the <strong>Sub-Actions</strong> box, right-click and pick <strong>Core → C# → Execute C# Code</strong>.</li>
+      <li>Delete everything in the code window, paste the code from step 1, then press <strong>Compile</strong>. It should say <em>Compiled successfully</em>.</li>
+      <li>Press <strong>Save and Compile</strong>, and make sure the action is ticked as enabled.</li>
+    </ol>
+    <div class="note"><strong>Test it without waiting for a raid:</strong> right-click the Raid trigger and pick <strong>Test Trigger</strong>. Your bot posts the messages in your chat.</div>
+    <div class="note warn"><strong>For the Twitch shoutout,</strong> the account that sends your chat messages must be a moderator in your channel. If you use a separate bot account, type <code>/mod yourbotname</code> in your chat.</div>
+  </section>
+
+  <section id="edit">
+    <div class="sec-head"><span class="num">3</span><h2>Make it yours</h2></div>
+    <p>Everything you'd want to change is at the top of the code, above <em>Nothing to change below here</em>. Edit it in the code window and press <strong>Save and Compile</strong> again.</p>
+    <div class="tw"><table>
+      <tr><th>Setting</th><th>What it does</th></tr>
+      <tr><td><code>Welcomes</code></td><td>The welcome messages. Add as many as you like, each in quotes with a comma after it. <code>{user}</code> becomes the raider's name and <code>{viewers}</code> how many they brought.</td></tr>
+      <tr><td><code>Shoutouts</code></td><td>The shoutout lines. <code>{link}</code> becomes the raider's Twitch link.</td></tr>
+      <tr><td><code>MinViewers</code></td><td>Raids smaller than this are ignored. Set it to 5, say, to skip one-person raids.</td></tr>
+      <tr><td><code>ShoutoutDelaySeconds</code></td><td>The gap between the welcome and the shoutout line.</td></tr>
+      <tr><td><code>NativeShoutout</code></td><td>Set to <code>false</code> to turn off Twitch's own shoutout.</td></tr>
+    </table></div>
+    <p>Keep chat messages under 500 characters, Twitch's limit.</p>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>It won't compile</td><td>Make sure you pasted over everything in the code window, and that any message you edited still has quotes at both ends and a comma after it.</td></tr>
+      <tr><td>Messages post, but no Twitch shoutout</td><td>Your bot account isn't a mod, or Twitch's limit kicked in: one shoutout every 2 minutes, and the same streamer once an hour.</td></tr>
+      <tr><td>Nothing happens on a raid</td><td>Check the action is enabled, the trigger is Twitch → Channel → Raid, and the raid is at least <code>MinViewers</code>.</td></tr>
+      <tr><td>Does it work on Kick?</td><td>Not yet. Streamer.bot doesn't have a Kick raid trigger.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot or Twitch.</div></footer>
+<script>
+document.getElementById("copyBtn").addEventListener("click",function(){
+  var b=this,t=document.getElementById("src").innerText;
+  function done(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy code"},1500)}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,sel);else sel();
+  function sel(){var r=document.createRange();r.selectNodeContents(document.getElementById("src"));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand("copy");done()}catch(e){}}
+});
+</script>
+</body>
+</html>
