@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Combined Chat: Twitch and Kick chat in one OBS overlay</title>
+<meta name="description" content="A free OBS chat overlay by itsCRA1G that shows your Twitch and Kick chat together, with emotes, badges and platform icons, through Streamer.bot.">
+<meta property="og:title" content="Combined Chat: Twitch and Kick chat in one overlay">
+<meta property="og:description" content="Show Twitch and Kick chat together on stream. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --warn:#FFB020;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
+  radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.18),transparent 60%),
+  radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.14),transparent 60%),
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:9/12;max-width:100%}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}
+.grid2{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.lbl b{color:var(--fg)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.tog{display:flex;flex-direction:column;gap:10px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--acc)}
+.tin{width:100%;font:15px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+details{max-width:46em}summary{cursor:pointer;font-weight:600;color:var(--fg);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 100px;gap:8px;margin-top:10px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0;height:100%}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:flex;position:fixed;inset:0;flex-direction:column;justify-content:flex-end;padding:12px;gap:var(--gap,8px);overflow:hidden;font-family:var(--text);font-size:var(--fs,22px);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 60px);mask-image:linear-gradient(to bottom,transparent 0,#000 60px)}
+.m{--g:#4DA3FF;--gr:77,163,255;--o:.85;position:relative;color:#F2F5F9;line-height:1.35;word-wrap:break-word;overflow-wrap:anywhere;animation:in .35s cubic-bezier(.2,.9,.2,1);transition:opacity .6s,transform .6s}
+@keyframes in{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+.m.bye{opacity:0;transform:translateX(-10px)}
+.m .who{font-weight:700;white-space:nowrap}
+.m .bd{height:1em;width:auto;vertical-align:-.15em;margin-right:4px}
+.m .av{display:inline-block;width:1.45em;height:1.45em;border-radius:50%;object-fit:cover;vertical-align:-.4em;margin-right:7px;background:#2A303B}
+.m .avi{display:inline-grid;place-items:center;width:1.45em;height:1.45em;border-radius:50%;vertical-align:-.4em;margin-right:7px;font-weight:700;font-size:.8em;color:#000}
+.ov-cards .m .av,.ov-cards .m .avi{width:1.7em;height:1.7em}
+.m .chipb{display:inline-block;font:700 .55em/1.6 var(--text);letter-spacing:.06em;padding:0 .45em;border-radius:.35em;margin-right:4px;vertical-align:.25em;color:#000}
+.m .pf{display:inline-grid;place-items:center;width:1.1em;height:1.1em;border-radius:.28em;vertical-align:-.2em;margin-right:6px}
+.m .pf svg{width:.72em;height:.72em;fill:#000}
+.m .pf.tw{background:#9146FF}.m .pf.tw svg{fill:#fff}.m .pf.kk{background:#53FC18}
+.m .em{height:1.6em;width:auto;vertical-align:-.45em;margin:0 1px}
+.m .tx{color:#E6EAF0}
+/* cards */
+.ov-cards .m{background:linear-gradient(135deg,rgba(17,19,24,var(--o)),rgba(8,9,12,var(--o)));border:1px solid rgba(var(--gr),.3);border-left:3px solid rgb(var(--gr));border-radius:14px;padding:.45em .7em;box-shadow:0 0 14px -6px rgba(var(--gr),.6)}
+.ov-cards .m .head{display:flex;align-items:center;margin-bottom:.1em}
+.ov-cards .m .head .who{font-size:.86em}
+/* classic */
+.ov-classic .m{background:rgba(8,9,12,var(--o));border-radius:10px;padding:.3em .6em}
+.ov-classic .m .head{display:inline}
+.ov-classic .m .head .who:after{content:":";margin-right:.35em;color:#AEB6C4;font-weight:600}
+/* clean */
+.ov-clean .m{text-shadow:0 1px 3px #000,0 0 8px rgba(0,0,0,.85)}
+.ov-clean .m .head{display:inline}
+.ov-clean .m .head .who:after{content:":";margin-right:.35em;color:#D7DDE6}
+.ov-clean .m .pf{box-shadow:0 1px 3px rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+<div id="ovr"></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Combined Chat</a>
+  <nav><a href="#setup">Set up</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
+    <h1>Twitch and Kick chat, together on stream.</h1>
+    <p class="lead">Streaming to both? Show one chat on screen with everyone in it: Twitch and Kick messages side by side, with profile pictures, emotes, badges, name colours and a little platform icon so viewers know where each one came from.</p>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">Profile pictures</span><span class="chip">Emotes and badges</span><span class="chip">3 styles</span><span class="chip">Deleted messages vanish</span><span class="chip">No Streamer.bot action needed</span></div>
+  </div>
+  <div class="stage"><iframe id="heroFrame" title="Chat preview" tabindex="-1"></iframe></div>
+</div></div>
+
+<main class="wrap">
+  <section id="setup">
+    <div class="sec-head"><span class="num">1</span><h2>Turn on Streamer.bot's WebSocket server</h2></div>
+    <p>The chat comes straight from <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> (1.0 or later), connected to Twitch, Kick or both. There's no action or code to add.</p>
+    <ol class="steps">
+      <li>In Streamer.bot, open <strong>Servers/Clients → WebSocket Server</strong>.</li>
+      <li>Tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Leave it on <code>127.0.0.1</code> port <code>8080</code> unless you've changed it.</li>
+    </ol>
+    <p>That's it. Already set up for Sub Goal or Credits? Then you're done.</p>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">2</span><h2>Style it</h2></div>
+    <div class="grid2">
+      <div class="ctl">
+        <div><div class="lbl">Style</div><div class="seg" id="lySeg"><button data-v="cards" aria-pressed="true">Cards</button><button data-v="classic" aria-pressed="false">Classic</button><button data-v="clean" aria-pressed="false">Clean</button></div>
+          <div class="hint">Cards: a glowing bubble each. Classic: name and message on a dark strip. Clean: just text with a shadow.</div></div>
+        <div><div class="lbl">Card glow</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Background <b id="opV">85%</b></div><input type="range" id="op" min="0" max="100" step="5" value="85" aria-label="Background opacity"></div>
+        <div><div class="lbl">Text size <b id="fsV">22</b></div><input type="range" id="fs" min="14" max="40" step="1" value="22" aria-label="Text size"></div>
+        <div><div class="lbl">Messages disappear after <b id="ttlV">never</b></div><input type="range" id="ttl" min="0" max="120" step="5" value="0" aria-label="Seconds before messages fade"></div>
+        <div class="tog">
+          <label><input type="checkbox" id="optAv" checked>Profile pictures</label>
+          <label><input type="checkbox" id="optPf" checked>Twitch / Kick icon on each message</label>
+          <label><input type="checkbox" id="optBd" checked>Chat badges (mod, VIP, sub and the rest)</label>
+          <label><input type="checkbox" id="optCol" checked>Viewers' own name colours</label>
+          <label><input type="checkbox" id="optCmd" checked>Hide !commands</label>
+          <label><input type="checkbox" id="optBot" checked>Hide bot messages</label>
+        </div>
+        <div><div class="lbl">Also hide these names</div><input class="tin" id="hide" placeholder="e.g. mybot, anotherbot" spellcheck="false"><div class="hint">With <em>Hide bot messages</em> on, these are already hidden: messages Streamer.bot sends itself, names ending in "bot" (like your_bot), and common bots like Nightbot and StreamElements.</div></div>
+        <details><summary>Streamer.bot connection (only if you changed it)</summary>
+          <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
+          <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
+        </details>
+      </div>
+      <div>
+        <div class="stage"><iframe id="prevFrame" title="Chat preview" tabindex="-1"></iframe></div>
+        <p class="hint">The preview uses made-up messages.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">3</span><h2>Add it to OBS</h2></div>
+    <p>Your chat link, with your style built in:</p>
+    <div class="copy"><input id="obsUrl" readonly aria-label="OBS link"><button class="btn" data-copy="obsUrl">Copy</button></div>
+    <ol class="steps">
+      <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+      <li>Paste the link into <strong>URL</strong>. A good size is <strong>450 × 800</strong>; make it wider or taller to fit your layout. Text size stays the same, so a bigger source just shows more messages.</li>
+      <li>Press OK and say something in chat. Messages appear at the bottom and move up.</li>
+    </ol>
+    <p>Changed the style? Copy the new link and paste it over the old one.</p>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>Nothing shows</td><td>Check Streamer.bot is running, its WebSocket server is started, and it's connected to Twitch or Kick. If you changed the address, port or set a password, enter them in step 2 and copy the link again.</td></tr>
+      <tr><td>Only one platform shows</td><td>Check Streamer.bot is connected to both Twitch and Kick (Platforms tab).</td></tr>
+      <tr><td>A bot's messages show</td><td>Add its name to <em>Also hide these names</em> and copy the link again.</td></tr>
+      <tr><td>Deleted messages stay up</td><td>The overlay removes messages that mods delete, time out or ban, if Streamer.bot passes those on. If yours doesn't, set messages to disappear after a while.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot, Twitch or Kick.</div></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var GLOWS=[["platform","Platform colours"],["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+var BOTS=["streamelements","streamlabs","nightbot","moobot","fossabot","wizebot","soundalerts","sery_bot","botrixoficial","kicbot","streamerbot","commanderroot"];
+var BASE=location.origin+location.pathname;
+var TW_SVG='<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>';
+var KK_SVG='<svg viewBox="0 0 24 24"><path d="M1.5 1.5h7.2v4.8h2.4V3.9h2.4V1.5h9v7.2h-2.4v2.4h-2.4v1.8h2.4v2.4h2.4v7.2h-9v-2.4h-2.4v-2.4H8.7v4.8H1.5z"/></svg>';
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+function overlay(){
+  var box=document.getElementById("ovr"),cfg,ws=null,live=false,ids={};
+  function read(){
+    var p=new URLSearchParams(location.hash.slice(1));
+    var g=p.get("g")||"platform";if(g!=="platform"&&!/^[0-9a-fA-F]{6}$/.test(g))g="platform";
+    var o=parseInt(p.get("o"),10);if(isNaN(o))o=85;
+    cfg={ly:["cards","classic","clean"].indexOf(p.get("ly"))>=0?p.get("ly"):"cards",g:g,o:Math.max(0,Math.min(100,o))/100,
+      fs:Math.max(12,Math.min(48,parseInt(p.get("fs"),10)||22)),ttl:Math.max(0,parseInt(p.get("ttl"),10)||0),
+      pf:p.get("pf")!=="0",av:p.get("av")!=="0",bd:p.get("bd")!=="0",col:p.get("col")!=="0",cmd:p.get("cmd")!=="0",bot:p.get("bot")!=="0",
+      hide:(p.get("hide")||"").toLowerCase().split(",").map(function(x){return x.trim().replace(/^@/,"")}).filter(Boolean),
+      h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1",max:60};
+    document.documentElement.className="ov ov-"+cfg.ly;box.style.setProperty("--fs",cfg.fs+"px");
+  }
+  function el(t,c){var e=document.createElement(t);if(c)e.className=c;return e}
+  function safeUrl(u){return typeof u==="string"&&/^https:\/\//.test(u)?u:""}
+  function emoteImg(url,alt){var i=el("img","em");i.src=url;i.alt=alt||"";i.loading="eager";return i}
+  // text with Kick's [emote:123:name] codes turned into pictures
+  function addText(node,t){
+    var re=/\[emote:(\d+):([^\]]*)\]/g,last=0,m;
+    while((m=re.exec(t))){if(m.index>last)node.appendChild(document.createTextNode(t.slice(last,m.index)));node.appendChild(emoteImg("https://files.kick.com/emotes/"+m[1]+"/fullsize",m[2]));last=re.lastIndex}
+    if(last<t.length)node.appendChild(document.createTextNode(t.slice(last)));
+  }
+  function body(d,text){
+    var span=el("span","tx");
+    var parts=Array.isArray(d.parts)?d.parts:null;
+    if(parts&&parts.length){
+      parts.forEach(function(pt){
+        if(!pt)return;var ty=String(pt.type||pt.Type||"").toLowerCase(),url=safeUrl(pt.imageUrl||pt.ImageUrl||(pt.emote&&pt.emote.imageUrl)),tx=pt.text!=null?pt.text:(pt.Text!=null?pt.Text:"");
+        if(url&&ty!=="text")span.appendChild(emoteImg(url,tx));else addText(span,String(tx));
+      });
+      return span;
+    }
+    var em=(d.emotes||(d.message&&d.message.emotes)||[]).map(function(e){return {s:e.startIndex!=null?e.startIndex:e.StartIndex,e:e.endIndex!=null?e.endIndex:e.EndIndex,u:safeUrl(e.imageUrl||e.ImageUrl),n:e.name||e.Name||""}}).filter(function(e){return e.u&&e.s!=null&&e.e!=null}).sort(function(a,b){return a.s-b.s});
+    if(em.length){
+      var cps=Array.from(text),pos=0;
+      em.forEach(function(e){if(e.s<pos)return;if(e.s>pos)addText(span,cps.slice(pos,e.s).join(""));span.appendChild(emoteImg(e.u,e.n));pos=e.e+1});
+      if(pos<cps.length)addText(span,cps.slice(pos).join(""));
+      return span;
+    }
+    addText(span,text);return span;
+  }
+  function norm(src,d){
+    var m=d.message&&typeof d.message==="object"?d.message:null,u=d.user||d.sender||{};
+    var name=u.name||u.displayName||u.display_name||u.username||(m&&(m.displayName||m.username))||d.displayName||d.userName||d.user_name||"";
+    var login=String(u.login||u.username||u.slug||(m&&m.username)||d.userLogin||name).toLowerCase();
+    var text=typeof d.text==="string"?d.text:m&&typeof m.message==="string"?m.message:typeof d.message==="string"?d.message:typeof d.content==="string"?d.content:"";
+    var color=u.color||(u.identity&&u.identity.color)||(m&&m.color)||d.color||"";
+    var badges=(u.badges||(m&&m.badges)||(u.identity&&u.identity.badges)||[]).map(function(b){return {u:safeUrl(b.imageUrl||b.ImageUrl||b.image_url),n:String(b.name||b.type||b.text||"").toLowerCase()}}).filter(function(b){return b.u||b.n});
+    var id=d.messageId||d.msgId||d.id||(m&&(m.msgId||m.id))||"";
+    var avatar=safeUrl(u.profilePicture||u.profileImageUrl||u.profile_pic||u.avatar||"");
+    var internal=!!(d.isInternal||d.internal||(d.meta&&(d.meta.internal||d.meta.isInternal))||(m&&m.internal));
+    var mm=Object.assign({},d);if(m&&!d.emotes)mm.emotes=m.emotes;
+    return {src:src,name:name,login:login,text:text,color:color,badges:badges,id:id,d:mm,avatar:avatar,internal:internal};
+  }
+  var CHIPS={broadcaster:["HOST","#FF4D4D"],moderator:["MOD","#3DDC97"],vip:["VIP","#FF6FB5"],subscriber:["SUB","#B57BFF"],og:["OG","#FFB020"],founder:["FOUNDER","#FFB020"],verified:["✓","#4DA3FF"],staff:["STAFF","#E8ECF2"]};
+  var AV={};try{AV=JSON.parse(localStorage.getItem("cc_av")||"{}")}catch(e){}
+  function saveAv(){try{var k=Object.keys(AV);if(k.length>400)k.slice(0,k.length-400).forEach(function(x){delete AV[x]});localStorage.setItem("cc_av",JSON.stringify(AV))}catch(e){}}
+  function initial(x,pc){var s=el("span","avi");s.textContent=(x.name||"?").charAt(0).toUpperCase();
+    s.style.background=/^#?[0-9a-fA-F]{6}$/.test(x.color)?(x.color[0]==="#"?x.color:"#"+x.color):"#"+pc;return s}
+  function avatarEl(x,pc){
+    var key=x.src+"|"+x.login,url=x.avatar||AV[key]||"";
+    if(x.avatar&&AV[key]!==x.avatar){AV[key]=x.avatar;saveAv()}
+    var fall=initial(x,pc);
+    if(url){var i=el("img","av");i.alt="";i.src=url;i.onerror=function(){if(i.parentNode)i.parentNode.replaceChild(fall,i)};return i}
+    if(x.src==="twitch"&&x.login&&!cfg.demo&&AV[key]===undefined){
+      AV[key]="";   // ask once per chatter
+      fetch("https://decapi.me/twitch/avatar/"+encodeURIComponent(x.login)).then(function(r){return r.ok?r.text():""}).then(function(t){
+        t=String(t||"").trim();if(!/^https:\/\//.test(t))return;AV[key]=t;saveAv();
+        [].slice.call(box.querySelectorAll('.m[data-login="'+key.replace(/"/g,"")+'"] .avi')).forEach(function(s){var i=el("img","av");i.alt="";i.src=t;s.parentNode.replaceChild(i,s)});
+      }).catch(function(){});
+    }
+    return fall;
+  }
+  function add(x){
+    if(!x.name||!x.text&&!(x.d.parts&&x.d.parts.length))return;
+    if(cfg.cmd&&/^\s*!/.test(x.text))return;
+    if(cfg.bot&&(BOTS.indexOf(x.login)>=0||/bot$/.test(x.login)||x.internal))return;
+    if(cfg.hide.indexOf(x.login)>=0||cfg.hide.indexOf(x.name.toLowerCase())>=0)return;
+    var plat=x.src==="kick"?"kk":"tw",pc=x.src==="kick"?"53FC18":"9146FF",g=cfg.g==="platform"?pc:cfg.g;
+    var m=el("div","m");m.style.setProperty("--g","#"+g);m.style.setProperty("--gr",hx2rgb(g));m.style.setProperty("--o",cfg.o);
+    m.dataset.login=x.src+"|"+x.login;if(x.id)m.dataset.id=x.id;
+    var head=el("span","head");
+    if(cfg.pf){var pf=el("span","pf "+plat);pf.innerHTML=plat==="kk"?KK_SVG:TW_SVG;head.appendChild(pf)}
+    if(cfg.av)head.appendChild(avatarEl(x,pc));
+    if(cfg.bd)x.badges.forEach(function(b){
+      if(b.u){var i=el("img","bd");i.src=b.u;i.alt=b.n;head.appendChild(i);return}
+      var c=CHIPS[b.n];if(!c)return;var s=el("span","chipb");s.textContent=c[0];s.style.background=c[1];head.appendChild(s);
+    });
+    var who=el("span","who");who.textContent=x.name;
+    who.style.color=cfg.col&&/^#?[0-9a-fA-F]{6}$/.test(x.color)?(x.color[0]==="#"?x.color:"#"+x.color):"#"+(cfg.ly==="cards"?"F2F5F9":pc);
+    head.appendChild(who);m.appendChild(head);
+    m.appendChild(body(x.d,x.text));
+    box.appendChild(m);
+    while(box.children.length>cfg.max)box.removeChild(box.firstChild);
+    if(cfg.ttl)setTimeout(function(){bye(m)},cfg.ttl*1000);
+  }
+  function bye(m){if(!m.parentNode)return;m.classList.add("bye");setTimeout(function(){if(m.parentNode)m.parentNode.removeChild(m)},650)}
+  function removeWhere(fn){[].slice.call(box.children).forEach(function(m){if(fn(m))bye(m)})}
+  function moderation(src,type,d){
+    var t=type.toLowerCase(),plat=src==="kick"?"kick":"twitch";
+    if(t.indexOf("clear")>=0){removeWhere(function(){return true});return}
+    if(t.indexOf("delet")>=0){var id=d.messageId||d.targetMessageId||d.msgId||d.id||(d.message&&(d.message.id||d.message.msgId))||"";if(id)removeWhere(function(m){return m.dataset.id===String(id)});return}
+    if(t.indexOf("ban")>=0||t.indexOf("timeout")>=0||t.indexOf("timedout")>=0){
+      var u=d.user||d.targetUser||d.bannedUser||{};var login=String(u.login||u.username||u.slug||d.userLogin||d.user_login||d.userName||d.targetUserLogin||u.name||"").toLowerCase();
+      if(login)removeWhere(function(m){return m.dataset.login===plat+"|"+login});
+    }
+  }
+  async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
+  function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+  function subscribe(){
+    if(live)return;live=true;
+    // one request per event, so an event a Streamer.bot version doesn't have can't block the others
+    [["Twitch","ChatMessage"],["Kick","ChatMessage"],["Twitch","ChatMessageDeleted"],["Twitch","ChatCleared"],["Twitch","UserTimedOut"],["Twitch","UserBanned"],["Kick","ChatMessageDeleted"],["Kick","UserTimedOut"],["Kick","UserBanned"]]
+      .forEach(function(e,i){var ev={};ev[e[0]]=[e[1]];send({request:"Subscribe",id:"cc-"+i,events:ev})});
+  }
+  function connect(){
+    live=false;
+    try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.port+"/")}catch(e){setTimeout(connect,5000);return}
+    var helloT=setTimeout(subscribe,1500);
+    ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.request==="Hello"){clearTimeout(helloT);if(m.authentication&&cfg.pw){var a=m.authentication;var s=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"cc-auth",authentication:await sha(s+a.challenge)})}else subscribe();return}
+      if(m.id==="cc-auth"){subscribe();return}
+      if(!m.event||!m.data)return;
+      var src=String(m.event.source||"").toLowerCase(),type=String(m.event.type||"");
+      if(src!=="twitch"&&src!=="kick")return;
+      if(type==="ChatMessage")add(norm(src,m.data));else moderation(src,type,m.data);
+    };
+    ws.onclose=function(){clearTimeout(helloT);live=false;setTimeout(connect,3000)};
+    ws.onerror=function(){try{ws.close()}catch(x){}};
+  }
+  var DEMO=[["twitch","NightOwlTV","#FF7F50","that clutch was unreal"],["kick","Kezza_Plays","#53FC18","GG from Kick! [emote:37227:LULW]"],["twitch","Morag","#B57BFF","hi chat, just got here"],
+    ["kick","pixelpete","#FFB020","what loadout is this?"],["twitch","moddy_mcmod","#3DDC97","be nice in chat folks"],["kick","LateShift","#4DA3FF","one more game!!"],["twitch","ChattyCath","#FF6FB5","that was so close"],["kick","Big_Dave","#E8ECF2","W stream as always"]];
+  function demo(){var i=0;function next(){var x=DEMO[i++%DEMO.length];add({src:x[0],name:x[1],login:x[1].toLowerCase(),text:x[3],color:x[2],badges:x[1]==="moddy_mcmod"?[{n:"moderator"}]:x[1]==="Kezza_Plays"?[{n:"og"},{n:"subscriber"}]:x[1]==="Morag"?[{n:"vip"}]:[],id:"",d:{},avatar:"",internal:false})}
+    for(var k=0;k<5;k++)next();setInterval(next,1800)}
+  read();
+  if(cfg.demo){demo();return}
+  connect();
+}
+
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={ly:"cards",g:"platform",o:85,fs:22,ttl:0,av:1,pf:1,bd:1,col:1,cmd:1,bot:1,hide:"",h:"127.0.0.1",p:"8080"};
+  try{var sv=JSON.parse(ls("cc_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);
+    if(g[0]==="platform")b.style.background="conic-gradient(#9146FF 0 50%,#53FC18 0)";else b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
+  var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  $("lySeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.ly=b.dataset.v;sync()}});
+  [["op","o"],["fs","fs"],["ttl","ttl"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=+this.value;sync()})});
+  [["optAv","av"],["optPf","pf"],["optBd","bd"],["optCol","col"],["optCmd","cmd"],["optBot","bot"]].forEach(function(x){$(x[0]).addEventListener("change",function(){S[x[1]]=this.checked?1:0;sync()})});
+  [["hide","hide"],["host","h"],["port","p"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value.trim();sync()})});
+  $("pw").addEventListener("input",sync);
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){var el=$(b.dataset.copy),o=b.textContent;
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select()})});
+  $("hide").value=S.hide;$("host").value=S.h;$("port").value=S.p;
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");p.set("ly",S.ly);p.set("g",S.g);if(S.o!==85)p.set("o",String(S.o));if(S.fs!==22)p.set("fs",String(S.fs));if(S.ttl)p.set("ttl",String(S.ttl));
+    ["av","pf","bd","col","cmd","bot"].forEach(function(k){if(!S[k])p.set(k,"0")});if(S.hide)p.set("hide",S.hide);
+    if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw);
+    for(var k in extra)p.set(k,extra[k]);return p.toString()}
+  function frame(el,h){var u=BASE+"#"+h;if(!el.dataset.on){el.src=u;el.dataset.on=1}else{el.src="about:blank";setTimeout(function(){el.src=u},30)}}
+  var pvT=null;
+  function sync(){
+    ls("cc_cfg",JSON.stringify(S));
+    $("lySeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.ly)});
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("op").value=S.o;$("opV").textContent=S.o+"%";$("fs").value=S.fs;$("fsV").textContent=S.fs;$("ttl").value=S.ttl;$("ttlV").textContent=S.ttl?S.ttl+" seconds":"never";
+    $("optAv").checked=!!S.av;$("optPf").checked=!!S.pf;$("optBd").checked=!!S.bd;$("optCol").checked=!!S.col;$("optCmd").checked=!!S.cmd;$("optBot").checked=!!S.bot;
+    $("obsUrl").value=BASE+"#"+hash({});
+    clearTimeout(pvT);pvT=setTimeout(function(){frame($("prevFrame"),hash({demo:"1"}))},300);
+  }
+  frame($("heroFrame"),"ov=1&demo=1&ly=cards&g=platform");
+  sync();
+}
+})();
+</script>
+</body>
+</html>
