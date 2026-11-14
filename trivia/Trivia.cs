@@ -61,6 +61,11 @@ public class CPHInline
     private const string AskLine = "TRIVIA: {question}  (first right answer in chat wins)";
     private const string WinLine = "{user} got it! The answer was {answer}. That's {wins} for {user}.";
 
+    // Post the winner as a Twitch announcement (the highlighted message). Kick doesn't have these, so it gets a normal message.
+    // Colour: "primary", "blue", "green", "orange" or "purple". Your bot account needs to be a mod for announcements.
+    private const bool AnnounceWinner = true;
+    private const string AnnounceColour = "purple";
+
     // ===== Nothing to change below here =====
 
     public bool Execute()
@@ -105,7 +110,7 @@ public class CPHInline
             long wins = CPH.GetGlobalVar<long>(key, true) + 1;
             CPH.SetGlobalVar(key, wins, true);
             CPH.SetGlobalVar("triviawinname|" + plat + "|" + login, user, true);
-            Say(WinLine.Replace("{user}", user).Replace("{answer}", CPH.GetGlobalVar<string>("trivia_answer", false)).Replace("{wins}", wins + (wins == 1 ? " trivia win" : " trivia wins")));
+            SayWin(WinLine.Replace("{user}", user).Replace("{answer}", CPH.GetGlobalVar<string>("trivia_answer", false)).Replace("{wins}", wins + (wins == 1 ? " trivia win" : " trivia wins")));
             return true;
         }
 
@@ -207,6 +212,37 @@ public class CPHInline
     {
         string t = (Arg("userType", "") + Arg("commandSource", "") + Arg("broadcastingService", "") + ev).ToLower();
         return t.Contains("kick") ? "kick" : "twitch";
+    }
+
+    // The winner: a Twitch announcement if switched on (falls back to a normal message), and a normal message on Kick.
+    private void SayWin(string msg)
+    {
+        bool sent = false;
+        if (AnnounceWinner)
+        {
+            try
+            {
+                foreach (var m in CPH.GetType().GetMethods())
+                {
+                    if (m.Name != "TwitchAnnounce") continue;
+                    var ps = m.GetParameters();
+                    var call = new object[ps.Length];
+                    for (int i = 0; i < ps.Length; i++)
+                    {
+                        if (i == 0) call[i] = msg;
+                        else if (ps[i].ParameterType == typeof(string)) call[i] = AnnounceColour;
+                        else if (ps[i].ParameterType == typeof(bool)) call[i] = ps[i].Name.ToLower().Contains("fallback") || ps[i].Name.ToLower().Contains("bot");
+                        else call[i] = ps[i].HasDefaultValue ? ps[i].DefaultValue : null;
+                    }
+                    m.Invoke(CPH, call);
+                    sent = true;
+                    break;
+                }
+            }
+            catch (Exception) { sent = false; }
+        }
+        if (!sent) CPH.SendMessage(msg);
+        try { CPH.SendKickMessage(msg); } catch (Exception) { }
     }
 
     // Questions and winners go to both chats, so it works when you stream to Twitch and Kick at once.

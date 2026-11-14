@@ -82,7 +82,7 @@ textarea.qbox{width:100%;min-height:150px;font:13px/1.55 var(--mono);color:var(-
     <div class="eyebrow">Free Streamer.bot action · by itsCRA1G</div>
     <h1>Quick-fire trivia for your chat.</h1>
     <p class="lead">Type <code>!trivia</code> and the first person to answer right in chat wins. There's a hint halfway through, a leaderboard for bragging rights and no points needed. Works on Twitch and Kick, with your own questions.</p>
-    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">40 starter questions</span><span class="chip">Add your own</span><span class="chip">Hints + leaderboard</span></div>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">40 starter questions</span><span class="chip">Add your own</span><span class="chip">Hints + leaderboard</span><span class="chip">Winner announcements</span></div>
   </div>
   <div class="chat" aria-label="Example chat">
     <div class="hd">Stream chat</div>
@@ -90,7 +90,7 @@ textarea.qbox{width:100%;min-height:150px;font:13px/1.55 var(--mono);color:var(-
     <div class="msg"><b>pixelpete</b>: sydney</div>
     <div class="msg"><span class="bot">YourBot</span>: Hint: C _ _ _ _ _ _ _</div>
     <div class="msg"><b>Morag</b>: canberra!</div>
-    <div class="msg sys">Morag got it! The answer was Canberra. That's 4 trivia wins for Morag.</div>
+    <div class="msg sys" style="border-left-color:#B57BFF;background:rgba(181,123,255,.16)"><span style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#B57BFF;font-weight:700;margin-bottom:2px">Announcement</span>Morag got it! The answer was Canberra. That's 4 trivia wins for Morag.</div>
   </div>
 </div></div>
 
@@ -170,6 +170,11 @@ public class CPHInline
     private const string AskLine = <span class="s">"TRIVIA: {question}  (first right answer in chat wins)"</span>;
     private const string WinLine = <span class="s">"{user} got it! The answer was {answer}. That's {wins} for {user}."</span>;
 
+<span class="c">    // Post the winner as a Twitch announcement (the highlighted message). Kick doesn't have these, so it gets a normal message.</span>
+<span class="c">    // Colour: "primary", "blue", "green", "orange" or "purple". Your bot account needs to be a mod for announcements.</span>
+    private const bool AnnounceWinner = true;
+    private const string AnnounceColour = <span class="s">"purple"</span>;
+
 <span class="c">    // ===== Nothing to change below here =====</span>
 
     public bool Execute()
@@ -214,7 +219,7 @@ public class CPHInline
             long wins = CPH.GetGlobalVar&lt;long&gt;(key, true) + 1;
             CPH.SetGlobalVar(key, wins, true);
             CPH.SetGlobalVar(<span class="s">"triviawinname|"</span> + plat + <span class="s">"|"</span> + login, user, true);
-            Say(WinLine.Replace(<span class="s">"{user}"</span>, user).Replace(<span class="s">"{answer}"</span>, CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_answer"</span>, false)).Replace(<span class="s">"{wins}"</span>, wins + (wins == 1 ? <span class="s">" trivia win"</span> : <span class="s">" trivia wins"</span>)));
+            SayWin(WinLine.Replace(<span class="s">"{user}"</span>, user).Replace(<span class="s">"{answer}"</span>, CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_answer"</span>, false)).Replace(<span class="s">"{wins}"</span>, wins + (wins == 1 ? <span class="s">" trivia win"</span> : <span class="s">" trivia wins"</span>)));
             return true;
         }
 
@@ -316,6 +321,37 @@ public class CPHInline
     {
         string t = (Arg(<span class="s">"userType"</span>, <span class="s">""</span>) + Arg(<span class="s">"commandSource"</span>, <span class="s">""</span>) + Arg(<span class="s">"broadcastingService"</span>, <span class="s">""</span>) + ev).ToLower();
         return t.Contains(<span class="s">"kick"</span>) ? <span class="s">"kick"</span> : <span class="s">"twitch"</span>;
+    }
+
+<span class="c">    // The winner: a Twitch announcement if switched on (falls back to a normal message), and a normal message on Kick.</span>
+    private void SayWin(string msg)
+    {
+        bool sent = false;
+        if (AnnounceWinner)
+        {
+            try
+            {
+                foreach (var m in CPH.GetType().GetMethods())
+                {
+                    if (m.Name != <span class="s">"TwitchAnnounce"</span>) continue;
+                    var ps = m.GetParameters();
+                    var call = new object[ps.Length];
+                    for (int i = 0; i &lt; ps.Length; i++)
+                    {
+                        if (i == 0) call[i] = msg;
+                        else if (ps[i].ParameterType == typeof(string)) call[i] = AnnounceColour;
+                        else if (ps[i].ParameterType == typeof(bool)) call[i] = ps[i].Name.ToLower().Contains(<span class="s">"fallback"</span>) || ps[i].Name.ToLower().Contains(<span class="s">"bot"</span>);
+                        else call[i] = ps[i].HasDefaultValue ? ps[i].DefaultValue : null;
+                    }
+                    m.Invoke(CPH, call);
+                    sent = true;
+                    break;
+                }
+            }
+            catch (Exception) { sent = false; }
+        }
+        if (!sent) CPH.SendMessage(msg);
+        try { CPH.SendKickMessage(msg); } catch (Exception) { }
     }
 
 <span class="c">    // Questions and winners go to both chats, so it works when you stream to Twitch and Kick at once.</span>
@@ -424,7 +460,7 @@ public class CPHInline
       <tr><td><code>!triviawins</code></td><td>Everyone</td><td>Shows your wins. <code>!triviawins @name</code> shows someone else's.</td></tr>
       <tr><td><code>!triviatop</code></td><td>Everyone</td><td>The top 5 trivia champions.</td></tr>
     </table></div>
-    <p>At the top of the code you can choose whether only mods can start questions, the wait between them, and every chat line. Hint and time-up timings are at the top of the Trivia Timer code (15 and 30 seconds to start).</p>
+    <p>At the top of the code you can choose whether only mods can start questions, the wait between them, every chat line, and whether the winner is posted as a Twitch <strong>announcement</strong> (the highlighted message) and in which colour. Announcements need your bot account to be a mod; Kick gets a normal message. Hint and time-up timings are at the top of the Trivia Timer code (15 and 30 seconds to start).</p>
     <div class="note">Questions and winners post in both Twitch and Kick chat, so it works when you stream to both at once. Answers count from either.</div>
   </section>
 
