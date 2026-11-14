@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trivia: free chat trivia for Streamer.bot</title>
+<meta name="description" content="Free chat trivia for Streamer.bot by itsCRA1G. First right answer in chat wins, with hints, your own questions and a leaderboard. Twitch and Kick.">
+<meta property="og:title" content="Trivia: free chat trivia for Streamer.bot">
+<meta property="og:description" content="Chat trivia for Twitch and Kick: first right answer wins. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#000;--tile:#0B0C0F;--tile2:#111318;--edge:#1C2028;--edge2:#2A303B;--fg:#E8ECF2;--body:#C3CAD5;--mute:#8A94A6;--acc:#4DA3FF;--acc-soft:rgba(77,163,255,.14);--warn:#FFB020;
+--display:"Space Grotesk",Inter,system-ui,sans-serif;--text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand .ico{width:34px;height:34px;border-radius:9px;background:var(--tile2);border:1px solid var(--edge2);display:grid;place-items:center;font:700 13px var(--display);color:var(--acc)}
+.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:760px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:60px 44px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:44px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,58px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.chat{background:var(--tile);border:1px solid var(--edge);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;font-size:14.5px;box-shadow:0 30px 80px -40px var(--acc)}
+.chat .hd{font:700 11px var(--text);letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--edge);padding-bottom:10px}
+.msg b{color:#B57BFF}.msg .bot{color:var(--acc)}.msg.sys{background:rgba(181,123,255,.12);border-left:3px solid #B57BFF;padding:8px 10px;border-radius:8px;color:var(--fg)}
+.msg .lnk{color:var(--acc);text-decoration:underline}
+main section{padding-block:48px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}ol.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.code{position:relative;background:var(--tile);border:1px solid var(--edge);border-radius:14px;margin:12px 0 18px}
+.code .top{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--edge)}
+.code .top span{font:600 13px var(--mono);color:var(--mute);margin-right:auto}
+.code pre.imp{white-space:pre-wrap;word-break:break-all;max-height:140px;font-size:12px;color:var(--mute)}
+.code pre{margin:0;padding:16px;overflow:auto;max-height:520px;font:13.5px/1.55 var(--mono);color:var(--body)}
+.code .c{color:#6B7689}.code .s{color:#3DDC97}.code .k{color:#B57BFF}
+.btn{font:700 13px var(--text);color:#000;background:var(--acc);border:0;border-radius:9px;padding:8px 13px;cursor:pointer;text-decoration:none}
+.btn:hover{background:#8CC4FF;color:#000}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.note.warn{border-left-color:var(--warn)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+details.manual{border:1px solid var(--edge);border-radius:14px;padding:14px 18px;background:var(--tile);margin:14px 0}
+details.manual summary{cursor:pointer;font:700 17px var(--display);color:var(--fg)}
+h3{font:700 21px var(--display);color:var(--fg);margin:30px 0 10px}
+.steps ul{margin:6px 0 0;padding-left:20px}
+textarea.qbox{width:100%;min-height:150px;font:13px/1.55 var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px;resize:vertical}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><span class="ico"><img src="img/logo.png" alt="" style="width:34px;height:34px;border-radius:9px"></span>Trivia</a>
+  <nav><a href="#setup">Set up</a><a href="#questions">Questions</a><a href="#commands">Commands</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free Streamer.bot action · by itsCRA1G</div>
+    <h1>Quick-fire trivia for your chat.</h1>
+    <p class="lead">Type <code>!trivia</code> and the first person to answer right in chat wins. There's a hint halfway through, a leaderboard for bragging rights and no points needed. Works on Twitch and Kick, with your own questions.</p>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">40 starter questions</span><span class="chip">Add your own</span><span class="chip">Hints + leaderboard</span></div>
+  </div>
+  <div class="chat" aria-label="Example chat">
+    <div class="hd">Stream chat</div>
+    <div class="msg"><span class="bot">YourBot</span>: TRIVIA: What is the capital of Australia?  (first right answer in chat wins)</div>
+    <div class="msg"><b>pixelpete</b>: sydney</div>
+    <div class="msg"><span class="bot">YourBot</span>: Hint: C _ _ _ _ _ _ _</div>
+    <div class="msg"><b>Morag</b>: canberra!</div>
+    <div class="msg sys">Morag got it! The answer was Canberra. That's 4 trivia wins for Morag.</div>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <section id="setup">
+    <div class="sec-head"><span class="num">1</span><h2>Add it to Streamer.bot</h2></div>
+    <p>Trivia is two actions: <strong>Trivia</strong> asks the questions and checks answers, and <strong>Trivia Timer</strong> gives the hint and reveals the answer if nobody gets it.</p>
+    
+    <details class="manual" open><summary>Set it up</summary>
+    <h3>The Trivia action</h3>
+    <ol class="steps">
+      <li>In Streamer.bot's <strong>Actions</strong> tab, right-click, pick <strong>Add</strong> and name it <strong>Trivia</strong>.</li>
+      <li>Right-click <strong>Triggers</strong> and add <strong>Twitch → Chat Message</strong> and <strong>Kick → Chat Message</strong> (skip one you don't use). These let it check answers.</li>
+      <li>In the <strong>Commands</strong> tab, add <code>!trivia</code>, <code>!triviawins</code> and <code>!triviatop</code> with Twitch and Kick ticked. In the Trivia action, add a <strong>Core → Commands → Command Triggered</strong> trigger for each.</li>
+      <li>Add an <strong>Execute C# Code</strong> sub-action with this code, then compile and save.</li>
+    </ol>
+    <div class="code"><div class="top"><span>Trivia.cs</span><a class="btn ghost" href="Trivia.cs" download>Download</a><button class="btn" data-copy="srcT">Copy code</button></div><pre id="srcT"><span class="c">// Trivia for Streamer.bot, free from itsCRA1G (itscra1g.github.io/trivia)</span>
+<span class="c">// !trivia asks a question and the first right answer in chat wins. Twitch and Kick.</span>
+<span class="c">// Works together with the "Trivia Timer" action, which gives the hint and reveals the answer.</span>
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+public class CPHInline
+{
+<span class="c">    // ===== Change these to suit your stream =====</span>
+
+    private const bool ModsOnly = false;         // true = only mods and you can start a question
+    private const int CooldownSeconds = 120;     // wait between questions started with !trivia
+
+<span class="c">    // Your questions: "Question|Answer|Other accepted answers...". Add as many as you like.</span>
+    private static readonly string[] Questions = new[]
+    {
+        <span class="s">"What is the capital of Australia?|Canberra"</span>,
+        <span class="s">"How many sides does a hexagon have?|6|six"</span>,
+        <span class="s">"Which planet is known as the Red Planet?|Mars"</span>,
+        <span class="s">"What is the largest ocean on Earth?|Pacific|Pacific Ocean"</span>,
+        <span class="s">"In what year did the Titanic sink?|1912"</span>,
+        <span class="s">"What is the chemical symbol for gold?|Au"</span>,
+        <span class="s">"How many players does a football (soccer) team have on the pitch?|11|eleven"</span>,
+        <span class="s">"Which company makes the PlayStation?|Sony"</span>,
+        <span class="s">"What is the best-selling video game of all time?|Minecraft"</span>,
+        <span class="s">"What is the name of Mario's brother?|Luigi"</span>,
+        <span class="s">"What colour is Pac-Man?|Yellow"</span>,
+        <span class="s">"Which game series stars Master Chief?|Halo"</span>,
+        <span class="s">"What does GG stand for in gaming?|Good game"</span>,
+        <span class="s">"How many hearts does an octopus have?|3|three"</span>,
+        <span class="s">"What is the smallest planet in our solar system?|Mercury"</span>,
+        <span class="s">"Who painted the Mona Lisa?|Leonardo da Vinci|da Vinci|Leonardo"</span>,
+        <span class="s">"How many minutes are there in a day?|1440|1,440"</span>,
+        <span class="s">"What is the tallest mountain in the world?|Everest|Mount Everest"</span>,
+        <span class="s">"Which band sang Bohemian Rhapsody?|Queen"</span>,
+        <span class="s">"What is the longest river in Africa?|Nile|River Nile"</span>,
+        <span class="s">"In which game do you build with blocks and run from Creepers?|Minecraft"</span>,
+        <span class="s">"Which fruit is guacamole made from?|Avocado|Avocados"</span>,
+        <span class="s">"How many strings does a standard guitar have?|6|six"</span>,
+        <span class="s">"What is the freezing point of water in Celsius?|0|zero"</span>,
+        <span class="s">"Which animal is called the King of the Jungle?|Lion"</span>,
+        <span class="s">"In Fortnite, what do players jump out of at the start of a match?|Battle Bus|Battlebus|Bus"</span>,
+        <span class="s">"What colour is Sonic the Hedgehog?|Blue"</span>,
+        <span class="s">"How many continents are there?|7|seven"</span>,
+        <span class="s">"Which gas do plants take in from the air?|Carbon dioxide|CO2"</span>,
+        <span class="s">"What is the name of Call of Duty's free battle royale?|Warzone"</span>,
+        <span class="s">"What is 12 times 12?|144"</span>,
+        <span class="s">"Which planet is famous for its rings?|Saturn"</span>,
+        <span class="s">"What is the largest mammal on Earth?|Blue whale|Whale"</span>,
+        <span class="s">"How many bones are in the adult human body?|206"</span>,
+        <span class="s">"In what year did the first iPhone come out?|2007"</span>,
+        <span class="s">"Which language has the most native speakers?|Mandarin|Mandarin Chinese|Chinese"</span>,
+        <span class="s">"What is the hardest natural substance?|Diamond|Diamonds"</span>,
+        <span class="s">"Which Pokemon is number 25 in the Pokedex?|Pikachu"</span>,
+        <span class="s">"What does the 'www' in a web address stand for?|World Wide Web"</span>,
+        <span class="s">"How many days are there in a leap year?|366"</span>
+    };
+
+<span class="c">    // {user} = winner, {answer}, {wins} = their total, like "3 trivia wins"</span>
+    private const string AskLine = <span class="s">"TRIVIA: {question}  (first right answer in chat wins)"</span>;
+    private const string WinLine = <span class="s">"{user} got it! The answer was {answer}. That's {wins} for {user}."</span>;
+
+<span class="c">    // ===== Nothing to change below here =====</span>
+
+    public bool Execute()
+    {
+        string ev = EventName();
+        string plat = Platform(ev);
+        string user = Arg(<span class="s">"user"</span>, Arg(<span class="s">"userName"</span>, <span class="s">""</span>));
+        string login = Arg(<span class="s">"userName"</span>, user).ToLower();
+
+        if (args.ContainsKey(<span class="s">"command"</span>))
+        {
+            string cmd = Arg(<span class="s">"command"</span>, <span class="s">""</span>).ToLower().TrimStart('!');
+            if (cmd == <span class="s">"triviawins"</span>)
+            {
+                string who = Arg(<span class="s">"input0"</span>, <span class="s">""</span>).TrimStart('@').ToLower();
+                if (who == <span class="s">""</span>) who = login;
+                long w = CPH.GetGlobalVar&lt;long&gt;(<span class="s">"triviawins|"</span> + plat + <span class="s">"|"</span> + who, true);
+                Reply(plat, (who == login ? <span class="s">"@"</span> + user + <span class="s">" you have "</span> : who + <span class="s">" has "</span>) + w + (w == 1 ? <span class="s">" trivia win."</span> : <span class="s">" trivia wins."</span>));
+                return true;
+            }
+            if (cmd == <span class="s">"triviatop"</span>) { Top(plat); return true; }
+            if (cmd != <span class="s">"trivia"</span>) return true;
+            if (ModsOnly &amp;&amp; !IsMod()) return true;
+            if (CPH.GetGlobalVar&lt;bool&gt;(<span class="s">"trivia_open"</span>, false)) { Reply(plat, <span class="s">"There's already a question going! "</span> + CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_text"</span>, false)); return true; }
+            long left = CPH.GetGlobalVar&lt;long&gt;(<span class="s">"trivia_next"</span>, false) - Now();
+            if (left &gt; 0 &amp;&amp; !IsMod()) { Reply(plat, <span class="s">"@"</span> + user + <span class="s">" next question in "</span> + left + <span class="s">"s."</span>); return true; }
+            Ask();
+            return true;
+        }
+
+        if (ev.Contains(<span class="s">"Chat"</span>) || ev.Contains(<span class="s">"Message"</span>))
+        {
+            if (!CPH.GetGlobalVar&lt;bool&gt;(<span class="s">"trivia_open"</span>, false)) return true;
+            string msg = Clean(Arg(<span class="s">"rawInput"</span>, Arg(<span class="s">"message"</span>, <span class="s">""</span>)));
+            if (msg == <span class="s">""</span>) return true;
+            bool right = false;
+            foreach (string a in (CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_answers"</span>, false) ?? <span class="s">""</span>).Split('|'))
+                if (a != <span class="s">""</span> &amp;&amp; Clean(a) == msg) { right = true; break; }
+            if (!right) return true;
+            CPH.SetGlobalVar(<span class="s">"trivia_open"</span>, false, false);           // first right answer only
+            string key = <span class="s">"triviawins|"</span> + plat + <span class="s">"|"</span> + login;
+            long wins = CPH.GetGlobalVar&lt;long&gt;(key, true) + 1;
+            CPH.SetGlobalVar(key, wins, true);
+            CPH.SetGlobalVar(<span class="s">"triviawinname|"</span> + plat + <span class="s">"|"</span> + login, user, true);
+            Say(WinLine.Replace(<span class="s">"{user}"</span>, user).Replace(<span class="s">"{answer}"</span>, CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_answer"</span>, false)).Replace(<span class="s">"{wins}"</span>, wins + (wins == 1 ? <span class="s">" trivia win"</span> : <span class="s">" trivia wins"</span>)));
+            return true;
+        }
+
+        if (!CPH.GetGlobalVar&lt;bool&gt;(<span class="s">"trivia_open"</span>, false)) Ask();        // e.g. a Timed Action trigger
+        return true;
+    }
+
+    private void Ask()
+    {
+        int i = Next();
+        string[] p = Questions[i].Split('|');
+        string q = p[0].Trim();
+        var ans = new List&lt;string&gt;();
+        for (int k = 1; k &lt; p.Length; k++) if (p[k].Trim() != <span class="s">""</span>) ans.Add(p[k].Trim());
+        if (ans.Count == 0) return;
+        string id = Now() + <span class="s">"-"</span> + i;
+        CPH.SetGlobalVar(<span class="s">"trivia_id"</span>, id, false);
+        CPH.SetGlobalVar(<span class="s">"trivia_answer"</span>, ans[0], false);
+        CPH.SetGlobalVar(<span class="s">"trivia_answers"</span>, string.Join(<span class="s">"|"</span>, ans.ToArray()), false);
+        CPH.SetGlobalVar(<span class="s">"trivia_text"</span>, q, false);
+        CPH.SetGlobalVar(<span class="s">"trivia_open"</span>, true, false);
+        CPH.SetGlobalVar(<span class="s">"trivia_next"</span>, Now() + CooldownSeconds, false);
+        Say(AskLine.Replace(<span class="s">"{question}"</span>, q));
+        CPH.RunAction(<span class="s">"Trivia Timer"</span>, false);                          // hint, then reveal if nobody gets it
+    }
+
+<span class="c">    // Pick a question that hasn't been asked yet, until they've all been used.</span>
+    private int Next()
+    {
+        string used = CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_used"</span>, true) ?? <span class="s">""</span>;
+        var done = new Dictionary&lt;string, bool&gt;();
+        foreach (string u in used.Split(',')) done[u] = true;
+        var free = new List&lt;int&gt;();
+        for (int i = 0; i &lt; Questions.Length; i++) if (!done.ContainsKey(i.ToString())) free.Add(i);
+        if (free.Count == 0) { used = <span class="s">""</span>; for (int i = 0; i &lt; Questions.Length; i++) free.Add(i); }
+        int pick = free[new Random().Next(free.Count)];
+        CPH.SetGlobalVar(<span class="s">"trivia_used"</span>, (used == <span class="s">""</span> ? <span class="s">""</span> : used + <span class="s">","</span>) + pick, true);
+        return pick;
+    }
+
+    private void Top(string plat)
+    {
+        var list = new List&lt;KeyValuePair&lt;string, long&gt;&gt;();
+        try
+        {
+            var mi = CPH.GetType().GetMethod(<span class="s">"GetGlobalVarValues"</span>);
+            object res = mi == null ? null : mi.Invoke(CPH, mi.GetParameters().Length == 1 ? new object[] { true } : new object[0]);
+            var items = res as System.Collections.IEnumerable;
+            if (items != null)
+                foreach (object it in items)
+                {
+                    string name = Prop(it, <span class="s">"VariableName"</span>) ?? Prop(it, <span class="s">"Name"</span>) ?? <span class="s">""</span>;
+                    if (!name.StartsWith(<span class="s">"triviawins|"</span>)) continue;
+                    long v; long.TryParse(Prop(it, <span class="s">"Value"</span>) ?? <span class="s">"0"</span>, out v);
+                    string shown = CPH.GetGlobalVar&lt;string&gt;(<span class="s">"triviawinname|"</span> + name.Substring(11), true) ?? name.Substring(name.LastIndexOf('|') + 1);
+                    list.Add(new KeyValuePair&lt;string, long&gt;(shown, v));
+                }
+        }
+        catch (Exception) { }
+        if (list.Count == 0) { Reply(plat, <span class="s">"No trivia winners yet. Type !trivia to play!"</span>); return; }
+        list.Sort((a, b) =&gt; b.Value.CompareTo(a.Value));
+        var parts = new List&lt;string&gt;();
+        for (int i = 0; i &lt; list.Count &amp;&amp; i &lt; 5; i++) parts.Add((i + 1) + <span class="s">". "</span> + list[i].Key + <span class="s">" ("</span> + list[i].Value + <span class="s">")"</span>);
+        Reply(plat, <span class="s">"Trivia champions: "</span> + string.Join(<span class="s">"  "</span>, parts.ToArray()));
+    }
+
+<span class="c">    // ----- helpers -----</span>
+
+<span class="c">    // Lower case, no punctuation, no leading "the"/"a"/"an", so small differences still count.</span>
+    private static string Clean(string s)
+    {
+        var sb = new StringBuilder();
+        foreach (char c in (s ?? <span class="s">""</span>).ToLower()) sb.Append(char.IsLetterOrDigit(c) ? c : ' ');
+        string t = string.Join(<span class="s">" "</span>, sb.ToString().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+        foreach (string w in new[] { <span class="s">"the "</span>, <span class="s">"a "</span>, <span class="s">"an "</span> }) if (t.StartsWith(w)) { t = t.Substring(w.Length); break; }
+        return t;
+    }
+
+    private static string Prop(object o, string name)
+    {
+        var p = o.GetType().GetProperty(name);
+        if (p == null) return null;
+        object v = p.GetValue(o, null);
+        return v == null ? null : v.ToString();
+    }
+
+    private string EventName()
+    {
+        try
+        {
+            var mi = CPH.GetType().GetMethod(<span class="s">"GetEventType"</span>, Type.EmptyTypes);
+            if (mi != null) { object r = mi.Invoke(CPH, null); string s = r == null ? <span class="s">""</span> : r.ToString(); if (s != <span class="s">""</span> &amp;&amp; s != <span class="s">"None"</span> &amp;&amp; s != <span class="s">"Unknown"</span>) return s; }
+        }
+        catch (Exception) { }
+        return Arg(<span class="s">"__source"</span>, Arg(<span class="s">"triggerName"</span>, <span class="s">""</span>)).Replace(<span class="s">" "</span>, <span class="s">""</span>);
+    }
+
+    private string Platform(string ev)
+    {
+        string t = (Arg(<span class="s">"userType"</span>, <span class="s">""</span>) + Arg(<span class="s">"commandSource"</span>, <span class="s">""</span>) + Arg(<span class="s">"broadcastingService"</span>, <span class="s">""</span>) + ev).ToLower();
+        return t.Contains(<span class="s">"kick"</span>) ? <span class="s">"kick"</span> : <span class="s">"twitch"</span>;
+    }
+
+<span class="c">    // Questions and winners go to both chats, so it works when you stream to Twitch and Kick at once.</span>
+    private void Say(string msg) { CPH.SendMessage(msg); try { CPH.SendKickMessage(msg); } catch (Exception) { } }
+    private void Reply(string plat, string msg) { if (plat == <span class="s">"kick"</span>) CPH.SendKickMessage(msg); else CPH.SendMessage(msg); }
+
+    private bool IsMod()
+    {
+        if (Arg(<span class="s">"isModerator"</span>, <span class="s">"False"</span>).ToLower() == <span class="s">"true"</span> || Arg(<span class="s">"isBroadcaster"</span>, <span class="s">"False"</span>).ToLower() == <span class="s">"true"</span>) return true;
+        string me = Arg(<span class="s">"broadcastUserName"</span>, Arg(<span class="s">"broadcastUser"</span>, <span class="s">""</span>)).ToLower();
+        return me != <span class="s">""</span> &amp;&amp; me == Arg(<span class="s">"userName"</span>, Arg(<span class="s">"user"</span>, <span class="s">""</span>)).ToLower();
+    }
+
+    private static long Now() { return DateTimeOffset.UtcNow.ToUnixTimeSeconds(); }
+
+    private string Arg(string key, string fallback)
+    {
+        object v;
+        if (args.TryGetValue(key, out v) &amp;&amp; v != null &amp;&amp; v.ToString().Length &gt; 0) return v.ToString();
+        return fallback;
+    }
+}</pre></div>
+    <h3>The Trivia Timer action</h3>
+    <ol class="steps">
+      <li>Add an action named exactly <strong>Trivia Timer</strong>, with no triggers. Trivia starts it.</li>
+      <li>Add an <strong>Execute C# Code</strong> sub-action with this code, then compile and save.</li>
+    </ol>
+    <div class="code"><div class="top"><span>TriviaTimer.cs</span><a class="btn ghost" href="TriviaTimer.cs" download>Download</a><button class="btn" data-copy="srcR">Copy code</button></div><pre id="srcR"><span class="c">// Trivia Timer for Streamer.bot, free from itsCRA1G (itscra1g.github.io/trivia)</span>
+<span class="c">// Started by the Trivia action: gives a hint, then reveals the answer if nobody gets it.</span>
+using System;
+using System.Text;
+
+public class CPHInline
+{
+<span class="c">    // ===== Change these to suit your stream =====</span>
+
+    private const int HintAfterSeconds = 15;
+    private const int TimeUpAfterSeconds = 30;
+    private const string HintLine = <span class="s">"Hint: {hint}"</span>;
+    private const string TimeUpLine = <span class="s">"Time's up! The answer was {answer}."</span>;
+
+<span class="c">    // ===== Nothing to change below here =====</span>
+
+    public bool Execute()
+    {
+        string id = CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_id"</span>, false);
+        if (!CPH.GetGlobalVar&lt;bool&gt;(<span class="s">"trivia_open"</span>, false)) return true;
+
+        CPH.Wait(HintAfterSeconds * 1000);
+        if (!StillOpen(id)) return true;
+        Say(HintLine.Replace(<span class="s">"{hint}"</span>, Hint(CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_answer"</span>, false) ?? <span class="s">""</span>)));
+
+        CPH.Wait(Math.Max(1, TimeUpAfterSeconds - HintAfterSeconds) * 1000);
+        if (!StillOpen(id)) return true;
+        CPH.SetGlobalVar(<span class="s">"trivia_open"</span>, false, false);
+        Say(TimeUpLine.Replace(<span class="s">"{answer}"</span>, CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_answer"</span>, false) ?? <span class="s">""</span>));
+        return true;
+    }
+
+    private bool StillOpen(string id)
+    {
+        return CPH.GetGlobalVar&lt;bool&gt;(<span class="s">"trivia_open"</span>, false) &amp;&amp; CPH.GetGlobalVar&lt;string&gt;(<span class="s">"trivia_id"</span>, false) == id;
+    }
+
+<span class="c">    // "Canberra" -&gt; "C _ _ _ _ _ _ _", keeping spaces and numbers' first digit.</span>
+    private static string Hint(string answer)
+    {
+        var sb = new StringBuilder();
+        bool first = true;
+        foreach (char c in answer)
+        {
+            if (c == ' ') { sb.Append(<span class="s">"   "</span>); first = true; continue; }
+            if (sb.Length &gt; 0 &amp;&amp; sb[sb.Length - 1] != ' ') sb.Append(' ');
+            sb.Append(first || !char.IsLetterOrDigit(c) ? c : '_');
+            first = false;
+        }
+        return sb.ToString();
+    }
+
+    private void Say(string msg) { CPH.SendMessage(msg); try { CPH.SendKickMessage(msg); } catch (Exception) { } }
+}</pre></div>
+    </details>
+    <h3>Ask a question every few minutes (optional)</h3>
+    <ol class="steps">
+      <li>In Streamer.bot, open <strong>Settings → Timed Actions</strong> and add a timer, say every 15 minutes.</li>
+      <li>In the Trivia action, add a trigger <strong>Core → Timed Actions → Timed Action</strong> and pick that timer.</li>
+    </ol>
+  </section>
+
+  <section id="questions">
+    <div class="sec-head"><span class="num">2</span><h2>Your questions</h2></div>
+    <p>Questions live at the top of the Trivia code, one per line, like this:</p>
+    <div class="code"><div class="top"><span>Format</span></div><pre>"Question|Answer|Other accepted answers...",</pre></div>
+    <p>Add as many as you like: about your game, your community, music, anything. Capital letters, punctuation and a leading "the" or "a" don't matter, so <em>the nile</em> matches <em>Nile</em>. Use the extra answers for numbers (<em>6|six</em>) and nicknames. Questions don't repeat until every one has been asked.</p>
+    <p>Write your questions here and press <strong>Make lines</strong> to turn them into code lines you can paste in. One question per line, with the answer after a | symbol:</p>
+    <textarea class="qbox" id="qin" spellcheck="false" placeholder="Who is the best Warzone player in this chat?|Rese&#10;What year did this channel start?|2024|twenty twenty four"></textarea>
+    <div style="display:flex;gap:10px;margin:10px 0 6px;flex-wrap:wrap"><button class="btn" id="qmake">Make lines</button><button class="btn ghost" data-copy="qout">Copy lines</button></div>
+    <div class="code"><div class="top"><span>Paste these inside the Questions list</span></div><pre id="qout"></pre></div>
+  </section>
+
+  <section id="commands">
+    <div class="sec-head"><span class="num">3</span><h2>Commands and settings</h2></div>
+    <div class="tw"><table>
+      <tr><th>Command</th><th>Who</th><th>What it does</th></tr>
+      <tr><td><code>!trivia</code></td><td>Everyone (or mods only)</td><td>Asks a question. There's a 2-minute wait between questions; mods and you can skip it.</td></tr>
+      <tr><td><code>!triviawins</code></td><td>Everyone</td><td>Shows your wins. <code>!triviawins @name</code> shows someone else's.</td></tr>
+      <tr><td><code>!triviatop</code></td><td>Everyone</td><td>The top 5 trivia champions.</td></tr>
+    </table></div>
+    <p>At the top of the code you can choose whether only mods can start questions, the wait between them, and every chat line. Hint and time-up timings are at the top of the Trivia Timer code (15 and 30 seconds to start).</p>
+    <div class="note">Questions and winners post in both Twitch and Kick chat, so it works when you stream to both at once. Answers count from either.</div>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>Right answers aren't picked up</td><td>Check the Trivia action has the <strong>Chat Message</strong> triggers, not just the commands.</td></tr>
+      <tr><td>No hint and no "time's up"</td><td>Check there's an action named exactly <strong>Trivia Timer</strong> with its code, and that it's enabled.</td></tr>
+      <tr><td>It won't compile after adding questions</td><td>Each line needs quotes at both ends and a comma after it, and the answer after a |. Use the <em>Make lines</em> box above to get it right.</td></tr>
+      <tr><td>!triviatop says no winners</td><td>Your Streamer.bot version may not let actions list saved values. Wins still count; check them with <code>!triviawins</code>.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot, Twitch or Kick.</div></footer>
+<script>
+function q(id){return document.getElementById(id)}
+q("qmake").addEventListener("click",function(){
+  var out=q("qin").value.split("\n").map(function(l){return l.trim()}).filter(function(l){return l.indexOf("|")>0}).map(function(l){
+    var p=l.split("|").map(function(x){return x.trim()}).filter(Boolean);return '        "'+p.join("|").replace(/\\/g,"\\\\").replace(/"/g,"'")+'",'});
+  q("qout").textContent=out.length?out.join("\n"):"Add at least one line with a question, a | and the answer.";
+});
+document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){
+  var el=q(b.dataset.copy),t=el.innerText.trim(),o=b.textContent;
+  function done(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1500)}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,sel);else sel();
+  function sel(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand("copy");done()}catch(e){}}
+})});
+</script>
+</body>
+</html>
