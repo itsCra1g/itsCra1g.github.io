@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Goal Bars: follower, bits and Kicks goals for Twitch and Kick</title>
+<meta name="description" content="Free OBS goal bars by itsCRA1G: follower, bits, Kicks or bits + Kicks goals for Twitch and Kick together, up to three in one overlay, through Streamer.bot.">
+<meta property="og:title" content="Goal Bars: follower, bits and Kicks goals">
+<meta property="og:description" content="Up to three goal bars for followers, bits and Kicks across Twitch and Kick. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14);
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
+  radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.18),transparent 60%),
+  radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.14),transparent 60%),
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:16/8;max-width:100%}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+.grid2{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.sticky{position:sticky;top:84px}
+@media (max-width:900px){.sticky{position:static}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.lbl b{color:var(--fg)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.tog{display:flex;flex-direction:column;gap:10px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--acc);flex:0 0 auto}
+.tin{width:100%;min-width:0;font:15px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px}
+select.tin{appearance:auto}
+input[type=range]{width:100%;accent-color:var(--acc)}
+details{max-width:46em}summary{cursor:pointer;font-weight:600;color:var(--fg);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 100px;gap:8px;margin-top:10px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.tests{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tests button{font:600 13px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:999px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tests button:hover{border-color:var(--acc)}
+.tests i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.goals{display:flex;flex-direction:column;gap:12px;max-width:46em}
+.gl{background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:28px minmax(0,1.2fr) minmax(0,1.4fr) 96px 96px 36px;gap:10px;align-items:end}
+.gl .gn{font:700 18px var(--display);color:var(--acc);align-self:center}
+.gl label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);min-width:0}
+.gl .del{width:36px;height:40px;border-radius:10px;border:1px solid var(--edge2);background:var(--tile2);color:var(--mute);cursor:pointer;font-size:15px}
+.gl .del:hover{color:#FF6B6B;border-color:#FF6B6B}
+@media (max-width:700px){.gl{grid-template-columns:28px minmax(0,1fr) minmax(0,1fr) 36px}.gl .gw{grid-column:2/4}.gl .gw2{grid-column:2/4}}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td code{white-space:nowrap}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0;height:100%}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:flex;flex-direction:column;gap:14px;position:fixed;left:0;top:0;width:760px;padding:20px;transform-origin:0 0;transform:scale(var(--k,1));font-family:var(--text);color:#E8ECF2}
+.sg{--g:#4DA3FF;--gr:77,163,255;--o:.95;position:relative;
+  background:linear-gradient(135deg,rgba(17,19,24,var(--o)),rgba(8,9,12,var(--o)));border:1px solid rgba(var(--gr),.38);
+  box-shadow:0 0 0 1px rgba(0,0,0,calc(.6*var(--o))),0 0 16px -3px rgba(var(--gr),.5),0 8px 16px -8px rgba(0,0,0,calc(.85*var(--o)));
+  text-shadow:0 1px 3px rgba(0,0,0,calc(.9 - .9*var(--o)));transition:box-shadow .3s,border-color .3s}
+.sg.hit{box-shadow:0 0 0 1px rgba(0,0,0,calc(.6*var(--o))),0 0 24px 2px rgba(var(--gr),.9),0 8px 16px -8px rgba(0,0,0,calc(.85*var(--o)));border-color:rgba(var(--gr),.9)}
+.sg .lab{color:var(--g);font:700 13px var(--text);letter-spacing:3px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;transition:opacity .2s,color .3s}
+.sg .lab.thx{color:#fff}.sg .lab.fade{opacity:0}
+.sg .cnt{font:700 30px/1 var(--display);color:#F2F5F9;font-variant-numeric:tabular-nums;white-space:nowrap;transition:transform .25s}
+.sg .cnt small{font-size:.62em;color:#8A94A6;font-weight:700}
+.sg.hit .cnt{transform:scale(1.12)}
+.sg .trk{position:relative;height:14px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.sg .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:99px;background:linear-gradient(90deg,rgba(var(--gr),.75),var(--g));box-shadow:0 0 14px rgba(var(--gr),.85);transition:width .9s cubic-bezier(.2,.9,.2,1)}
+.sg.done .fill:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);background-size:200% 100%;animation:shine 1.8s linear infinite}
+@keyframes shine{from{background-position:150% 0}to{background-position:-50% 0}}
+.sg .pop{position:absolute;right:18px;top:-6px;font:700 17px var(--text);background:rgba(var(--gr),.9);color:var(--ink,#000);padding:4px 10px;border-radius:99px;opacity:0;transform:translateY(8px);pointer-events:none;white-space:nowrap;max-width:70%;overflow:hidden;text-overflow:ellipsis;text-shadow:none}
+.sg .pop.go{animation:pop 2.6s ease forwards}
+@keyframes pop{0%{opacity:0;transform:translateY(10px)}12%{opacity:1;transform:translateY(-14px)}80%{opacity:1;transform:translateY(-18px)}100%{opacity:0;transform:translateY(-26px)}}
+.l-bar .sg{width:720px;height:90px;border-radius:20px;padding:14px 20px 16px;display:flex;flex-direction:column;justify-content:space-between}
+.l-bar .sg .top{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+.l-pill .sg{height:48px;width:560px;border-radius:999px;padding:0 20px;display:flex;align-items:center;gap:14px}
+.l-pill .sg .top{display:contents}
+.l-pill .sg .lab{flex:0 1 auto;letter-spacing:2px;order:1;max-width:170px}
+.l-pill .sg .trk{flex:1;height:10px;order:2}
+.l-pill .sg .cnt{font-size:20px;order:3}
+.l-pill .sg .pop{top:auto;bottom:40px;right:12px;font-size:14px}
+@media (prefers-reduced-motion:reduce){.sg .fill{transition:none}.sg.done .fill:after{animation:none}}
+</style>
+</head>
+<body>
+<div id="ovr"></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Goal Bars</a>
+  <nav><a href="#setup">Set up</a><a href="#goals">Goals</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#chat">Commands</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
+    <h1>Follower, bits and Kicks goals.</h1>
+    <p class="lead">Up to three goal bars in one overlay, counting Twitch and Kick together: new followers, bits, Kicks, or bits and Kicks combined. Pairs with <a href="../sub-goal/">Sub Goal</a>.</p>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">Up to 3 bars</span><span class="chip">Bits + Kicks combined</span><span class="chip">Fix counts from chat</span><span class="chip">No Streamer.bot action needed</span></div>
+  </div>
+  <div class="stage"><iframe id="heroFrame" title="Goal bars preview" tabindex="-1"></iframe></div>
+</div></div>
+
+<main class="wrap">
+  <section id="setup">
+    <div class="sec-head"><span class="num">1</span><h2>Turn on Streamer.bot's WebSocket server</h2></div>
+    <p>The bars count events straight from <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> (1.0 or later), connected to Twitch, Kick or both. There's no action or code to add.</p>
+    <ol class="steps">
+      <li>In Streamer.bot, open <strong>Servers/Clients → WebSocket Server</strong>.</li>
+      <li>Tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Leave it on <code>127.0.0.1</code> port <code>8080</code> unless you've changed it.</li>
+    </ol>
+    <p>Already set up for Alerts, Activity Feed or Combined Chat? Then you're done.</p>
+  </section>
+
+  <section id="goals">
+    <div class="sec-head"><span class="num">2</span><h2>Set your goals</h2></div>
+    <p><strong>Start from</strong> is where the bar begins. For a total follower goal, put your follower count now (say 1,180 towards 1,500); for "new this stream", leave it at 0.</p>
+    <div class="goals" id="goalList"></div>
+    <div style="margin-top:12px"><button class="btn ghost" id="addGoal" type="button">+ Add a goal</button></div>
+    <div class="tog" style="margin-top:18px"><label><input type="checkbox" id="optFresh">Go back to "start from" each time you go live</label></div>
+    <p class="hint">Bits + Kicks counts 1 bit and 1 Kick the same, as both are worth about a cent.</p>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">3</span><h2>Style it</h2></div>
+    <div class="grid2">
+      <div class="ctl">
+        <div><div class="lbl">Layout</div><div class="seg" id="lySeg"><button data-v="bar" aria-pressed="true">Bar</button><button data-v="pill" aria-pressed="false">Pill</button></div></div>
+        <div><div class="lbl">Colour</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Background <b id="opV">95%</b></div><input type="range" id="op" min="0" max="100" step="5" value="95" aria-label="Background opacity"></div>
+        <div class="tog"><label><input type="checkbox" id="optPop" checked>Show who added to a goal</label></div>
+        <details><summary>Streamer.bot connection (only if you changed it)</summary>
+          <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
+          <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
+        </details>
+      </div>
+      <div class="sticky">
+        <div class="stage"><iframe id="prevFrame" title="Goal bars preview" tabindex="-1"></iframe></div>
+        <div class="tests"><button type="button" data-t="follow"><i style="background:#9146FF"></i>Follow</button><button type="button" data-t="cheer"><i style="background:#9146FF"></i>100 bits</button><button type="button" data-t="kicks"><i style="background:#53FC18"></i>100 Kicks</button><button type="button" data-t="kfollow"><i style="background:#53FC18"></i>Kick follow</button></div>
+        <p class="hint">Press one to see the bars count up. The preview uses made-up names.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">4</span><h2>Add it to OBS</h2></div>
+    <p>Your goal bars link, with your goals built in:</p>
+    <div class="copy"><input id="obsUrl" readonly aria-label="OBS link"><button class="btn" data-copy="obsUrl">Copy</button></div>
+    <ol class="steps">
+      <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+      <li>Paste the link into <strong>URL</strong> and set the size to <strong id="obsSize">760 × 340</strong>. Resize it in OBS to make it bigger or smaller.</li>
+      <li>Want the bars in more than one scene? Add the source once, then use <strong>Paste (Reference)</strong> in the other scenes, so they share one count.</li>
+    </ol>
+    <p>Changed a goal? Copy the new link and paste it over the old one. Changing a <strong>start from</strong> number restarts that bar from it.</p>
+  </section>
+
+  <section id="chat">
+    <div class="sec-head"><span class="num">5</span><h2>Fix a count from chat</h2></div>
+    <p>Missed something, or want to top a bar up? You and your mods can set it from Twitch or Kick chat. Bars are numbered top to bottom.</p>
+    <div class="tw"><table>
+      <tr><th>Type</th><th>What it does</th></tr>
+      <tr><td><code>!goalset 1 150</code></td><td>Sets bar 1 to 150.</td></tr>
+      <tr><td><code>!goaladd 2 500</code></td><td>Adds 500 to bar 2 (use a minus number to take some off).</td></tr>
+      <tr><td><code>!goalreset 1</code></td><td>Puts bar 1 back to its start from number.</td></tr>
+    </table></div>
+    <p class="hint">These work without setting up any commands in Streamer.bot: the overlay reads them from chat. They don't reply in chat; the bar just changes.</p>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>The bars don't move</td><td>Check Streamer.bot is running, its WebSocket server is started, and it's connected to Twitch or Kick. If you changed the address, port or set a password, enter them in step 3 and copy the link again.</td></tr>
+      <tr><td>Things count twice</td><td>You probably have two separate copies of the source. Delete one and use <strong>Paste (Reference)</strong> instead.</td></tr>
+      <tr><td>A count is wrong</td><td>Use <code>!goalset</code> from chat (step 5).</td></tr>
+      <tr><td>Kicks don't count</td><td>Kick's gift events are new in Streamer.bot; update Streamer.bot to the latest version.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot, Twitch or Kick.</div></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var GLOWS=[["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+var KINDS=[["follow","Followers","Follower goal"],["bits","Bits","Bits goal"],["kicks","Kicks","Kicks goal"],["bk","Bits + Kicks","Support goal"]];
+var KLAB={};KINDS.forEach(function(k){KLAB[k[0]]=k[2]});
+var BASE=location.origin+location.pathname;
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function lum(h){var c=[0,2,4].map(function(i){var v=parseInt(h.slice(i,i+2),16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+function fmtN(n){return Math.round(n).toLocaleString("en-GB")}
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+function overlay(){
+  var box=document.getElementById("ovr"),cfg,ws=null,live=false,seen={},kickHold={},kickMute={},bars=[],lastOnline=0;
+  function read(){
+    var p=new URLSearchParams(location.hash.slice(1));
+    var g=p.get("g")||"4DA3FF";if(!/^[0-9a-fA-F]{6}$/.test(g))g="4DA3FF";
+    var o=parseInt(p.get("o"),10);if(isNaN(o))o=95;
+    cfg={ly:p.get("ly")==="pill"?"pill":"bar",g:g.toUpperCase(),o:Math.max(0,Math.min(100,o))/100,pop:p.get("pop")!=="0",fresh:p.get("fresh")==="1",
+      goals:[],h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1"};
+    for(var i=1;i<=3;i++){var t=p.get("t"+i);if(!t||!KLAB[t])continue;
+      cfg.goals.push({k:t,goal:Math.max(1,parseInt(p.get("g"+i),10)||100),start:Math.max(0,parseInt(p.get("s"+i),10)||0),lab:(p.get("l"+i)||KLAB[t]).slice(0,40)})}
+    if(!cfg.goals.length)cfg.goals.push({k:"follow",goal:50,start:0,lab:KLAB.follow});
+    document.documentElement.className="ov l-"+cfg.ly;
+  }
+  function fit(){box.style.setProperty("--k",innerWidth/760)}
+  function el(t,c){var e=document.createElement(t);if(c)e.className=c;return e}
+  // each bar's count is kept in the OBS browser, so it survives restarts
+  function key(i,g){return "gb_"+i+"_"+g.k}
+  function load(i,g){
+    if(cfg.demo)return g.start;
+    try{var s=JSON.parse(localStorage.getItem(key(i,g))||"null");if(s&&s.base===g.start&&typeof s.c==="number")return s.c}catch(e){}
+    return g.start;
+  }
+  function save(i){if(cfg.demo)return;var b=bars[i];try{localStorage.setItem(key(i,b.g),JSON.stringify({c:b.c,base:b.g.start}))}catch(e){}}
+  function build(){
+    box.innerHTML="";bars=[];
+    cfg.goals.forEach(function(g,i){
+      var d=el("div","sg"),top=el("div","top"),lab=el("div","lab"),cnt=el("div","cnt"),trk=el("div","trk"),fill=el("div","fill"),pop=el("div","pop");
+      d.style.setProperty("--g","#"+cfg.g);d.style.setProperty("--gr",hx2rgb(cfg.g));d.style.setProperty("--o",cfg.o);d.style.setProperty("--ink",lum(cfg.g)>.35?"#000":"#fff");
+      lab.textContent=g.lab;top.appendChild(lab);top.appendChild(cnt);trk.appendChild(fill);d.appendChild(top);d.appendChild(trk);d.appendChild(pop);box.appendChild(d);
+      var b={g:g,c:load(i,g),d:d,lab:lab,cnt:cnt,fill:fill,pop:pop,t:0};bars.push(b);draw(b);
+    });
+  }
+  function draw(b){
+    b.cnt.innerHTML="";b.cnt.appendChild(document.createTextNode(fmtN(b.c)));var s=el("small");s.textContent=" / "+fmtN(b.g.goal);b.cnt.appendChild(s);
+    b.fill.style.width=Math.max(0,Math.min(100,b.c/b.g.goal*100))+"%";b.d.classList.toggle("done",b.c>=b.g.goal);
+  }
+  function bump(i,n,who){
+    var b=bars[i];if(!b||!n)return;var was=b.c;b.c=Math.max(0,b.c+n);draw(b);save(i);
+    b.d.classList.add("hit");clearTimeout(b.t);b.t=setTimeout(function(){b.d.classList.remove("hit")},900);
+    if(cfg.pop&&who&&n>0){b.pop.textContent="+"+fmtN(n)+" "+who;b.pop.classList.remove("go");void b.pop.offsetWidth;b.pop.classList.add("go")}
+    if(was<b.g.goal&&b.c>=b.g.goal){b.lab.classList.add("fade");setTimeout(function(){b.lab.textContent="Goal reached!";b.lab.classList.add("thx");b.lab.classList.remove("fade")},200);
+      setTimeout(function(){b.lab.classList.add("fade");setTimeout(function(){b.lab.textContent=b.g.lab;b.lab.classList.remove("thx","fade")},200)},5000)}
+  }
+  function setTo(i,n){var b=bars[i];if(!b)return;b.c=Math.max(0,n);draw(b);save(i)}
+  // which bars an event counts towards
+  function push(a){
+    if(!a||!a.name)return;
+    bars.forEach(function(b,i){
+      var k=b.g.k,n=0;
+      if(a.type==="follow"&&k==="follow")n=1;
+      else if(a.type==="cheer"&&(k==="bits"||k==="bk"))n=+a.amount||0;
+      else if(a.type==="kicks"&&(k==="kicks"||k==="bk"))n=+a.amount||0;
+      if(n>0)bump(i,n,a.name);
+    });
+  }
+
+  /* ---- reading Streamer.bot's events ---- */
+  function nm(o){if(!o||typeof o!=="object")return "";return String(o.name||o.displayName||o.display_name||o.userName||o.login||o.username||o.slug||"")}
+  function who(d){return nm(d.user)||d.user_name||d.userName||d.displayName||d.display_name||d.username||nm(d.targetUser)||nm(d.follower)||""}
+  function num(){for(var i=0;i<arguments.length;i++){var v=parseInt(arguments[i],10);if(!isNaN(v)&&v>0)return v}return 0}
+  function txt(d){var m=d.message&&typeof d.message==="object"?d.message:null;var t=typeof d.text==="string"?d.text:typeof d.message==="string"?d.message:m&&typeof m.message==="string"?m.message:"";return t.slice(0,240)}
+  function anon(d){return !!(d.isAnonymous||d.anonymous||d.gifterIsAnonymous)}
+  function tier(d){if(d.isPrime||d.is_prime)return "Prime";var s=String(d.subTier||d.sub_tier||d.tier||"");return /3/.test(s)?"Tier 3":/2/.test(s)?"Tier 2":""}
+  function stripCheer(t,d){
+    var names=(d.cheerEmotes||[]).map(function(c){return String(c.Name||c.name||"").replace(/[^A-Za-z]/g,"")}).filter(Boolean);
+    var re=names.length?new RegExp("(^|\\s)("+names.join("|")+")\\d+(?=\\s|$)","gi"):/(^|\s)cheer\d+(?=\s|$)/gi;
+    return t.replace(re,"$1").replace(/\s{2,}/g," ").trim();
+  }
+  function onceOnly(d){var id=d.messageId||d.id||"";if(!id)return true;id=String(id);if(seen[id])return false;seen[id]=Date.now();
+    var ks=Object.keys(seen);if(ks.length>300)ks.slice(0,100).forEach(function(k){delete seen[k]});return true}
+  function twitch(type,d){
+    switch(type){
+      case "Follow":return {type:"follow",name:who(d)};
+      case "Sub":return {type:"sub",name:who(d),tier:tier(d)};
+      case "ReSub":return {type:"resub",name:who(d),months:num(d.cumulativeMonths,d.cumulative,d.durationMonths,d.monthsSubscribed),tier:tier(d),msg:txt(d)};
+      case "GiftSub":
+        if(d.fromCommunitySubGift||d.from_community_sub_gift)return null; // part of a gift bomb, shown once by GiftBomb
+        return {type:"gift",name:anon(d)?"Anonymous":who(d),to:nm(d.recipient)||d.recipientDisplayName||d.recipientUser||"",tier:tier(d)};
+      case "GiftBomb":return {type:"bomb",name:anon(d)?"Anonymous":who(d),amount:num(d.total,d.gifts,d.count,(d.recipients||[]).length),tier:tier(d)};
+      case "Cheer":{var bits=num(d.bits,d.message&&d.message.bits);return {type:"cheer",name:anon(d)?"Anonymous":who(d),amount:bits,msg:stripCheer(txt(d),d)}}
+      case "Raid":return {type:"raid",name:nm(d.raider)||d.from_broadcaster_user_name||d.fromBroadcasterUserName||who(d),amount:num(d.viewers,d.viewerCount)};
+    }
+    return null;
+  }
+  function kick(type,d){
+    switch(type){
+      case "Follow":return {type:"follow",name:who(d)};
+      case "Subscription":return {type:"sub",name:who(d)};
+      case "Resubscription":return {type:"resub",name:who(d),months:num(d.duration,d.months,d.cumulativeMonths),msg:txt(d)};
+      case "GiftSubscription":{
+        var g=anon(d)?"Anonymous":who(d),key=g.toLowerCase(),r=d.recipient||(d.recipients&&d.recipients[0]);
+        var mu=kickMute[key];if(mu&&mu.left>0&&mu.until>Date.now()){mu.left--;return null}  // already shown as part of a mass gift
+        var a={src:"kick",type:"gift",name:g,to:nm(r)};
+        // hold it a moment, in case it turns out to be part of a mass gift
+        var h=kickHold[key]||(kickHold[key]={list:[],t:0});h.list.push(a);clearTimeout(h.t);
+        h.t=setTimeout(function(){delete kickHold[key];if(h.list.length===1)push(h.list[0]);else push({src:"kick",type:"bomb",name:g,amount:h.list.length})},1500);
+        return "held";
+      }
+      case "MassGiftSubscription":{
+        var gg=anon(d)?"Anonymous":who(d),k2=gg.toLowerCase(),n=num((d.recipients||[]).length,d.quantity,d.total,d.count,d.amount);
+        if(kickHold[k2]){clearTimeout(kickHold[k2].t);n=Math.max(n,kickHold[k2].list.length);delete kickHold[k2]}
+        kickMute[k2]={until:Date.now()+20000,left:n};
+        return {type:"bomb",name:gg,amount:n};
+      }
+      case "KicksGifted":{
+        var gift=d.gift&&typeof d.gift==="object"?d.gift:{};
+        return {type:"kicks",name:anon(d)?"Anonymous":(who(d)||nm(d.sender)),amount:num(d.amount,d.kicks,d.quantity,d.total,gift.amount,gift.kicks,gift.value),msg:txt(d)};
+      }
+    }
+    return null;
+  }
+  function isMod(d){
+    var u=d.user||{},role=+u.role||0;if(role>=3)return true;
+    if(u.isModerator||u.isBroadcaster||d.isModerator||d.isBroadcaster)return true;
+    return (u.badges||d.badges||[]).some(function(b){var n=String(b.name||b.type||b.setId||"").toLowerCase();return n==="moderator"||n==="broadcaster"});
+  }
+  function chat(d){
+    var t=String(d.text||d.message||"").trim();if(t.charAt(0)!=="!")return;
+    var m=t.match(/^!goal(set|add|reset)\s+(\d)(?:\s+(-?[\d,]+))?\s*$/i);if(!m||!isMod(d))return;
+    var i=+m[2]-1,n=parseInt(String(m[3]||"0").replace(/,/g,""),10)||0,op=m[1].toLowerCase();
+    if(!bars[i])return;
+    if(op==="set")setTo(i,n);else if(op==="add"){if(n>0)bump(i,n,"");else setTo(i,bars[i].c+n)}else setTo(i,bars[i].g.start);
+  }
+  function handle(src,type,d){
+    if(type==="StreamOnline"){if(cfg.fresh&&!d.isTest&&Date.now()-lastOnline>600000){lastOnline=Date.now();bars.forEach(function(b,i){setTo(i,b.g.start)})}return}
+    if(type==="ChatMessage"){chat(d);return}
+    if(!onceOnly(d))return;
+    var a=src==="kick"?kick(type,d):twitch(type,d);
+    if(!a||a==="held")return;a.src=src;push(a);
+  }
+  async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
+  function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+  var EVENTS=[["Twitch","Follow"],["Twitch","Cheer"],["Twitch","ChatMessage"],["Twitch","StreamOnline"],["Kick","Follow"],["Kick","KicksGifted"],["Kick","ChatMessage"],["Kick","StreamOnline"]];
+  function subscribe(){
+    if(live)return;live=true;
+    EVENTS.forEach(function(e,i){var ev={};ev[e[0]]=[e[1]];send({request:"Subscribe",id:"gb-"+i,events:ev})});
+  }
+  function connect(){
+    live=false;
+    try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.port+"/")}catch(e){setTimeout(connect,5000);return}
+    var helloT=setTimeout(subscribe,1500);
+    ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.request==="Hello"){clearTimeout(helloT);if(m.authentication&&cfg.pw){var a=m.authentication;var s=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"gb-auth",authentication:await sha(s+a.challenge)})}else subscribe();return}
+      if(m.id==="gb-auth"){subscribe();return}
+      if(!m.event||!m.data)return;
+      var src=String(m.event.source||"").toLowerCase();
+      if(src==="twitch"||src==="kick")handle(src,String(m.event.type||""),m.data);
+    };
+    ws.onclose=function(){clearTimeout(helloT);live=false;setTimeout(connect,3000)};
+    ws.onerror=function(){try{ws.close()}catch(x){}};
+  }
+  var NAMES=["NightOwlTV","Kezza_Plays","pixelpete","Morag","Loco_Lou","LateShift"],ni=0;
+  function demo(t){var n=NAMES[ni++%NAMES.length];
+    if(t==="follow")push({type:"follow",name:n});else if(t==="kfollow")push({type:"follow",name:n});
+    else if(t==="cheer")push({type:"cheer",name:n,amount:100});else if(t==="kicks")push({type:"kicks",name:n,amount:100})}
+  read();fit();addEventListener("resize",fit);build();
+  if(cfg.demo){
+    // the preview starts part-way so the bars have something in them
+    bars.forEach(function(b,i){setTo(i,Math.max(b.g.start,Math.round(b.g.start+(b.g.goal-b.g.start)*(.55-i*.15))))});
+    var auto=new URLSearchParams(location.hash.slice(1)).get("auto")==="1";
+    window.addEventListener("message",function(e){var d=e.data;if(!d)return;
+      if(typeof d.gbHash==="string"){try{history.replaceState(null,"","#"+d.gbHash)}catch(x){}read();build();bars.forEach(function(b,i){setTo(i,Math.max(b.g.start,Math.round(b.g.start+(b.g.goal-b.g.start)*(.55-i*.15))))});return}
+      if(typeof d.gb==="string"){auto=false;demo(d.gb)}});
+    var cyc=["follow","cheer","kfollow","kicks"],ci=0;
+    setInterval(function(){if(auto)demo(cyc[ci++%cyc.length])},2600);
+    return;
+  }
+  addEventListener("hashchange",function(){read();build()});
+  connect();
+}
+
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={goals:[{k:"follow",goal:50,start:0,lab:""},{k:"bk",goal:5000,start:0,lab:""}],fresh:0,ly:"bar",g:"4DA3FF",o:95,pop:1,h:"127.0.0.1",p:"8080"};
+  try{var sv=JSON.parse(ls("gb_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  if(!Array.isArray(S.goals)||!S.goals.length)S.goals=[{k:"follow",goal:50,start:0,lab:""}];
+  var list=$("goalList");
+  function drawGoals(){
+    list.innerHTML="";
+    S.goals.forEach(function(g,i){
+      var r=document.createElement("div");r.className="gl";
+      r.innerHTML='<span class="gn">'+(i+1)+'</span><label>Counts<select class="tin"></select></label><label class="gw">Label<input class="tin" maxlength="40" spellcheck="false"></label><label>Goal<input class="tin" type="number" min="1" inputmode="numeric"></label><label class="gw2">Start from<input class="tin" type="number" min="0" inputmode="numeric"></label><button class="del" type="button" title="Remove this goal" aria-label="Remove goal '+(i+1)+'">✕</button>';
+      var sel=r.querySelector("select"),ins=r.querySelectorAll("input");
+      KINDS.forEach(function(k){var o=document.createElement("option");o.value=k[0];o.textContent=k[1];if(k[0]===g.k)o.selected=true;sel.appendChild(o)});
+      ins[0].value=g.lab;ins[0].placeholder=KLAB[g.k];ins[1].value=g.goal;ins[2].value=g.start;
+      sel.addEventListener("change",function(){g.k=sel.value;ins[0].placeholder=KLAB[g.k];sync()});
+      ins[0].addEventListener("input",function(){g.lab=this.value.trim();sync()});
+      ins[1].addEventListener("input",function(){var v=parseInt(this.value,10);if(v>0){g.goal=v;sync()}});
+      ins[2].addEventListener("input",function(){var v=parseInt(this.value,10);g.start=v>0?v:0;sync()});
+      var del=r.querySelector(".del");del.hidden=S.goals.length<2;del.addEventListener("click",function(){S.goals.splice(i,1);drawGoals();sync()});
+      list.appendChild(r);
+    });
+    $("addGoal").hidden=S.goals.length>=3;
+  }
+  $("addGoal").addEventListener("click",function(){var used=S.goals.map(function(g){return g.k});var k=["follow","bits","kicks","bk"].find(function(x){return used.indexOf(x)<0})||"follow";
+    S.goals.push({k:k,goal:k==="follow"?50:1000,start:0,lab:""});drawGoals();sync()});
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
+  var nmL=document.createElement("span");nmL.className="name";sw.appendChild(nmL);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  $("lySeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.ly=b.dataset.v;sync()}});
+  $("op").addEventListener("input",function(){S.o=+this.value;sync()});
+  $("optPop").addEventListener("change",function(){S.pop=this.checked?1:0;sync()});
+  $("optFresh").addEventListener("change",function(){S.fresh=this.checked?1:0;sync()});
+  [["host","h"],["port","p"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value.trim();sync()})});
+  $("pw").addEventListener("input",sync);
+  document.querySelectorAll("[data-t]").forEach(function(b){b.addEventListener("click",function(){var f=$("prevFrame");if(f.contentWindow)f.contentWindow.postMessage({gb:b.dataset.t},"*")})});
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){var el=$(b.dataset.copy),o=b.textContent;
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select()})});
+  $("host").value=S.h;$("port").value=S.p;
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(S.ly!=="bar")p.set("ly",S.ly);p.set("g",S.g);if(S.o!==95)p.set("o",String(S.o));
+    if(!S.pop)p.set("pop","0");if(S.fresh)p.set("fresh","1");
+    S.goals.forEach(function(g,i){var n=i+1;p.set("t"+n,g.k);p.set("g"+n,String(g.goal));if(g.start)p.set("s"+n,String(g.start));if(g.lab)p.set("l"+n,g.lab)});
+    if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw);
+    for(var k in extra)p.set(k,extra[k]);return p.toString()}
+  function sync(){
+    ls("gb_cfg",JSON.stringify(S));
+    $("lySeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.ly)});
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nmL.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("op").value=S.o;$("opV").textContent=S.o+"%";$("optPop").checked=!!S.pop;$("optFresh").checked=!!S.fresh;
+    var h=S.ly==="pill"?[760,40+S.goals.length*62]:[760,40+S.goals.length*104];$("obsSize").textContent=h[0]+" × "+h[1];
+    $("obsUrl").value=BASE+"#"+hash({});
+    var pf=$("prevFrame");
+    if(pf.dataset.on&&pf.contentWindow)pf.contentWindow.postMessage({gbHash:hash({demo:"1"})},"*");
+    else{pf.src=BASE+"#"+hash({demo:"1"});pf.dataset.on=1}
+  }
+  $("heroFrame").src=BASE+"#ov=1&demo=1&auto=1&g=4DA3FF&t1=follow&g1=1500&s1=1180&l1=Road+to+1,500+followers&t2=bk&g2=5000&l2=Bits+%2B+Kicks+goal&t3=kicks&g3=2000";
+  drawGoals();sync();
+}
+})();
+</script>
+</body>
+</html>
