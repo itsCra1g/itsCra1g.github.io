@@ -14,7 +14,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
-@property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
 :root{
   --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
   --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14);
@@ -116,24 +115,34 @@ html.ov .site{display:none}
 #ovr{display:none}
 html.ov #ovr{display:block;position:fixed;inset:0;font-family:var(--text);
   --c:77,163,255;--rc:77,163,255;--bw:8px;--r:24px;--m:20px;--gl:14px;--cl:16%}
-.ring,.flash,.burst{position:absolute;inset:var(--m);border-radius:var(--r);padding:var(--bw);pointer-events:none;
+.ring,.flash,.burst{position:absolute;inset:var(--m);border-radius:var(--r);padding:var(--bw);pointer-events:none;overflow:hidden;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
-.glow{position:absolute;inset:var(--m);border-radius:var(--r);pointer-events:none;
-  box-shadow:0 0 var(--gl) calc(var(--gl)*.15) rgba(var(--c),.75),inset 0 0 var(--gl) calc(var(--gl)*.1) rgba(var(--c),.55);transition:box-shadow .4s}
+/* a big rotating gradient behind the ring's mask: turned by the graphics card, so it stays smooth */
+.sweep{position:absolute;left:50%;top:50%;width:300vmax;height:300vmax;margin:-150vmax 0 0 -150vmax;will-change:transform}
+.glow{position:absolute;inset:var(--m);border-radius:var(--r);pointer-events:none;will-change:opacity;
+  box-shadow:0 0 var(--gl) calc(var(--gl)*.15) rgba(var(--c),.75),inset 0 0 var(--gl) calc(var(--gl)*.1) rgba(var(--c),.55)}
 .ring{background:rgb(var(--c))}
 /* idle styles */
 .id-breathe .glow{animation:breathe 3.2s ease-in-out infinite}
-@keyframes breathe{50%{box-shadow:0 0 calc(var(--gl)*.35) 0 rgba(var(--c),.35),inset 0 0 calc(var(--gl)*.3) 0 rgba(var(--c),.25)}}
-.id-spin .ring{background:conic-gradient(from var(--a),rgb(var(--c)),rgba(var(--c),.25) 18%,rgba(var(--c),.25) 32%,rgb(var(--c)) 50%,rgba(var(--c),.25) 68%,rgba(var(--c),.25) 82%,rgb(var(--c)));animation:spin 6s linear infinite}
-@keyframes spin{to{--a:360deg}}
+.id-breathe .cglow{animation:breatheC 3.2s ease-in-out infinite}
+.hit-s .cglow,.hit-m .cglow,.hit-l .cglow{animation:none}
+@keyframes breathe{50%{opacity:.4}}
+@keyframes breatheC{50%{opacity:.72}}
+.ring .sweep{display:none}
+.id-spin .ring{background:rgba(var(--c),.3)}
+.id-spin .ring .sweep{display:block;background:conic-gradient(rgb(var(--c)),rgba(var(--c),0) 15%,rgba(var(--c),0) 35%,rgb(var(--c)) 50%,rgba(var(--c),0) 65%,rgba(var(--c),0) 85%,rgb(var(--c)));animation:rot 6s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
 /* reactions */
-.flash{background:conic-gradient(from var(--a),rgb(var(--rc)),#fff 10%,rgb(var(--rc)) 22%,rgb(var(--rc)) 50%,#fff 60%,rgb(var(--rc)) 72%,rgb(var(--rc)));opacity:0;animation:spin 1.1s linear infinite}
+.flash{background:rgb(var(--rc));opacity:0;will-change:opacity}
+.flash .sweep{background:conic-gradient(rgba(255,255,255,0),#fff 8%,rgba(255,255,255,0) 18%,rgba(255,255,255,0) 50%,#fff 58%,rgba(255,255,255,0) 68%,rgba(255,255,255,0));animation:rot 1.1s linear infinite}
+.hit-l .flash .sweep{animation-duration:.7s}
 .fglow{position:absolute;inset:var(--m);border-radius:var(--r);pointer-events:none;opacity:0;
   box-shadow:0 0 calc(var(--gl)*2.2) calc(var(--gl)*.4) rgba(var(--rc),.95),inset 0 0 calc(var(--gl)*1.6) calc(var(--gl)*.2) rgba(var(--rc),.7)}
-.burst{background:rgb(var(--rc));opacity:0}
-.hit-s .flash,.hit-s .fglow{animation:spin 1.1s linear infinite,hitS 1.5s ease-out}
-.hit-m .flash,.hit-m .fglow{animation:spin 1.1s linear infinite,hitM 2.6s ease-in-out}
-.hit-l .flash,.hit-l .fglow{animation:spin .7s linear infinite,hitL 4.2s ease-in-out}
+.burst{background:rgb(var(--rc));opacity:0;will-change:transform,opacity}
+.fglow{will-change:opacity}
+.hit-s .flash,.hit-s .fglow{animation:hitS 1.5s ease-out}
+.hit-m .flash,.hit-m .fglow{animation:hitM 2.6s ease-in-out}
+.hit-l .flash,.hit-l .fglow{animation:hitL 4.2s ease-in-out}
 .hit-m .burst{animation:burst 1.1s ease-out}
 .hit-l .burst{animation:burst 1.1s ease-out 0s 3}
 @keyframes hitS{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
@@ -322,8 +331,9 @@ function overlay(){
     s.setProperty("--m",Math.max(8,Math.round(cfg.gl*1.4+cfg.bw/2))+"px");s.setProperty("--tfs",cfg.tfs+"px");
     s.setProperty("--ink",lum(cfg.g)>.35?"#000":"#fff");
     box.innerHTML="";
-    if(cfg.st==="corners"){var cg=el("div","cglow"),cm=el("div","cmask");cm.appendChild(el("div","ring"));cm.appendChild(el("div","flash"));cm.appendChild(el("div","burst"));cg.appendChild(cm);box.appendChild(cg)}
-    else{box.appendChild(el("div","glow"));box.appendChild(el("div","ring"));box.appendChild(el("div","fglow"));box.appendChild(el("div","flash"));box.appendChild(el("div","burst"))}
+    function sw(c){var d=el("div",c);d.appendChild(el("div","sweep"));return d}
+    if(cfg.st==="corners"){var cg=el("div","cglow"),cm=el("div","cmask");cm.appendChild(sw("ring"));cm.appendChild(sw("flash"));cm.appendChild(el("div","burst"));cg.appendChild(cm);box.appendChild(cg)}
+    else{box.appendChild(el("div","glow"));box.appendChild(sw("ring"));box.appendChild(el("div","fglow"));box.appendChild(sw("flash"));box.appendChild(el("div","burst"))}
     tag=el("div","tag");tagTx=el("span");tag.appendChild(tagTx);box.appendChild(tag);idleTag();
   }
   function idleTag(){tag.classList.remove("ev");if(cfg.tag){tagTx.textContent=cfg.tag;tag.classList.remove("hide")}else tag.classList.add("hide")}
@@ -433,7 +443,9 @@ function overlay(){
   read();build();
   if(cfg.demo){
     var order=["follow","sub","raid","cheer","bomb","kicks"],i=0,auto=new URLSearchParams(location.hash.slice(1)).get("auto")==="1";
-    window.addEventListener("message",function(e){var d=e.data;if(!d||typeof d.cf!=="string"||!SAMPLE[d.cf])return;auto=false;queue=[];push(sample(d.cf),true)});
+    window.addEventListener("message",function(e){var d=e.data;if(!d)return;
+      if(typeof d.cfHash==="string"){try{history.replaceState(null,"","#"+d.cfHash)}catch(x){}read();build();return}
+      if(typeof d.cf!=="string"||!SAMPLE[d.cf])return;auto=false;queue=[];push(sample(d.cf),true)});
     (function loop(){if(auto&&!busy&&!queue.length)push(sample(order[i++%order.length]),true);setTimeout(loop,1800)})();
     return;
   }
@@ -501,7 +513,9 @@ function setup(){
     $("optTev").checked=!!S.tev;$("tfsBox").hidden=!S.tag&&!S.tev;
     list.querySelectorAll(".al-row").forEach(function(r){var on=S.off.indexOf(r.dataset.k)<0;r.querySelector('input[type=checkbox]').checked=on;r.classList.toggle("off",!on);r.querySelector(".tin").disabled=!S.tev});
     $("obsUrl").value=BASE+"#"+hash({});
-    clearTimeout(pvT);pvT=setTimeout(function(){frame($("prevFrame"),hash({demo:"1"}))},300);
+    var pf=$("prevFrame");
+    if(pf.dataset.on&&pf.contentWindow)pf.contentWindow.postMessage({cfHash:hash({demo:"1"})},"*");   // live update, no reload
+    else{clearTimeout(pvT);pvT=setTimeout(function(){frame(pf,hash({demo:"1"}))},300)}
   }
   frame($("heroFrame"),"ov=1&demo=1&auto=1&g=4DA3FF&id=spin&tag=itsCRA1G&tfs=16&gl=12&bw=6");
   sync();
