@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chat Poll: one poll for Twitch and Kick chat together</title>
+<meta name="description" content="A free poll for Streamer.bot and OBS by itsCRA1G: start a poll with a command and viewers on Twitch and Kick vote in chat, with live bars on stream.">
+<meta property="og:title" content="Chat Poll: one poll for Twitch and Kick together">
+<meta property="og:description" content="Run one poll across Twitch and Kick chat, with live results on stream. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14);
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
+  radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.18),transparent 60%),
+  radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.14),transparent 60%),
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:4/3;max-width:100%}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 17px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+textarea.code{display:block;width:100%;max-width:46em;font:12.5px/1.45 var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px;resize:vertical;white-space:pre;overflow:auto}
+textarea.imp{white-space:pre-wrap;word-break:break-all}
+.grid2{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.sticky{position:sticky;top:84px}
+@media (max-width:900px){.sticky{position:static}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.lbl b{color:var(--fg)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.tog{display:flex;flex-direction:column;gap:10px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--acc);flex:0 0 auto}
+.tin{width:100%;min-width:0;font:15px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+details{max-width:46em}summary{cursor:pointer;font-weight:600;color:var(--fg);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 100px;gap:8px;margin-top:10px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.tests{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tests button{font:600 13px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:999px;padding:7px 12px;cursor:pointer}
+.tests button:hover{border-color:var(--acc)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td code{white-space:nowrap}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0;height:100%}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:block;position:fixed;left:0;top:0;width:800px;transform-origin:0 0;transform:scale(var(--k,1));font-family:var(--text);color:#F2F5F9}
+.pl{--gr:77,163,255;--o:.9;--ink:#000;margin:20px;padding:22px 24px 18px;border-radius:22px;
+  background:linear-gradient(150deg,rgba(20,23,30,var(--o)),rgba(7,8,11,var(--o)));border:1px solid rgba(var(--gr),.4);
+  box-shadow:0 0 34px -10px rgba(var(--gr),.8),0 18px 40px -20px rgba(0,0,0,.7);transition:opacity .5s,transform .5s}
+.pl.in{animation:plIn .55s cubic-bezier(.2,1.2,.4,1)}
+.pl.bye{opacity:0;transform:translateY(-14px) scale(.98)}
+@keyframes plIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.pl .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.pl .tag{font:800 13px/1 var(--text);letter-spacing:.16em;color:var(--ink);background:rgb(var(--gr));border-radius:7px;padding:6px 9px}
+.pl .pf{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:6px}
+.pl .pf svg{width:15px;height:15px}.pl .pf.tw{background:#9146FF}.pl .pf.tw svg{fill:#fff}.pl .pf.kk{background:#53FC18}.pl .pf.kk svg{fill:#000}
+.pl .clock{margin-left:auto;display:flex;align-items:center;gap:8px;font:700 22px var(--display);font-variant-numeric:tabular-nums;color:#fff}
+.pl .clock svg{width:30px;height:30px;transform:rotate(-90deg)}
+.pl .clock circle{fill:none;stroke-width:4}.pl .clock .tr{stroke:rgba(255,255,255,.14)}.pl .clock .rg{stroke:rgb(var(--gr));stroke-linecap:round;transition:stroke-dashoffset .9s linear}
+.pl .clock.low{color:#FFB020}.pl .clock.low .rg{stroke:#FFB020}
+.pl .q{font:700 30px/1.15 var(--display);color:#fff;margin:2px 0 16px;overflow-wrap:anywhere}
+.pl .opts{display:flex;flex-direction:column;gap:10px}
+.op{position:relative;display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;border-radius:12px;background:rgba(255,255,255,.05);overflow:hidden;transition:opacity .5s,box-shadow .5s}
+.op .fill{position:absolute;left:0;top:0;bottom:0;display:flex;width:0;transition:width .6s cubic-bezier(.2,.9,.2,1);z-index:0}
+.op .fill i{display:block;height:100%;transition:flex-grow .6s}
+.op .fill .t{background:linear-gradient(90deg,rgba(145,70,255,.55),rgba(145,70,255,.85))}.op .fill .k{background:linear-gradient(90deg,rgba(83,252,24,.45),rgba(83,252,24,.75))}
+.op .fill .s{background:linear-gradient(90deg,rgba(var(--gr),.35),rgba(var(--gr),.7))}
+.op>*:not(.fill){position:relative;z-index:1}
+.op .n{flex:0 0 auto;width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font:800 18px var(--display);color:var(--ink);background:rgb(var(--gr))}
+.op .t2{flex:1;min-width:0;font:600 21px/1.2 var(--text);color:#fff;overflow-wrap:anywhere;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.op .v{flex:0 0 auto;text-align:right;font:700 20px var(--display);color:#fff;font-variant-numeric:tabular-nums;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.op .v small{display:block;font:600 12px var(--text);color:#C9D0DB}
+.op .win{display:none;font:800 11px/1 var(--text);letter-spacing:.14em;color:#000;background:#fff;border-radius:6px;padding:5px 7px}
+.closed .op{opacity:.45}
+.closed .op.w{opacity:1;box-shadow:0 0 0 2px rgb(var(--gr)),0 0 26px -4px rgba(var(--gr),.9)}
+.closed .op.w .win{display:inline-block}
+.pl .foot{display:flex;justify-content:space-between;gap:12px;margin-top:14px;font:600 15px var(--text);color:#AEB6C4}
+.pl .foot b{color:#fff}
+@media (prefers-reduced-motion:reduce){.pl.in{animation:none}.op .fill{transition:none}}
+</style>
+</head>
+<body>
+<div id="ovr"></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Chat Poll</a>
+  <nav><a href="#setup">Set up</a><a href="#use">Commands</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free Streamer.bot action + OBS overlay · by itsCRA1G</div>
+    <h1>One poll for Twitch and Kick chat.</h1>
+    <p class="lead">Twitch's own polls leave your Kick viewers out. Start a poll with one command and everyone votes by typing a number in either chat, with live bars on stream showing Twitch and Kick votes side by side.</p>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">Vote by typing 1, 2, 3</span><span class="chip">Live results on stream</span><span class="chip">Results posted to both chats</span><span class="chip">Up to 6 options</span></div>
+  </div>
+  <div class="stage"><iframe id="heroFrame" title="Poll preview" tabindex="-1"></iframe></div>
+</div></div>
+
+<main class="wrap">
+  <section id="setup">
+    <div class="sec-head"><span class="num">1</span><h2>Add it to Streamer.bot</h2></div>
+    <p>Polls run in <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> (1.0 or later), connected to Twitch, Kick or both, so votes count and results post to chat even when the overlay isn't on screen.</p>
+    <div id="impBox">
+      <ol class="steps">
+        <li>In Streamer.bot, press <strong>Import</strong> (top of the window), paste this into <strong>Import String</strong> and press <strong>Import</strong>. It adds two actions, <code>Poll</code> and <code>Poll Timer</code>, and the poll commands.
+          <textarea id="plImp" class="code imp" readonly rows="3" aria-label="Poll import string" style="margin-top:8px"></textarea>
+          <button class="btn ghost" type="button" data-copy="plImp" style="margin-top:8px">Copy import string</button></li>
+        <li>Open the <strong>Commands</strong> tab and switch on the imported commands (right-click each one and tick <strong>Enabled</strong>). Commands always arrive switched off.</li>
+        <li>For the overlay, open <strong>Servers/Clients → WebSocket Server</strong>, tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Already done this for another overlay here? Then skip it.</li>
+      </ol>
+    </div>
+    <details id="diyBox"><summary>Rather make it yourself?</summary>
+      <ol class="steps" style="margin-top:12px">
+        <li>Add an action called exactly <code>Poll</code>. Add a sub-action <strong>Core → C# → Execute C# Code</strong>, paste in this code, then press <strong>Compile</strong> and <strong>Save and Compile</strong>.
+          <textarea id="plCode" class="code" readonly rows="5" aria-label="Poll code" style="margin-top:8px">// Poll for Streamer.bot, free from itsCRA1G (itscra1g.github.io/poll)
+// One poll for Twitch and Kick chat together. Viewers vote by typing the option&#x27;s number.
+// Works with the &quot;Poll Timer&quot; action (closes the poll when time&#x27;s up) and the Poll overlay.
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+
+public class CPHInline
+{
+    // ===== Change these to suit your stream =====
+
+    private const int DefaultSeconds = 60;        // how long a poll runs if you don&#x27;t give a time
+    private const int MaxOptions = 6;             // most options a poll can have
+    private const bool ModsOnly = true;           // true = only mods and you can start, end or cancel polls
+    private const bool AllowChangeVote = true;    // true = viewers can change their vote by typing another number
+    private const bool VoteByName = true;         // true = typing an option&#x27;s name exactly also counts as a vote
+
+    // {question}, {options} (like &quot;1 Rebirth  2 Verdansk&quot;), {seconds}
+    private const string StartLine = &quot;POLL: {question}  Type the number to vote: {options}  ({seconds}s to vote)&quot;;
+    // {winner}, {votes}, {percent}, {total}
+    private const string WinLine = &quot;Poll closed: {winner} wins with {votes} of {total} votes ({percent}%).&quot;;
+    private const string TieLine = &quot;Poll closed: it&#x27;s a tie between {winner} with {votes} votes each.&quot;;
+    private const string NoVotesLine = &quot;Poll closed with no votes.&quot;;
+    private const string CancelLine = &quot;Poll cancelled.&quot;;
+
+    // Post the result as a Twitch announcement (the highlighted message). Kick gets a normal message.
+    // Colour: &quot;primary&quot;, &quot;blue&quot;, &quot;green&quot;, &quot;orange&quot; or &quot;purple&quot;. Your bot account needs to be a mod for announcements.
+    private const bool AnnounceResult = true;
+    private const string AnnounceColour = &quot;purple&quot;;
+
+    // ===== Nothing to change below here =====
+
+    private const char SEP = &#x27;\u001F&#x27;;
+    private static readonly object Gate = new object();   // chat messages can arrive at the same moment; count them one at a time
+
+    public bool Execute()
+    {
+        lock (Gate) { return Run(); }
+    }
+
+    private bool Run()
+    {
+        string mode = Arg(&quot;mode&quot;, &quot;&quot;).ToLower();
+        if (mode == &quot;sync&quot;) { Broadcast(); return true; }                 // the overlay asking what&#x27;s happening
+
+        string id = Get(&quot;poll_id&quot;);
+        if (Get(&quot;poll_timeup&quot;) != &quot;&quot; &amp;&amp; Get(&quot;poll_timeup&quot;) == id)        // the Poll Timer says time&#x27;s up
+        {
+            CPH.SetGlobalVar(&quot;poll_timeup&quot;, &quot;&quot;, false);
+            if (IsOpen()) Close();
+            return true;
+        }
+
+        string ev = EventName();
+        string plat = Platform(ev);
+        string user = Arg(&quot;user&quot;, Arg(&quot;userName&quot;, &quot;&quot;));
+        string login = Arg(&quot;userName&quot;, user).ToLower();
+
+        if (args.ContainsKey(&quot;command&quot;))
+        {
+            string cmd = Arg(&quot;command&quot;, &quot;&quot;).ToLower().TrimStart(&#x27;!&#x27;);
+            string raw = Arg(&quot;rawInput&quot;, &quot;&quot;).Trim();
+            if (cmd == &quot;vote&quot;) { if (IsOpen()) Vote(plat, login, raw); return true; }
+            if (cmd == &quot;pollresults&quot;) { Results(plat); return true; }
+            if (ModsOnly &amp;&amp; !IsMod()) return true;
+            if (cmd == &quot;poll&quot;) { Start(plat, raw); return true; }
+            if (cmd == &quot;endpoll&quot;) { if (IsOpen()) Close(); else Reply(plat, &quot;There&#x27;s no poll running.&quot;); return true; }
+            if (cmd == &quot;cancelpoll&quot;)
+            {
+                if (!IsOpen()) { Reply(plat, &quot;There&#x27;s no poll running.&quot;); return true; }
+                CPH.SetGlobalVar(&quot;poll_state&quot;, &quot;cancelled&quot;, false);
+                CPH.SetGlobalVar(&quot;poll_closed_at&quot;, Now(), false);
+                Say(CancelLine);
+                Broadcast();
+                return true;
+            }
+            return true;
+        }
+
+        if ((ev.Contains(&quot;Chat&quot;) || ev.Contains(&quot;Message&quot;)) &amp;&amp; IsOpen())
+            Vote(plat, login, Arg(&quot;rawInput&quot;, Arg(&quot;message&quot;, &quot;&quot;)).Trim());
+        return true;
+    }
+
+    // &quot;!poll 90 Best map? | Rebirth | Verdansk&quot; (the time is optional: 90, 90s, 2m)
+    private void Start(string plat, string raw)
+    {
+        if (IsOpen()) { Reply(plat, &quot;There&#x27;s already a poll running. Type !endpoll to close it first.&quot;); return; }
+        int seconds = DefaultSeconds;
+        string first = raw.Split(&#x27; &#x27;)[0].ToLower();
+        int t;
+        if (first.Length &gt; 0)
+        {
+            string n = first.TrimEnd(&#x27;s&#x27;, &#x27;m&#x27;);
+            if (int.TryParse(n, out t) &amp;&amp; t &gt; 0)
+            {
+                seconds = first.EndsWith(&quot;m&quot;) ? t * 60 : t;
+                raw = raw.Substring(first.Length).Trim();
+            }
+        }
+        seconds = Math.Max(10, Math.Min(seconds, 3600));
+        string[] parts = raw.Split(&#x27;|&#x27;);
+        var opts = new List&lt;string&gt;();
+        for (int i = 1; i &lt; parts.Length &amp;&amp; opts.Count &lt; MaxOptions; i++) if (parts[i].Trim() != &quot;&quot;) opts.Add(parts[i].Trim());
+        string question = parts[0].Trim();
+        if (question == &quot;&quot; || opts.Count &lt; 2)
+        {
+            Reply(plat, &quot;To start a poll: !poll Question? | Option 1 | Option 2  (add a time first if you like: !poll 2m Question? | A | B)&quot;);
+            return;
+        }
+        string id = Now() + &quot;-&quot; + new Random().Next(1000, 9999);
+        CPH.SetGlobalVar(&quot;poll_id&quot;, id, false);
+        CPH.SetGlobalVar(&quot;poll_question&quot;, question, false);
+        CPH.SetGlobalVar(&quot;poll_options&quot;, string.Join(SEP.ToString(), opts.ToArray()), false);
+        CPH.SetGlobalVar(&quot;poll_votes&quot;, &quot;&quot;, false);
+        CPH.SetGlobalVar(&quot;poll_ends&quot;, Now() + seconds, false);
+        CPH.SetGlobalVar(&quot;poll_state&quot;, &quot;open&quot;, false);
+        CPH.SetGlobalVar(&quot;poll_timeup&quot;, &quot;&quot;, false);
+        var list = new List&lt;string&gt;();
+        for (int i = 0; i &lt; opts.Count; i++) list.Add((i + 1) + &quot; &quot; + opts[i]);
+        Say(StartLine.Replace(&quot;{question}&quot;, question).Replace(&quot;{options}&quot;, string.Join(&quot;  &quot;, list.ToArray())).Replace(&quot;{seconds}&quot;, seconds.ToString()));
+        Broadcast();
+        CPH.RunAction(&quot;Poll Timer&quot;, false);
+    }
+
+    private void Vote(string plat, string login, string text)
+    {
+        if (login == &quot;&quot; || text == &quot;&quot;) return;
+        string[] opts = Options();
+        int pick = -1, n;
+        string t = text.Trim().TrimStart(&#x27;#&#x27;);
+        if (int.TryParse(t, NumberStyles.Integer, CultureInfo.InvariantCulture, out n)) { if (n &gt;= 1 &amp;&amp; n &lt;= opts.Length) pick = n - 1; }
+        else if (VoteByName)
+        {
+            string c = Clean(t);
+            for (int i = 0; i &lt; opts.Length; i++) if (c != &quot;&quot; &amp;&amp; Clean(opts[i]) == c) { pick = i; break; }
+        }
+        if (pick &lt; 0) return;
+        var votes = Votes();
+        string key = plat + &quot;|&quot; + login;
+        if (votes.ContainsKey(key) &amp;&amp; (!AllowChangeVote || votes[key] == pick)) return;
+        votes[key] = pick;
+        var sb = new StringBuilder();
+        foreach (var kv in votes) sb.Append(kv.Key).Append(&#x27;=&#x27;).Append(kv.Value).Append(&#x27;\n&#x27;);
+        CPH.SetGlobalVar(&quot;poll_votes&quot;, sb.ToString(), false);
+        Broadcast();
+    }
+
+    private void Close()
+    {
+        CPH.SetGlobalVar(&quot;poll_state&quot;, &quot;closed&quot;, false);
+        CPH.SetGlobalVar(&quot;poll_closed_at&quot;, Now(), false);
+        string line = ResultLine();
+        CPH.SetGlobalVar(&quot;poll_last&quot;, line, false);
+        Announce(line);
+        Broadcast();
+    }
+
+    private string ResultLine()
+    {
+        string[] opts = Options();
+        int[] tw, kk;
+        int total = Count(opts.Length, out tw, out kk);
+        if (total == 0) return NoVotesLine;
+        int best = 0;
+        for (int i = 0; i &lt; opts.Length; i++) best = Math.Max(best, tw[i] + kk[i]);
+        var win = new List&lt;string&gt;();
+        for (int i = 0; i &lt; opts.Length; i++) if (tw[i] + kk[i] == best) win.Add(opts[i]);
+        int pct = (int)Math.Round(best * 100.0 / total);
+        string tpl = win.Count &gt; 1 ? TieLine : WinLine;
+        string line = tpl.Replace(&quot;{winner}&quot;, string.Join(&quot; and &quot;, win.ToArray())).Replace(&quot;{votes}&quot;, best.ToString())
+                  .Replace(&quot;{percent}&quot;, pct.ToString()).Replace(&quot;{total}&quot;, total.ToString());
+        return line.Replace(&quot; 1 votes&quot;, &quot; 1 vote&quot;);
+    }
+
+    private void Results(string plat)
+    {
+        if (!IsOpen())
+        {
+            string last = Get(&quot;poll_last&quot;);
+            Reply(plat, last != &quot;&quot; ? last : &quot;There&#x27;s no poll running.&quot;);
+            return;
+        }
+        string[] opts = Options();
+        int[] tw, kk;
+        int total = Count(opts.Length, out tw, out kk);
+        var list = new List&lt;string&gt;();
+        for (int i = 0; i &lt; opts.Length; i++) list.Add((i + 1) + &quot; &quot; + opts[i] + &quot;: &quot; + (tw[i] + kk[i]));
+        long left = Math.Max(0, CPH.GetGlobalVar&lt;long&gt;(&quot;poll_ends&quot;, false) - Now());
+        Reply(plat, Get(&quot;poll_question&quot;) + &quot;  &quot; + string.Join(&quot;  &quot;, list.ToArray()) + &quot;  (&quot; + total + (total == 1 ? &quot; vote, &quot; : &quot; votes, &quot;) + left + &quot;s left)&quot;);
+    }
+
+    // Tell the overlay everything it needs to draw the poll.
+    private void Broadcast()
+    {
+        string state = Get(&quot;poll_state&quot;);
+        if (state == &quot;&quot;) state = &quot;none&quot;;
+        string[] opts = Options();
+        int[] tw, kk;
+        int total = Count(opts.Length, out tw, out kk);
+        var sb = new StringBuilder();
+        sb.Append(&quot;{\&quot;poll\&quot;:{\&quot;id\&quot;:\&quot;&quot;).Append(Esc(Get(&quot;poll_id&quot;))).Append(&quot;\&quot;,\&quot;state\&quot;:\&quot;&quot;).Append(state)
+          .Append(&quot;\&quot;,\&quot;question\&quot;:\&quot;&quot;).Append(Esc(Get(&quot;poll_question&quot;))).Append(&quot;\&quot;,\&quot;ends\&quot;:&quot;).Append(CPH.GetGlobalVar&lt;long&gt;(&quot;poll_ends&quot;, false))
+          .Append(&quot;,\&quot;closedAt\&quot;:&quot;).Append(CPH.GetGlobalVar&lt;long&gt;(&quot;poll_closed_at&quot;, false))
+          .Append(&quot;,\&quot;now\&quot;:&quot;).Append(Now()).Append(&quot;,\&quot;total\&quot;:&quot;).Append(total).Append(&quot;,\&quot;options\&quot;:[&quot;);
+        for (int i = 0; i &lt; opts.Length; i++)
+        {
+            if (i &gt; 0) sb.Append(&#x27;,&#x27;);
+            sb.Append(&quot;{\&quot;text\&quot;:\&quot;&quot;).Append(Esc(opts[i])).Append(&quot;\&quot;,\&quot;twitch\&quot;:&quot;).Append(tw[i]).Append(&quot;,\&quot;kick\&quot;:&quot;).Append(kk[i]).Append(&#x27;}&#x27;);
+        }
+        sb.Append(&quot;]}}&quot;);
+        CPH.WebsocketBroadcastJson(sb.ToString());
+    }
+
+    // ----- helpers -----
+
+    private bool IsOpen() { return Get(&quot;poll_state&quot;) == &quot;open&quot;; }
+    private string Get(string k) { return CPH.GetGlobalVar&lt;string&gt;(k, false) ?? &quot;&quot;; }
+
+    private string[] Options()
+    {
+        string o = Get(&quot;poll_options&quot;);
+        return o == &quot;&quot; ? new string[0] : o.Split(SEP);
+    }
+
+    private Dictionary&lt;string, int&gt; Votes()
+    {
+        var d = new Dictionary&lt;string, int&gt;();
+        foreach (string line in Get(&quot;poll_votes&quot;).Split(&#x27;\n&#x27;))
+        {
+            int eq = line.LastIndexOf(&#x27;=&#x27;);
+            int v;
+            if (eq &gt; 0 &amp;&amp; int.TryParse(line.Substring(eq + 1), out v)) d[line.Substring(0, eq)] = v;
+        }
+        return d;
+    }
+
+    private int Count(int n, out int[] tw, out int[] kk)
+    {
+        tw = new int[n]; kk = new int[n];
+        int total = 0;
+        foreach (var kv in Votes())
+        {
+            if (kv.Value &lt; 0 || kv.Value &gt;= n) continue;
+            if (kv.Key.StartsWith(&quot;kick|&quot;)) kk[kv.Value]++; else tw[kv.Value]++;
+            total++;
+        }
+        return total;
+    }
+
+    // Lower case, letters and numbers only, so &quot;Verdansk!&quot; matches &quot;verdansk&quot;.
+    private static string Clean(string s)
+    {
+        var sb = new StringBuilder();
+        foreach (char c in (s ?? &quot;&quot;).ToLower()) if (char.IsLetterOrDigit(c)) sb.Append(c);
+        return sb.ToString();
+    }
+
+    private static string Esc(string s)
+    {
+        var sb = new StringBuilder();
+        foreach (char c in s ?? &quot;&quot;)
+        {
+            if (c == &#x27;&quot;&#x27; || c == &#x27;\\&#x27;) sb.Append(&#x27;\\&#x27;).Append(c);
+            else if (c &lt; &#x27; &#x27;) sb.Append(&quot;\\u&quot;).Append(((int)c).ToString(&quot;x4&quot;));
+            else sb.Append(c);
+        }
+        return sb.ToString();
+    }
+
+    private string EventName()
+    {
+        try
+        {
+            var mi = CPH.GetType().GetMethod(&quot;GetEventType&quot;, Type.EmptyTypes);
+            if (mi != null) { object r = mi.Invoke(CPH, null); string s = r == null ? &quot;&quot; : r.ToString(); if (s != &quot;&quot; &amp;&amp; s != &quot;None&quot; &amp;&amp; s != &quot;Unknown&quot;) return s; }
+        }
+        catch (Exception) { }
+        return Arg(&quot;__source&quot;, Arg(&quot;triggerName&quot;, &quot;&quot;)).Replace(&quot; &quot;, &quot;&quot;);
+    }
+
+    private string Platform(string ev)
+    {
+        string t = (Arg(&quot;userType&quot;, &quot;&quot;) + Arg(&quot;commandSource&quot;, &quot;&quot;) + Arg(&quot;broadcastingService&quot;, &quot;&quot;) + ev).ToLower();
+        return t.Contains(&quot;kick&quot;) ? &quot;kick&quot; : &quot;twitch&quot;;
+    }
+
+    // The result: a Twitch announcement if switched on (falls back to a normal message), and a normal message on Kick.
+    private void Announce(string msg)
+    {
+        bool sent = false;
+        if (AnnounceResult)
+        {
+            try
+            {
+                foreach (var m in CPH.GetType().GetMethods())
+                {
+                    if (m.Name != &quot;TwitchAnnounce&quot;) continue;
+                    var ps = m.GetParameters();
+                    var call = new object[ps.Length];
+                    for (int i = 0; i &lt; ps.Length; i++)
+                    {
+                        if (i == 0) call[i] = msg;
+                        else if (ps[i].ParameterType == typeof(string)) call[i] = AnnounceColour;
+                        else if (ps[i].ParameterType == typeof(bool)) call[i] = ps[i].Name.ToLower().Contains(&quot;fallback&quot;) || ps[i].Name.ToLower().Contains(&quot;bot&quot;);
+                        else call[i] = ps[i].HasDefaultValue ? ps[i].DefaultValue : null;
+                    }
+                    m.Invoke(CPH, call);
+                    sent = true;
+                    break;
+                }
+            }
+            catch (Exception) { sent = false; }
+        }
+        if (!sent) CPH.SendMessage(msg);
+        try { CPH.SendKickMessage(msg); } catch (Exception) { }
+    }
+
+    private void Say(string msg) { CPH.SendMessage(msg); try { CPH.SendKickMessage(msg); } catch (Exception) { } }
+    private void Reply(string plat, string msg) { if (plat == &quot;kick&quot;) CPH.SendKickMessage(msg); else CPH.SendMessage(msg); }
+
+    private bool IsMod()
+    {
+        if (Arg(&quot;isModerator&quot;, &quot;False&quot;).ToLower() == &quot;true&quot; || Arg(&quot;isBroadcaster&quot;, &quot;False&quot;).ToLower() == &quot;true&quot;) return true;
+        string me = Arg(&quot;broadcastUserName&quot;, Arg(&quot;broadcastUser&quot;, &quot;&quot;)).ToLower();
+        return me != &quot;&quot; &amp;&amp; me == Arg(&quot;userName&quot;, Arg(&quot;user&quot;, &quot;&quot;)).ToLower();
+    }
+
+    private static long Now() { return DateTimeOffset.UtcNow.ToUnixTimeSeconds(); }
+
+    private string Arg(string key, string fallback)
+    {
+        object v;
+        if (args.TryGetValue(key, out v) &amp;&amp; v != null &amp;&amp; v.ToString().Length &gt; 0) return v.ToString();
+        return fallback;
+    }
+}
+</textarea>
+          <button class="btn ghost" type="button" data-copy="plCode" style="margin-top:8px">Copy Poll code</button></li>
+        <li>Give <code>Poll</code> these triggers: <strong>Twitch → Chat → Chat Message</strong>, <strong>Kick → Chat → Chat Message</strong>, and a <strong>Core → Commands → Command Triggered</strong> trigger for each of these commands (make them in the Commands tab, for Twitch and Kick): <code>!poll</code>, <code>!endpoll</code>, <code>!cancelpoll</code>, <code>!pollresults</code>, <code>!vote</code>.</li>
+        <li>Add a second action called exactly <code>Poll Timer</code> with <strong>no triggers</strong>, and paste this code into an Execute C# Code sub-action the same way.
+          <textarea id="ptCode" class="code" readonly rows="5" aria-label="Poll Timer code" style="margin-top:8px">// Poll Timer for Streamer.bot, free from itsCRA1G (itscra1g.github.io/poll)
+// Started by the Poll action. Waits until the poll&#x27;s time is up, then asks the Poll action to close it.
+using System;
+
+public class CPHInline
+{
+    public bool Execute()
+    {
+        string id = CPH.GetGlobalVar&lt;string&gt;(&quot;poll_id&quot;, false) ?? &quot;&quot;;
+        while (true)
+        {
+            if ((CPH.GetGlobalVar&lt;string&gt;(&quot;poll_state&quot;, false) ?? &quot;&quot;) != &quot;open&quot;) return true;   // ended or cancelled early
+            if ((CPH.GetGlobalVar&lt;string&gt;(&quot;poll_id&quot;, false) ?? &quot;&quot;) != id) return true;         // a new poll took over
+            long ends = CPH.GetGlobalVar&lt;long&gt;(&quot;poll_ends&quot;, false);
+            if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() &gt;= ends) break;
+            CPH.Wait(1000);
+        }
+        CPH.SetGlobalVar(&quot;poll_timeup&quot;, id, false);
+        CPH.RunAction(&quot;Poll&quot;, false);
+        return true;
+    }
+}
+</textarea>
+          <button class="btn ghost" type="button" data-copy="ptCode" style="margin-top:8px">Copy Poll Timer code</button></li>
+      </ol>
+      <p class="hint">Want different wording, a longer default time or anyone to be able to start polls? Change the lines at the top of the Poll code.</p>
+    </details>
+  </section>
+
+  <section id="use">
+    <div class="sec-head"><span class="num">2</span><h2>Run a poll</h2></div>
+    <p>Start one from either chat. Separate the question and the options with <code>|</code>:</p>
+    <p><code>!poll Best map? | Rebirth | Verdansk | Area 99</code></p>
+    <p>Add a time first if you want something other than a minute: <code>!poll 2m Best map? | Rebirth | Verdansk</code> or <code>!poll 30 Quick one? | Yes | No</code>.</p>
+    <p>Streamer.bot posts the poll in both chats, viewers vote by typing <strong>1</strong>, <strong>2</strong>, <strong>3</strong> (or the option's name), and when time's up it posts the winner to both chats.</p>
+    <div class="tw"><table>
+      <tr><th>Command</th><th>Who</th><th>What it does</th></tr>
+      <tr><td><code>!poll</code></td><td>You and mods</td><td>Starts a poll. Up to 6 options, 10 seconds to an hour.</td></tr>
+      <tr><td><code>!endpoll</code></td><td>You and mods</td><td>Closes it early and posts the result.</td></tr>
+      <tr><td><code>!cancelpoll</code></td><td>You and mods</td><td>Throws it away without a result.</td></tr>
+      <tr><td><code>!pollresults</code></td><td>Anyone</td><td>The votes so far, or the last result.</td></tr>
+      <tr><td><code>!vote 2</code></td><td>Anyone</td><td>Another way to vote (just typing <strong>2</strong> works too).</td></tr>
+    </table></div>
+    <p class="hint">Each viewer gets one vote per platform, and can change it by typing another number. The result goes out as a Twitch announcement if your bot account is a mod; Kick gets a normal message.</p>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">3</span><h2>Style the overlay</h2></div>
+    <div class="grid2">
+      <div class="ctl">
+        <div><div class="lbl">Bars</div><div class="seg" id="barSeg"><button data-v="split" aria-pressed="true">Twitch + Kick split</button><button data-v="single" aria-pressed="false">One colour</button></div>
+          <div class="hint">Split: each bar shows Twitch votes in purple and Kick votes in green.</div></div>
+        <div><div class="lbl">Accent colour</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Background <b id="opV">90%</b></div><input type="range" id="op" min="0" max="100" step="5" value="90" aria-label="Background opacity"></div>
+        <div class="tog">
+          <label><input type="checkbox" id="optPct" checked>Percentages</label>
+          <label><input type="checkbox" id="optCnt" checked>Vote counts</label>
+          <label><input type="checkbox" id="optHow" checked>"Type 1, 2 or 3 to vote" line</label>
+          <label><input type="checkbox" id="optClock" checked>Countdown</label>
+        </div>
+        <div><div class="lbl">Results stay up for <b id="keepV">15 seconds</b></div><input type="range" id="keep" min="5" max="120" step="5" value="15" aria-label="Seconds results stay on screen"></div>
+        <details><summary>Streamer.bot connection (only if you changed it)</summary>
+          <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
+          <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
+        </details>
+      </div>
+      <div class="sticky">
+        <div class="stage"><iframe id="prevFrame" title="Poll preview" tabindex="-1"></iframe></div>
+        <div class="tests"><button type="button" data-t="start">Start a poll</button><button type="button" data-t="votes">Add votes</button><button type="button" data-t="close">Close it</button></div>
+        <p class="hint">The overlay only shows while a poll is running, then shows the result and hides. The preview uses made-up votes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">4</span><h2>Add it to OBS</h2></div>
+    <p>Your poll link, with your style built in:</p>
+    <div class="copy"><input id="obsUrl" readonly aria-label="OBS link"><button class="btn" data-copy="obsUrl">Copy</button></div>
+    <ol class="steps">
+      <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+      <li>Paste the link into <strong>URL</strong> and set the size to <strong>800 × 600</strong>. Resize it in OBS to make it bigger or smaller.</li>
+      <li>Press OK and start a test poll from chat to see it.</li>
+    </ol>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>Nothing happens when I type !poll</td><td>Switch the commands on in Streamer.bot's Commands tab (they import switched off), and check you're a mod or the broadcaster.</td></tr>
+      <tr><td>The poll never closes</td><td>Check the <strong>Poll Timer</strong> action is there and named exactly that. You can always close it with <code>!endpoll</code>.</td></tr>
+      <tr><td>Chat works but the overlay shows nothing</td><td>Start Streamer.bot's WebSocket server (step 1). If you changed the address, port or set a password, enter them in step 3 and copy the link again.</td></tr>
+      <tr><td>Only one platform's votes count</td><td>Check Streamer.bot is connected to both Twitch and Kick, and the Poll action has both Chat Message triggers.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot, Twitch or Kick.</div></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var GLOWS=[["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+var BASE=location.origin+location.pathname;
+var TW_SVG='<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>';
+var KK_SVG='<svg viewBox="0 0 24 24"><path d="M1.5 1.5h7.2v4.8h2.4V3.9h2.4V1.5h9v7.2h-2.4v2.4h-2.4v1.8h2.4v2.4h2.4v7.2h-9v-2.4h-2.4v-2.4H8.7v4.8H1.5z"/></svg>';
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function lum(h){var c=[0,2,4].map(function(i){var v=parseInt(h.slice(i,i+2),16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+function overlay(){
+  var box=document.getElementById("ovr"),cfg,ws=null,live=false,poll=null,card=null,shownId="",skew=0,hideT=0,tick=0;
+  function read(){
+    var p=new URLSearchParams(location.hash.slice(1));
+    var g=p.get("g")||"4DA3FF";if(!/^[0-9a-fA-F]{6}$/.test(g))g="4DA3FF";
+    var o=parseInt(p.get("o"),10);if(isNaN(o))o=90;
+    cfg={bar:p.get("bar")==="single"?"single":"split",g:g.toUpperCase(),o:Math.max(0,Math.min(100,o))/100,
+      pct:p.get("pct")!=="0",cnt:p.get("cnt")!=="0",how:p.get("how")!=="0",clock:p.get("clock")!=="0",
+      keep:Math.max(3,Math.min(600,parseInt(p.get("keep"),10)||15)),
+      h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1"};
+  }
+  function fit(){box.style.setProperty("--k",innerWidth/800)}
+  function el(t,c,txt){var e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e}
+  function fmt(s){s=Math.max(0,Math.ceil(s));var m=Math.floor(s/60);return m+":"+String(s%60).padStart(2,"0")}
+  // draw the card for a poll (rebuilt when a new poll starts; updated in place as votes come in)
+  function build(p){
+    box.innerHTML="";card=el("div","pl in");
+    card.style.setProperty("--gr",hx2rgb(cfg.g));card.style.setProperty("--o",cfg.o);card.style.setProperty("--ink",lum(cfg.g)>.35?"#000":"#fff");
+    var top=el("div","top");top.appendChild(el("span","tag","POLL"));
+    var t=el("span","pf tw");t.innerHTML=TW_SVG;top.appendChild(t);var k=el("span","pf kk");k.innerHTML=KK_SVG;top.appendChild(k);
+    var ck=el("div","clock");ck.innerHTML='<svg viewBox="0 0 36 36"><circle class="tr" cx="18" cy="18" r="15"/><circle class="rg" cx="18" cy="18" r="15" stroke-dasharray="94.25" stroke-dashoffset="0"/></svg><span></span>';
+    if(!cfg.clock)ck.hidden=true;top.appendChild(ck);card.appendChild(top);
+    card.appendChild(el("div","q",p.question));
+    var opts=el("div","opts");
+    p.options.forEach(function(o,i){
+      var r=el("div","op"),f=el("div","fill");
+      if(cfg.bar==="split"){f.appendChild(el("i","t"));f.appendChild(el("i","k"))}else f.appendChild(el("i","s"));
+      r.appendChild(f);r.appendChild(el("span","n",String(i+1)));r.appendChild(el("span","t2",o.text));
+      r.appendChild(el("span","win","WINNER"));var v=el("span","v");v.innerHTML="<span></span><small></small>";r.appendChild(v);opts.appendChild(r);
+    });
+    card.appendChild(opts);
+    var foot=el("div","foot");foot.appendChild(el("span","how"));foot.appendChild(el("span","tot"));card.appendChild(foot);
+    box.appendChild(card);
+    p._dur=Math.max(1,p.ends-p.now);
+  }
+  function update(p){
+    var total=0,best=0;p.options.forEach(function(o){var n=(o.twitch||0)+(o.kick||0);total+=n;best=Math.max(best,n)});
+    var rows=card.querySelectorAll(".op");
+    p.options.forEach(function(o,i){
+      var n=(o.twitch||0)+(o.kick||0),r=rows[i];if(!r)return;
+      var pct=total?Math.round(n*100/total):0;
+      r.querySelector(".fill").style.width=(total?n/total*100:0)+"%";
+      if(cfg.bar==="split"){r.querySelector(".fill .t").style.flexGrow=o.twitch||0;r.querySelector(".fill .k").style.flexGrow=o.kick||0}
+      else r.querySelector(".fill .s").style.flexGrow=1;
+      var v=r.querySelector(".v span"),s=r.querySelector(".v small");
+      v.textContent=cfg.pct?pct+"%":(cfg.cnt?String(n):"");s.textContent=cfg.pct&&cfg.cnt?(n===1?"1 vote":n+" votes"):"";
+      r.classList.toggle("w",p.state==="closed"&&total>0&&n===best);
+    });
+    card.classList.toggle("closed",p.state==="closed");
+    card.querySelector(".tag").textContent=p.state==="closed"?"RESULTS":"POLL";
+    var n=p.options.length,list=n===2?"1 or 2":Array.from({length:n-1},function(_,i){return i+1}).join(", ")+" or "+n;
+    card.querySelector(".how").textContent=p.state==="closed"?(total?"":"No votes this time"):(cfg.how?"Type "+list+" in chat to vote":"");
+    card.querySelector(".tot").innerHTML="";var b=el("b",null,String(total));card.querySelector(".tot").appendChild(b);card.querySelector(".tot").appendChild(document.createTextNode(total===1?" vote":" votes"));
+    clock(p);
+  }
+  function clock(p){
+    if(!card||!cfg.clock)return;
+    var ck=card.querySelector(".clock");
+    if(p.state!=="open"){ck.hidden=true;return}
+    ck.hidden=false;var left=p.ends-(Date.now()/1000+skew);
+    ck.querySelector("span").textContent=fmt(left);ck.classList.toggle("low",left<=10);
+    ck.querySelector(".rg").style.strokeDashoffset=94.25*(1-Math.max(0,Math.min(1,left/p._dur)));
+  }
+  function hide(fast){if(!card)return;var c=card;c.classList.add("bye");setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);if(card===c)card=null},fast?300:550)}
+  function apply(p){
+    if(!p)return;
+    if(typeof p.now==="number"&&p.now>0)skew=p.now-Date.now()/1000;
+    clearTimeout(hideT);
+    if(p.state==="none"||!p.options||!p.options.length){hide(true);shownId="";poll=null;return}
+    if(p.state==="cancelled"){if(shownId===p.id)hide(true);shownId="";poll=null;return}
+    if(p.state==="closed"){
+      var since=(Date.now()/1000+skew)-(p.closedAt||0);
+      if(since>cfg.keep){if(card)hide();poll=null;return}            // an old result: don't bring it back
+      if(shownId!==p.id||!card){build(p);shownId=p.id}
+      poll=p;update(p);hideT=setTimeout(function(){hide()},Math.max(1,cfg.keep-since)*1000);return;
+    }
+    if(shownId!==p.id||!card){build(p);shownId=p.id}else p._dur=poll&&poll.id===p.id?poll._dur:Math.max(1,p.ends-p.now);
+    poll=p;update(p);
+  }
+  setInterval(function(){if(poll&&poll.state==="open")clock(poll)},500);
+  async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
+  function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+  function subscribe(){
+    if(live)return;live=true;
+    send({request:"Subscribe",id:"pl-sub",events:{General:["Custom"]}});
+    send({request:"DoAction",id:"pl-sync",action:{name:"Poll"},args:{mode:"sync"}});
+  }
+  function connect(){
+    live=false;
+    try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.port+"/")}catch(e){setTimeout(connect,5000);return}
+    var helloT=setTimeout(subscribe,1500);
+    ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.request==="Hello"){clearTimeout(helloT);if(m.authentication&&cfg.pw){var a=m.authentication;var s=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"pl-auth",authentication:await sha(s+a.challenge)})}else subscribe();return}
+      if(m.id==="pl-auth"){subscribe();return}
+      if(m.event&&m.event.source==="General"&&m.event.type==="Custom"){
+        var d=m.data;if(typeof d==="string"){try{d=JSON.parse(d)}catch(x){return}}
+        if(d&&d.data&&d.data.poll)d=d.data;
+        if(d&&d.poll)apply(d.poll);
+      }
+    };
+    ws.onclose=function(){clearTimeout(helloT);live=false;setTimeout(connect,3000)};
+    ws.onerror=function(){try{ws.close()}catch(x){}};
+  }
+  // ---- preview: a pretend poll ----
+  var D=null,dn=0;
+  function demoPoll(){var now=Math.floor(Date.now()/1000);dn++;
+    D={id:"demo"+dn,state:"open",question:"Best map for the next game?",now:now,ends:now+45,closedAt:0,
+      options:[{text:"Rebirth Island",twitch:7,kick:4},{text:"Verdansk",twitch:5,kick:6},{text:"Area 99",twitch:2,kick:1}]};apply(clone(D))}
+  function clone(o){return JSON.parse(JSON.stringify(o))}
+  function demoVotes(n){if(!D||D.state!=="open")demoPoll();for(var i=0;i<n;i++){var o=D.options[Math.floor(Math.random()*D.options.length)];if(Math.random()<.5)o.twitch++;else o.kick++}D.now=Math.floor(Date.now()/1000);apply(clone(D))}
+  function demoClose(){if(!D||D.state!=="open")demoPoll();D.state="closed";D.now=D.closedAt=Math.floor(Date.now()/1000);apply(clone(D))}
+  read();fit();addEventListener("resize",fit);
+  if(cfg.demo){
+    var auto=new URLSearchParams(location.hash.slice(1)).get("auto")==="1";
+    window.addEventListener("message",function(e){var d=e.data;if(!d)return;
+      if(typeof d.plHash==="string"){try{history.replaceState(null,"","#"+d.plHash)}catch(x){}read();if(D){shownId="";apply(clone(D))}return}
+      if(d.pl==="start"){auto=false;demoPoll()}else if(d.pl==="votes"){auto=false;demoVotes(6)}else if(d.pl==="close"){auto=false;demoClose()}});
+    demoPoll();
+    setInterval(function(){if(!auto&&D&&D.state==="closed")return;if(!D)return;
+      if(D.state==="open")demoVotes(Math.random()<.6?1:2);
+      if(auto&&D.state==="open"&&D.options.reduce(function(a,o){return a+o.twitch+o.kick},0)>34)demoClose();
+      else if(auto&&D.state==="closed")setTimeout(demoPoll,1200)},1400);
+    return;
+  }
+  connect();
+}
+
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={bar:"split",g:"4DA3FF",o:90,pct:1,cnt:1,how:1,clock:1,keep:15,h:"127.0.0.1",p:"8080"};
+  try{var sv=JSON.parse(ls("pl_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  if(!$("plImp").value.trim()){$("impBox").hidden=true;$("diyBox").open=true;$("diyBox").querySelector("summary").textContent="Make it in Streamer.bot";}
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
+  var nmL=document.createElement("span");nmL.className="name";sw.appendChild(nmL);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  $("barSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.bar=b.dataset.v;sync()}});
+  [["op","o"],["keep","keep"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=+this.value;sync()})});
+  [["optPct","pct"],["optCnt","cnt"],["optHow","how"],["optClock","clock"]].forEach(function(x){$(x[0]).addEventListener("change",function(){S[x[1]]=this.checked?1:0;sync()})});
+  [["host","h"],["port","p"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value.trim();sync()})});
+  $("pw").addEventListener("input",sync);
+  document.querySelectorAll("[data-t]").forEach(function(b){b.addEventListener("click",function(){var f=$("prevFrame");if(f.contentWindow)f.contentWindow.postMessage({pl:b.dataset.t},"*")})});
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){var el=$(b.dataset.copy),o=b.textContent;
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select()})});
+  $("host").value=S.h;$("port").value=S.p;
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(S.bar!=="split")p.set("bar",S.bar);p.set("g",S.g);if(S.o!==90)p.set("o",String(S.o));
+    ["pct","cnt","how","clock"].forEach(function(k){if(!S[k])p.set(k,"0")});if(S.keep!==15)p.set("keep",String(S.keep));
+    if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw);
+    for(var k in extra)p.set(k,extra[k]);return p.toString()}
+  function sync(){
+    ls("pl_cfg",JSON.stringify(S));
+    $("barSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.bar)});
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nmL.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("op").value=S.o;$("opV").textContent=S.o+"%";$("keep").value=S.keep;$("keepV").textContent=S.keep+" seconds";
+    $("optPct").checked=!!S.pct;$("optCnt").checked=!!S.cnt;$("optHow").checked=!!S.how;$("optClock").checked=!!S.clock;
+    $("obsUrl").value=BASE+"#"+hash({});
+    var pf=$("prevFrame");
+    if(pf.dataset.on&&pf.contentWindow)pf.contentWindow.postMessage({plHash:hash({demo:"1"})},"*");     // live update, no reload
+    else{pf.src=BASE+"#"+hash({demo:"1"});pf.dataset.on=1}
+  }
+  $("heroFrame").src=BASE+"#ov=1&demo=1&auto=1&g=4DA3FF";
+  sync();
+}
+})();
+</script>
+</body>
+</html>
