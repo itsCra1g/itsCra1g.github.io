@@ -138,6 +138,23 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;width:1920px;height:1080p
 .sc .pill svg{width:24px;height:24px;fill:var(--pc)}
 .sc .ul{position:absolute;left:50%;top:0;height:6px;width:360px;margin-left:-180px;background:var(--g);box-shadow:0 0 24px rgba(var(--gr),.9);border-radius:0 0 6px 6px}
 .sc.clear .ul{display:none}
+/* vertical canvas (1080 x 1920), e.g. TikTok LIVE or a vertical OBS canvas */
+html.ov.vert #ovr{width:1080px;height:1920px}
+.vert .sc{display:flex;flex-direction:column}
+.vert .sc .mid{position:relative;top:auto;flex:1 1 auto;min-height:0;justify-content:center;padding:150px 70px 50px}
+.vert .sc .ch{font-size:30px;letter-spacing:7px}
+.vert .sc .ti{font-size:128px;letter-spacing:-2px}
+.vert .sc .tm{font-size:136px;margin-top:40px}
+.vert .sc .tm.sm{font-size:70px}
+.vert .sc .tm small{font-size:28px}
+.vert .sc .ln{font-size:42px;margin-top:44px;min-height:110px}
+.vert .sc .soc{position:relative;bottom:auto;flex:0 0 auto;flex-direction:column;align-items:center;gap:18px;padding:0 60px 150px}
+.vert .sc .pill{font-size:32px;padding:11px 28px 11px 11px}
+.vert .sc .pill i{width:52px;height:52px}.vert .sc .pill svg{width:28px;height:28px}
+.vert .sc .grid{height:40%;background-size:84px 84px}
+.vert .sc .blob{width:800px;height:800px}
+.vert .sc .ul{width:300px;margin-left:-150px}
+.screen.v{aspect-ratio:9/16;width:auto;height:min(640px,80vh);max-width:100%;margin:0 auto}
 </style>
 </head>
 <body>
@@ -185,6 +202,8 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;width:1920px;height:1080p
       <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
       <div><div class="lbl">Background</div><div class="seg" id="bgSeg"><button data-v="anim" aria-pressed="true">Animated</button><button data-v="clear" aria-pressed="false">Transparent</button></div>
         <div class="hint">Transparent shows just the text, timer and socials, so you can put your own background behind them.</div></div>
+      <div><div class="lbl">Canvas</div><div class="seg" id="cvSeg"><button data-v="h" aria-pressed="true">Landscape 1920 × 1080</button><button data-v="v" aria-pressed="false">Vertical 1080 × 1920</button></div>
+        <div class="hint">Vertical is for TikTok LIVE, phone-shaped streams or a vertical canvas in OBS.</div></div>
     </div>
   </section>
 
@@ -219,7 +238,7 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;width:1920px;height:1080p
     </div>
     <ol class="steps" style="margin-top:16px">
       <li>In each scene (Starting Soon, BRB, Ending), press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
-      <li>Paste that screen's link into <strong>URL</strong> and set the size to <strong>1920 × 1080</strong>.</li>
+      <li>Paste that screen's link into <strong>URL</strong> and set the size to <strong class="cvSize">1920 × 1080</strong>.</li>
       <li>Tick <strong>Refresh browser when scene becomes active</strong>. That's what restarts a "from when the scene appears" timer each time you switch to it.</li>
       <li>Press OK. Using Transparent? Put your own background below it in the scene.</li>
     </ol>
@@ -232,7 +251,7 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;width:1920px;height:1080p
       <tr><th>What you see</th><th>What to do</th></tr>
       <tr><td>The countdown doesn't restart when I switch scenes</td><td>Tick <strong>Refresh browser when scene becomes active</strong> in the browser source's settings.</td></tr>
       <tr><td>The clock-time countdown is out</td><td>It uses your PC's clock and time zone, so check those are right.</td></tr>
-      <tr><td>It's cut off or has borders</td><td>Set the browser source to exactly 1920 × 1080 and let it fill the canvas.</td></tr>
+      <tr><td>It's cut off or has borders</td><td>Set the browser source to exactly <span class="cvSize">1920 × 1080</span> and let it fill the canvas.</td></tr>
       <tr><td>The animation stutters</td><td>Switch to Transparent with your own background, which is lighter on OBS.</td></tr>
     </table></div>
   </section>
@@ -265,7 +284,7 @@ setup();
 function overlay(){
   var $=function(i){return document.getElementById(i)},sc=$("sc"),ovr=$("ovr");
   var cfg,t0=Date.now(),li=0,tick=null,rot=null;
-  function fit(){var k=Math.min(innerWidth/1920,innerHeight/1080);ovr.style.transform="scale("+k+")"}
+  function fit(){var v=cfg&&cfg.cv==="v",W=v?1080:1920,H=v?1920:1080;var k=Math.min(innerWidth/W,innerHeight/H);ovr.style.transform="scale("+k+")"}
   addEventListener("resize",fit);
   function read(){
     var p=new URLSearchParams(location.hash.slice(1));
@@ -274,7 +293,8 @@ function overlay(){
     var tm=p.get("tm")||DEF[k].tm;if(!MODES[k].some(function(m){return m[0]===tm}))tm=MODES[k][0][0];
     cfg={k:k,g:g,bg:p.get("bg")==="clear"?"clear":"anim",n:p.get("n")||"",t:p.has("t")?p.get("t"):DEF[k].t,tm:tm,
       d:Math.max(1,Math.min(180,parseInt(p.get("d"),10)||DEF[k].d)),at:/^\d{1,2}:\d{2}$/.test(p.get("at")||"")?p.get("at"):DEF[k].at,
-      ln:p.has("ln")?p.getAll("ln").filter(Boolean):DEF[k].ln,s:dec(p.get("s")),f:p.get("f")==="at"?"at":"link"};
+      ln:p.has("ln")?p.getAll("ln").filter(Boolean):DEF[k].ln,s:dec(p.get("s")),f:p.get("f")==="at"?"at":"link",cv:p.get("cv")==="v"?"v":"h"};
+    document.documentElement.classList.toggle("vert",cfg.cv==="v");
     sc.className="sc"+(cfg.bg==="clear"?" clear":"");
     sc.style.setProperty("--g","#"+g);sc.style.setProperty("--gr",hx2rgb(g));
     $("ch").textContent=cfg.n;$("ti").textContent=cfg.t;
@@ -302,7 +322,7 @@ function overlay(){
 
 function setup(){
   var $=function(id){return document.getElementById(id)};
-  var S={n:"",list:[{p:"twitch",h:""},{p:"tiktok",h:""},{p:"discord",h:""}],f:"link",g:"4DA3FF",bg:"anim",scr:JSON.parse(JSON.stringify(DEF)),tab:"start"};
+  var S={n:"",list:[{p:"twitch",h:""},{p:"tiktok",h:""},{p:"discord",h:""}],f:"link",g:"4DA3FF",bg:"anim",cv:"h",scr:JSON.parse(JSON.stringify(DEF)),tab:"start"};
   try{var sv=JSON.parse(ls("sc_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
   $("chName").value=S.n;
   $("chName").addEventListener("input",function(){S.n=this.value;sync()});
@@ -336,6 +356,7 @@ function setup(){
   sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
   $("bgSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.bg=b.dataset.v;sync()}});
   $("fmtSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.f=b.dataset.v;sync()}});
+  $("cvSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.cv=b.dataset.v;sync()}});
   $("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.tab=b.dataset.k;fillTab();sync()}});
   function cur(){return S.scr[S.tab]}
   function fillTab(){
@@ -355,7 +376,7 @@ function setup(){
     var el=$(b.dataset.copy),o=b.textContent,done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select();
   })});
-  function hash(k){var c=S.scr[k],p=new URLSearchParams();p.set("ov","1");p.set("sc",k);p.set("g",S.g);if(S.bg!=="anim")p.set("bg",S.bg);
+  function hash(k){var c=S.scr[k],p=new URLSearchParams();p.set("ov","1");p.set("sc",k);p.set("g",S.g);if(S.bg!=="anim")p.set("bg",S.bg);if(S.cv==="v")p.set("cv","v");
     if(S.n.trim())p.set("n",S.n.trim());p.set("t",c.t);if(k!=="end"){p.set("tm",c.tm);if(c.tm==="scene")p.set("d",String(c.d));if(c.tm==="clock")p.set("at",c.at)}
     c.ln.forEach(function(l){p.append("ln",l)});var real=S.list.filter(function(x){return x.h});if(real.length)p.set("s",enc(real));if(S.f!=="link")p.set("f",S.f);return p.toString()}
   function frame(el,h){var u=BASE+"#"+h;if(!el.dataset.on){el.src=u;el.dataset.on=1}else el.contentWindow.location.replace(u)}
@@ -367,6 +388,9 @@ function setup(){
     nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
     $("bgSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.bg)});
     $("fmtSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.f)});
+    $("cvSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.cv)});
+    $("prevFrame").parentNode.classList.toggle("v",S.cv==="v");
+    document.querySelectorAll(".cvSize").forEach(function(e){e.textContent=S.cv==="v"?"1080 × 1920":"1920 × 1080"});
     ["start","brb","end"].forEach(function(k){$("u-"+k).value=BASE+"#"+hash(k)});
     clearTimeout(pvT);pvT=setTimeout(function(){frame($("prevFrame"),hash(S.tab))},250);
   }
