@@ -47,7 +47,7 @@ h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12
 .stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
   radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.18),transparent 60%),
   radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.14),transparent 60%),
-  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:3/1.4;max-width:100%}
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:9/4;max-width:100%}
 .stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
 main section{padding-block:52px;border-top:1px solid var(--edge)}
 .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
@@ -99,6 +99,8 @@ details{max-width:46em}summary{cursor:pointer;font-weight:600;color:var(--fg);fo
 .al-row.off .tin,.al-row.off .mn{opacity:.4}
 @media (max-width:640px){.al-row{grid-template-columns:auto minmax(0,1fr)}.al-row .tin,.al-row .mn{grid-column:1/-1}}
 .tw{overflow-x:auto}
+.snd-row{display:flex;gap:8px;align-items:center}.snd-row .tin{flex:1}.snd-row .btn{padding:9px 12px}
+.snd-row label{flex:0 0 92px;font-size:13px;font-weight:600;color:var(--fg)}
 .login{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 12px}
 .btn.tw{background:#9146FF;color:#fff}.btn.tw:hover{background:#A970FF}
 .btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
@@ -113,7 +115,7 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
 html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0;height:100%}
 html.ov .site{display:none}
 #ovr{display:none}
-html.ov #ovr{display:flex;position:fixed;inset:0;align-items:center;justify-content:center;padding:4%;font-family:var(--text);font-size:var(--fs,26px);overflow:hidden}
+html.ov #ovr{display:flex;position:fixed;left:50%;top:50%;width:900px;height:400px;transform:translate(-50%,-50%) scale(var(--k,1));align-items:center;justify-content:center;padding:24px;font-family:var(--text);font-size:var(--fs,26px)}
 html.ov.ly-slide #ovr{justify-content:flex-start}
 .al{--gr:77,163,255;--o:.88;--ink:#000;--dur:6s;position:relative;display:flex;align-items:center;gap:.75em;max-width:100%;min-width:0;
   padding:.7em 1.3em .7em .7em;border-radius:1em;color:#F2F5F9;
@@ -122,13 +124,14 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
 .al .ic{position:relative;flex:0 0 auto;width:2.7em;height:2.7em;border-radius:.75em;background:rgb(var(--gr));display:grid;place-items:center;box-shadow:0 0 1.4em rgba(var(--gr),.8)}
 .al .ic svg{width:1.45em;height:1.45em;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .al .ic b{position:absolute;right:-.45em;top:-.45em;min-width:1.5em;height:1.5em;padding:0 .35em;border-radius:.75em;background:#fff;color:#000;font:800 .55em/1.5em var(--text);text-align:center;box-shadow:0 0 0 .15em rgba(7,8,11,1)}
-.al .tx{min-width:0;display:flex;flex-direction:column}
-.al .tt{display:flex;align-items:center;gap:.4em;font:700 .62em/1.3 var(--text);letter-spacing:.12em;text-transform:uppercase;color:rgb(var(--gr));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.al .tx{min-width:0;flex:0 1 auto;display:flex;flex-direction:column}
+.al .tt{display:flex;align-items:center;gap:.4em;font:700 .62em/1.3 var(--text);letter-spacing:.12em;text-transform:uppercase;color:rgb(var(--gr))}
+.al .tt>span:not(.pf):not(.tier){min-width:0;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .al .pf{flex:0 0 auto;display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:.35em}
 .al .pf svg{width:1em;height:1em}
 .al .pf.tw{background:#9146FF}.al .pf.tw svg{fill:#fff}.al .pf.kk{background:#53FC18}.al .pf.kk svg{fill:#000}
 .al .tier{flex:0 0 auto;font-size:.9em;letter-spacing:.08em;color:#000;background:rgb(var(--gr));border-radius:.35em;padding:0 .4em}
-.al .nm{font:700 1.45em/1.15 var(--display);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.al .nm{font:700 1.45em/1.15 var(--display);color:#fff;white-space:nowrap;overflow:hidden}
 .al .ms{font-size:.68em;line-height:1.35;color:#D3D9E2;margin-top:.25em;max-width:24em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .al .ms .em{height:1.5em;width:auto;vertical-align:-.4em;margin:0 1px}
 .al .tm{position:absolute;left:1em;right:1em;bottom:0;height:2px;border-radius:2px;background:rgb(var(--gr));opacity:.7;transform-origin:left;animation:tm var(--dur) linear forwards}
@@ -203,12 +206,19 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
           <div class="hint">Pop: bursts in from the middle. Slide: sweeps in from the left.</div></div>
         <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
         <div><div class="lbl">Background <b id="opV">88%</b></div><input type="range" id="op" min="0" max="100" step="5" value="88" aria-label="Background opacity"></div>
-        <div><div class="lbl">Size <b id="fsV">26</b></div><input type="range" id="fs" min="16" max="48" step="1" value="26" aria-label="Alert size"></div>
+        <div><div class="lbl">Size <b id="fsV">26</b></div><input type="range" id="fs" min="16" max="44" step="1" value="26" aria-label="Alert size"></div>
         <div><div class="lbl">Each alert shows for <b id="durV">6 seconds</b></div><input type="range" id="dur" min="3" max="15" step="1" value="6" aria-label="Seconds each alert shows"></div>
         <div class="tog">
           <label><input type="checkbox" id="optSnd" checked>Play a sound</label>
         </div>
         <div id="volBox"><div class="lbl">Sound volume <b id="volV">50%</b></div><input type="range" id="vol" min="5" max="100" step="5" value="50" aria-label="Sound volume"></div>
+        <div id="ownBox">
+          <div class="lbl">Your own sounds <b>(optional)</b></div>
+          <div class="snd-row"><input class="tin" id="su_all" placeholder="Link to a sound for every alert" spellcheck="false" aria-label="Sound link for every alert"><button class="btn ghost" type="button" data-test="all">Test</button></div>
+          <details style="margin-top:10px"><summary>A different sound for each alert</summary><div id="suList" class="ctl" style="gap:8px;margin-top:10px"></div></details>
+          <div class="hint" id="suMsg" role="status"></div>
+          <div class="hint">Paste a link to an mp3, wav or ogg file. OBS can't play files straight from your PC, so put them online first: Dropbox share links work (we turn them into a direct link for you), and so do files in a GitHub repo. Leave it blank for the built-in chimes. If a link ever fails, the built-in chime plays instead.</div>
+        </div>
         <div class="tog">
           <label><input type="checkbox" id="optMsg" checked>Show viewers' messages (resubs, cheers, Kicks)</label>
           <label><input type="checkbox" id="optPf" checked>Twitch / Kick icon on each alert</label>
@@ -232,7 +242,7 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
     <div class="copy"><input id="obsUrl" readonly aria-label="OBS link"><button class="btn" data-copy="obsUrl">Copy</button></div>
     <ol class="steps">
       <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
-      <li>Paste the link into <strong>URL</strong> and set the size to <strong>900 × 400</strong>. Drag it where you want alerts to appear.</li>
+      <li>Paste the link into <strong>URL</strong> and set the size to <strong>900 × 400</strong>. Drag it where you want alerts to appear, and resize it to make the alerts bigger or smaller (or use the Size slider).</li>
       <li>To hear the sounds on stream, tick <strong>Control audio via OBS</strong> in the same window, then press OK.</li>
     </ol>
     <p>Changed something? Copy the new link and paste it over the old one.</p>
@@ -246,6 +256,7 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
       <tr><td>Twitch only: "Twitch login expired" shows</td><td>Come back to this page, press <strong>Log in with Twitch</strong> and paste the new link into OBS.</td></tr>
       <tr><td>Only one platform alerts</td><td>Check Streamer.bot is connected to both Twitch and Kick (Platforms tab).</td></tr>
       <tr><td>No sound on stream</td><td>Tick <strong>Control audio via OBS</strong> on the browser source and check it isn't muted in the audio mixer.</td></tr>
+      <tr><td>My own sound doesn't play (you hear the chime instead)</td><td>The link has to open the sound file itself, not a page about it. Press <strong>Test</strong> next to it to check. Google Drive and OneDrive share links usually don't work; Dropbox and GitHub do.</td></tr>
       <tr><td>Alerts double up with another tool</td><td>Turn that alert type off here, or in the other tool, so only one shows it.</td></tr>
     </table></div>
   </section>
@@ -302,9 +313,10 @@ function overlay(){
     cfg={ly:p.get("ly")==="slide"?"slide":"pop",g:g,o:Math.max(0,Math.min(100,o))/100,
       fs:Math.max(12,Math.min(64,parseInt(p.get("fs"),10)||26)),dur:Math.max(2,Math.min(30,parseInt(p.get("dur"),10)||6)),
       snd:p.get("snd")!=="0",vol:Math.max(0,Math.min(100,vol))/100,msg:p.get("msg")!=="0",pf:p.get("pf")!=="0",
-      off:(p.get("off")||"").split(","),t:{},min:{},
+      off:(p.get("off")||"").split(","),t:{},min:{},su:{},
       h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1",tk:(p.get("tk")||"").replace(/[^A-Za-z0-9]/g,"")};
     TYPES.forEach(function(t){var v=p.get("t_"+t[0]);cfg.t[t[0]]=v!=null&&v.trim()?v:t[3]});
+    ["all"].concat(TYPES.map(function(t){return t[0]})).forEach(function(k){var u=p.get(k==="all"?"su":"su_"+k);if(u&&/^https:\/\//.test(u))cfg.su[k]=u});
     for(var k in MINK)cfg.min[k]=Math.max(0,parseInt(p.get(MINK[k]),10)||0);
     document.documentElement.className="ov ly-"+cfg.ly;box.style.setProperty("--fs",cfg.fs+"px");
   }
@@ -320,8 +332,18 @@ function overlay(){
   /* ---- sound: a short chime made in the browser, different per alert ---- */
   var actx=null;
   var NOTES={follow:[659,880],sub:[523,659,784],resub:[523,784,1047],gift:[587,740,880],bomb:[587,740,880,1175,1480],cheer:[784,988,1319],kicks:[698,880,1047,1397],raid:[392,523,659,784,1047]};
+  var AUD={};
   function chime(type){
     if(!cfg.snd||!cfg.vol)return;
+    var url=cfg.su[type]||cfg.su.all;
+    if(url){
+      var base=AUD[url]||(AUD[url]=new Audio(url)),a=base.cloneNode();a.volume=Math.min(1,cfg.vol);
+      var done=false,fb=function(){if(!done){done=true;builtIn(type)}};
+      var p=a.play();if(p&&p.catch)p.catch(fb);a.onerror=fb;return;
+    }
+    builtIn(type);
+  }
+  function builtIn(type){
     try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){return}
     var t0=actx.currentTime+.03,ns=NOTES[type]||NOTES.follow,peak=.22*cfg.vol;
     ns.forEach(function(f,i){
@@ -351,7 +373,10 @@ function overlay(){
     tx.appendChild(tt);tx.appendChild(nm);
     if(cfg.msg&&a.msg){var ms=el("div","ms");addText(ms,a.msg);tx.appendChild(ms)}
     c.appendChild(tx);c.appendChild(el("div","tm"));
-    box.innerHTML="";box.appendChild(c);chime(a.type);cur=c;
+    box.innerHTML="";box.appendChild(c);
+    // long names shrink to fit rather than being cut off
+    var fsz=1.45;while(nm.scrollWidth>nm.clientWidth+1&&fsz>.7){fsz-=.05;nm.style.fontSize=fsz.toFixed(2)+"em"}
+    chime(a.type);cur=c;
     curT=setTimeout(function(){c.classList.add("out");curT=setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);cur=null;busy=false;curT=setTimeout(next,350)},480)},cfg.dur*1000);
   }
   function next(){if(busy||!queue.length)return;busy=true;show(queue.shift())}
@@ -447,6 +472,9 @@ function overlay(){
   }
   function sample(type){var s=SAMPLE[type],a={type:type,src:s[0],name:s[1]};for(var k in s[2])a[k]=s[2][k];if(type==="sub"&&s[0]==="twitch")a.tier="Tier 2";return a}
   read();
+  for(var su in cfg.su)if(!AUD[cfg.su[su]]){AUD[cfg.su[su]]=new Audio(cfg.su[su]);AUD[cfg.su[su]].preload="auto"}
+  function fit(){box.style.setProperty("--k",Math.min(innerWidth/900,innerHeight/400))}
+  fit();addEventListener("resize",fit);
   if(cfg.demo){
     var order=["follow","bomb","cheer","sub","raid","resub","kicks","gift"],i=0,auto=true;cfg.snd=cfg.snd&&false;
     var loud=new URLSearchParams(location.hash.slice(1)).get("snd")!=="0";
@@ -518,9 +546,29 @@ function overlay(){
 
 function setup(){
   var $=function(id){return document.getElementById(id)};
-  var S={mode:"sb",ly:"pop",g:"platform",o:88,fs:26,dur:6,snd:1,vol:50,msg:1,pf:1,off:[],t:{},mb:0,mk:0,mr:0,h:"127.0.0.1",p:"8080"};
+  var S={mode:"sb",ly:"pop",g:"platform",o:88,fs:26,dur:6,snd:1,vol:50,msg:1,pf:1,off:[],t:{},mb:0,mk:0,mr:0,su:{},h:"127.0.0.1",p:"8080"};
   try{var sv=JSON.parse(ls("al_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
-  if(!Array.isArray(S.off))S.off=[];if(!S.t||typeof S.t!=="object")S.t={};
+  if(!Array.isArray(S.off))S.off=[];if(!S.t||typeof S.t!=="object")S.t={};if(!S.su||typeof S.su!=="object")S.su={};
+  // own sounds
+  function sndLink(u){
+    u=String(u||"").trim();if(!u)return "";
+    if(!/^https?:\/\//i.test(u))u="https://"+u;u=u.replace(/^http:/i,"https:");
+    var m=u.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/i);if(m)return "https://raw.githubusercontent.com/"+m[1]+"/"+m[2]+"/"+m[3];
+    if(/^https:\/\/(www\.)?dropbox\.com\//i.test(u)){u=u.replace(/([?&])dl=[01]/,"$1raw=1");if(!/[?&]raw=1/.test(u))u+=(u.indexOf("?")>=0?"&":"?")+"raw=1"}
+    return u;
+  }
+  var suList=$("suList");
+  TYPES.forEach(function(t){var r=document.createElement("div");r.className="snd-row";r.dataset.k=t[0];
+    r.innerHTML='<label for="su_'+t[0]+'"></label><input class="tin" id="su_'+t[0]+'" placeholder="Same as every alert" spellcheck="false"><button class="btn ghost" type="button" data-test="'+t[0]+'">Test</button>';
+    r.querySelector("label").textContent=t[1];suList.appendChild(r)});
+  ["all"].concat(TYPES.map(function(t){return t[0]})).forEach(function(k){var i=$("su_"+k);i.value=S.su[k]||"";
+    i.addEventListener("change",function(){var v=sndLink(i.value);i.value=v;if(v)S.su[k]=v;else delete S.su[k];$("suMsg").textContent="";sync()})});
+  document.querySelectorAll("[data-test]").forEach(function(b){b.addEventListener("click",function(){
+    var k=b.dataset.test,u=sndLink($("su_"+k).value)||(k!=="all"&&S.su.all)||"",msg=$("suMsg");
+    if(!u){msg.textContent="Paste a link first.";return}
+    var a=new Audio(u);a.volume=S.vol/100;msg.textContent="Loading…";
+    a.play().then(function(){msg.textContent="That link plays."}).catch(function(){msg.textContent="That link didn't play. Check it opens the sound file itself (mp3, wav or ogg), not a page about it."});
+  })});
   // Twitch login
   var TK=null;try{TK=JSON.parse(ls("al_tk")||"null")}catch(e){}
   var hp=new URLSearchParams(location.hash.slice(1)),loginMsg="";
@@ -591,12 +639,13 @@ function setup(){
   $("host").value=S.h;$("port").value=S.p;
   function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(S.mode==="tw"&&TK&&!extra.demo)p.set("tk",TK.tk);p.set("ly",S.ly);p.set("g",S.g);
     if(S.o!==88)p.set("o",String(S.o));if(S.fs!==26)p.set("fs",String(S.fs));if(S.dur!==6)p.set("dur",String(S.dur));
-    if(!S.snd)p.set("snd","0");else if(S.vol!==50)p.set("vol",String(S.vol));if(!S.msg)p.set("msg","0");if(!S.pf)p.set("pf","0");
+    if(!S.snd)p.set("snd","0");else{if(S.vol!==50)p.set("vol",String(S.vol));for(var sk in S.su)if(S.su[sk])p.set(sk==="all"?"su":"su_"+sk,S.su[sk])}if(!S.msg)p.set("msg","0");if(!S.pf)p.set("pf","0");
     var off=S.off.slice();if(S.mode==="tw"&&off.indexOf("kicks")<0)off.push("kicks");if(off.length)p.set("off",off.join(","));["mb","mk","mr"].forEach(function(k){if(S[k])p.set(k,String(S[k]))});
     TYPES.forEach(function(t){if(S.t[t[0]])p.set("t_"+t[0],S.t[t[0]])});
     if(S.mode!=="tw"){if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw)}
     for(var k in extra)p.set(k,extra[k]);return p.toString()}
-  function frame(el,h){var u=BASE+"#"+h;if(!el.dataset.on){el.src=u;el.dataset.on=1}else{el.src="about:blank";setTimeout(function(){el.src=u},30)}}
+  function frame(el,h){var u=BASE+"#"+h;el.onload=function(){if(el.src.indexOf("about:")!==0)el.style.visibility=""};
+    if(!el.dataset.on){el.src=u;el.dataset.on=1}else{el.style.visibility="hidden";el.src="about:blank";setTimeout(function(){el.src=u},30)}}
   var pvT=null;
   function sync(){
     ls("al_cfg",JSON.stringify(S));
@@ -605,7 +654,7 @@ function setup(){
     cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
     nmL.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
     $("op").value=S.o;$("opV").textContent=S.o+"%";$("fs").value=S.fs;$("fsV").textContent=S.fs;$("dur").value=S.dur;$("durV").textContent=S.dur+" seconds";
-    $("vol").value=S.vol;$("volV").textContent=S.vol+"%";$("optSnd").checked=!!S.snd;$("volBox").hidden=!S.snd;$("optMsg").checked=!!S.msg;$("optPf").checked=!!S.pf;
+    $("vol").value=S.vol;$("volV").textContent=S.vol+"%";$("optSnd").checked=!!S.snd;$("volBox").hidden=!S.snd;$("ownBox").hidden=!S.snd;$("optMsg").checked=!!S.msg;$("optPf").checked=!!S.pf;
     list.querySelectorAll(".al-row").forEach(function(r){var on=S.off.indexOf(r.dataset.k)<0;r.querySelector('input[type=checkbox]').checked=on;r.classList.toggle("off",!on)});
     var tw=S.mode==="tw";
     $("modeSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.mode)});
