@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alerts: Twitch and Kick alerts in one OBS overlay</title>
+<meta name="description" content="Free OBS alerts by itsCRA1G for Twitch and Kick together: follows, subs, gifts, cheers, Kicks and raids, through Streamer.bot.">
+<meta property="og:title" content="Alerts: Twitch and Kick alerts in one overlay">
+<meta property="og:description" content="Follows, subs, gifts, cheers, Kicks and raids from Twitch and Kick. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14);
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
+  radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.18),transparent 60%),
+  radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.14),transparent 60%),
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:3/1.4;max-width:100%}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}
+.grid2{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.sticky{position:sticky;top:84px}
+@media (max-width:900px){.sticky{position:static}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.lbl b{color:var(--fg)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.tog{display:flex;flex-direction:column;gap:10px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input,.al-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--acc);flex:0 0 auto}
+.tin{width:100%;min-width:0;font:15px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+details{max-width:46em}summary{cursor:pointer;font-weight:600;color:var(--fg);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 100px;gap:8px;margin-top:10px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.tests{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tests button{font:600 13px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:999px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tests button:hover{border-color:var(--acc)}
+.tests i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.al-list{display:flex;flex-direction:column;gap:10px;max-width:46em}
+.al-row{display:grid;grid-template-columns:auto 130px minmax(0,1fr) 110px;gap:10px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:10px 12px}
+.al-row .n{font-weight:700;color:var(--fg);font-size:15px;line-height:1.25}
+.al-row .n small{display:block;font-weight:500;color:var(--mute);font-size:12px}
+.al-row .mn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mute)}
+.al-row .mn input{width:64px;padding:8px}
+.al-row.off .tin,.al-row.off .mn{opacity:.4}
+@media (max-width:640px){.al-row{grid-template-columns:auto minmax(0,1fr)}.al-row .tin,.al-row .mn{grid-column:1/-1}}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0;height:100%}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:flex;position:fixed;inset:0;align-items:center;justify-content:center;padding:4%;font-family:var(--text);font-size:var(--fs,26px);overflow:hidden}
+html.ov.ly-slide #ovr{justify-content:flex-start}
+.al{--gr:77,163,255;--o:.88;--ink:#000;--dur:6s;position:relative;display:flex;align-items:center;gap:.75em;max-width:100%;min-width:0;
+  padding:.7em 1.3em .7em .7em;border-radius:1em;color:#F2F5F9;
+  background:linear-gradient(135deg,rgba(20,23,30,var(--o)),rgba(7,8,11,var(--o)));
+  border:1px solid rgba(var(--gr),.5);box-shadow:0 0 2.2em -.5em rgba(var(--gr),.85),0 .6em 2em -1em rgba(0,0,0,.6)}
+.al .ic{position:relative;flex:0 0 auto;width:2.7em;height:2.7em;border-radius:.75em;background:rgb(var(--gr));display:grid;place-items:center;box-shadow:0 0 1.4em rgba(var(--gr),.8)}
+.al .ic svg{width:1.45em;height:1.45em;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.al .ic b{position:absolute;right:-.45em;top:-.45em;min-width:1.5em;height:1.5em;padding:0 .35em;border-radius:.75em;background:#fff;color:#000;font:800 .55em/1.5em var(--text);text-align:center;box-shadow:0 0 0 .15em rgba(7,8,11,1)}
+.al .tx{min-width:0;display:flex;flex-direction:column}
+.al .tt{display:flex;align-items:center;gap:.4em;font:700 .62em/1.3 var(--text);letter-spacing:.12em;text-transform:uppercase;color:rgb(var(--gr));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.al .pf{flex:0 0 auto;display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:.35em}
+.al .pf svg{width:1em;height:1em}
+.al .pf.tw{background:#9146FF}.al .pf.tw svg{fill:#fff}.al .pf.kk{background:#53FC18}.al .pf.kk svg{fill:#000}
+.al .tier{flex:0 0 auto;font-size:.9em;letter-spacing:.08em;color:#000;background:rgb(var(--gr));border-radius:.35em;padding:0 .4em}
+.al .nm{font:700 1.45em/1.15 var(--display);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.al .ms{font-size:.68em;line-height:1.35;color:#D3D9E2;margin-top:.25em;max-width:24em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.al .ms .em{height:1.5em;width:auto;vertical-align:-.4em;margin:0 1px}
+.al .tm{position:absolute;left:1em;right:1em;bottom:0;height:2px;border-radius:2px;background:rgb(var(--gr));opacity:.7;transform-origin:left;animation:tm var(--dur) linear forwards}
+@keyframes tm{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+/* pop */
+.ly-pop .al{animation:popIn .55s cubic-bezier(.2,1.4,.4,1) both}
+.ly-pop .al .ic:after{content:"";position:absolute;inset:-.2em;border-radius:1em;border:2px solid rgb(var(--gr));animation:ring 1s .15s ease-out both}
+.ly-pop .al.out{animation:popOut .4s ease-in both}
+@keyframes popIn{from{opacity:0;transform:scale(.55) translateY(.6em)}to{opacity:1;transform:none}}
+@keyframes popOut{to{opacity:0;transform:scale(.9) translateY(-.4em)}}
+@keyframes ring{from{opacity:.9;transform:scale(.8)}to{opacity:0;transform:scale(1.9)}}
+/* slide */
+.ly-slide .al{animation:slIn .6s cubic-bezier(.16,1,.3,1) both}
+.ly-slide .al.out{animation:slOut .45s cubic-bezier(.7,0,.84,0) both}
+@keyframes slIn{from{opacity:0;transform:translateX(-110%)}to{opacity:1;transform:none}}
+@keyframes slOut{to{opacity:0;transform:translateX(-110%)}}
+@media (prefers-reduced-motion:reduce){.al,.al.out,.al .ic:after{animation-duration:.01s!important}}
+</style>
+</head>
+<body>
+<div id="ovr"></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Alerts</a>
+  <nav><a href="#setup">Set up</a><a href="#alerts">Alerts</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
+    <h1>Twitch and Kick alerts, in one place.</h1>
+    <p class="lead">Follows, subs, resubs, gifted subs, cheers, Kicks and raids from both platforms, one after another in a single alert box, each marked with where it came from.</p>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">8 alert types</span><span class="chip">Your own wording</span><span class="chip">Built-in sounds</span><span class="chip">Gift bombs grouped</span><span class="chip">No Streamer.bot action needed</span></div>
+  </div>
+  <div class="stage"><iframe id="heroFrame" title="Alert preview" tabindex="-1"></iframe></div>
+</div></div>
+
+<main class="wrap">
+  <section id="setup">
+    <div class="sec-head"><span class="num">1</span><h2>Turn on Streamer.bot's WebSocket server</h2></div>
+    <p>Alerts come straight from <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> (1.0 or later), connected to Twitch, Kick or both. There's no action or code to add.</p>
+    <ol class="steps">
+      <li>In Streamer.bot, open <strong>Servers/Clients → WebSocket Server</strong>.</li>
+      <li>Tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Leave it on <code>127.0.0.1</code> port <code>8080</code> unless you've changed it.</li>
+    </ol>
+    <p>Already set up for Combined Chat, Sub Goal or Credits? Then you're done.</p>
+  </section>
+
+  <section id="alerts">
+    <div class="sec-head"><span class="num">2</span><h2>Pick your alerts and wording</h2></div>
+    <p>Untick any you don't want. The line above the viewer's name is yours to change: use <code>{amount}</code> for the number of subs, bits, Kicks or raiders, <code>{months}</code> for months subscribed and <code>{to}</code> for who got a gifted sub.</p>
+    <div class="al-list" id="alList"></div>
+    <p class="hint">Gift bombs show as one alert, not one for every sub in them.</p>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">3</span><h2>Style it</h2></div>
+    <div class="grid2">
+      <div class="ctl">
+        <div><div class="lbl">Entrance</div><div class="seg" id="lySeg"><button data-v="pop" aria-pressed="true">Pop</button><button data-v="slide" aria-pressed="false">Slide</button></div>
+          <div class="hint">Pop: bursts in from the middle. Slide: sweeps in from the left.</div></div>
+        <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Background <b id="opV">88%</b></div><input type="range" id="op" min="0" max="100" step="5" value="88" aria-label="Background opacity"></div>
+        <div><div class="lbl">Size <b id="fsV">26</b></div><input type="range" id="fs" min="16" max="48" step="1" value="26" aria-label="Alert size"></div>
+        <div><div class="lbl">Each alert shows for <b id="durV">6 seconds</b></div><input type="range" id="dur" min="3" max="15" step="1" value="6" aria-label="Seconds each alert shows"></div>
+        <div class="tog">
+          <label><input type="checkbox" id="optSnd" checked>Play a sound</label>
+        </div>
+        <div id="volBox"><div class="lbl">Sound volume <b id="volV">50%</b></div><input type="range" id="vol" min="5" max="100" step="5" value="50" aria-label="Sound volume"></div>
+        <div class="tog">
+          <label><input type="checkbox" id="optMsg" checked>Show viewers' messages (resubs, cheers, Kicks)</label>
+          <label><input type="checkbox" id="optPf" checked>Twitch / Kick icon on each alert</label>
+        </div>
+        <details><summary>Streamer.bot connection (only if you changed it)</summary>
+          <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
+          <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
+        </details>
+      </div>
+      <div class="sticky">
+        <div class="stage"><iframe id="prevFrame" title="Alert preview" tabindex="-1" allow="autoplay"></iframe></div>
+        <div class="tests" id="tests"></div>
+        <p class="hint">Press one to try it in the preview, with sound. The preview uses made-up names.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">4</span><h2>Add it to OBS</h2></div>
+    <p>Your alerts link, with your choices built in:</p>
+    <div class="copy"><input id="obsUrl" readonly aria-label="OBS link"><button class="btn" data-copy="obsUrl">Copy</button></div>
+    <ol class="steps">
+      <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+      <li>Paste the link into <strong>URL</strong> and set the size to <strong>900 × 400</strong>. Drag it where you want alerts to appear.</li>
+      <li>To hear the sounds on stream, tick <strong>Control audio via OBS</strong> in the same window, then press OK.</li>
+    </ol>
+    <p>Changed something? Copy the new link and paste it over the old one.</p>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>No alerts show</td><td>Check Streamer.bot is running, its WebSocket server is started, and it's connected to Twitch or Kick. If you changed the address, port or set a password, enter them in step 3 and copy the link again.</td></tr>
+      <tr><td>Only one platform alerts</td><td>Check Streamer.bot is connected to both Twitch and Kick (Platforms tab).</td></tr>
+      <tr><td>No sound on stream</td><td>Tick <strong>Control audio via OBS</strong> on the browser source and check it isn't muted in the audio mixer.</td></tr>
+      <tr><td>Alerts double up with another tool</td><td>Turn that alert type off here, or in the other tool, so only one shows it.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot, Twitch or Kick.</div></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var GLOWS=[["platform","Platform colours"],["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+// key, name, where, default line, minimum label
+var TYPES=[
+  ["follow","Follow","Twitch + Kick","New follower",""],
+  ["sub","Sub","Twitch + Kick","New subscriber",""],
+  ["resub","Resub","Twitch + Kick","Subscribed for {months} months",""],
+  ["gift","Gifted sub","Twitch + Kick","Gifted a sub to {to}",""],
+  ["bomb","Gift bomb","Twitch + Kick","Gifted {amount} subs",""],
+  ["cheer","Cheer","Twitch","Cheered {amount} bits","bits"],
+  ["kicks","Kicks","Kick","Sent {amount} Kicks","Kicks"],
+  ["raid","Raid","Twitch + Kick","Raiding with {amount} viewers","viewers"]];
+var DEF={};TYPES.forEach(function(t){DEF[t[0]]=t[3]});
+var MINK={cheer:"mb",kicks:"mk",raid:"mr"};
+var BASE=location.origin+location.pathname;
+var TW_SVG='<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>';
+var KK_SVG='<svg viewBox="0 0 24 24"><path d="M1.5 1.5h7.2v4.8h2.4V3.9h2.4V1.5h9v7.2h-2.4v2.4h-2.4v1.8h2.4v2.4h2.4v7.2h-9v-2.4h-2.4v-2.4H8.7v4.8H1.5z"/></svg>';
+var ICON={
+  follow:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  sub:'<path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+  resub:'<path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.5"/><path d="M4 20v-4.5h4.5"/>',
+  gift:'<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-1.5-3.5-5.5-4.5-5.5-2S10 9 12 9zm0 0c1.5-3.5 5.5-4.5 5.5-2S14 9 12 9z"/>',
+  bomb:'<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-1.5-3.5-5.5-4.5-5.5-2S10 9 12 9zm0 0c1.5-3.5 5.5-4.5 5.5-2S14 9 12 9z"/>',
+  cheer:'<path d="M12 2.5l7 7.5-7 11.5L5 10z"/><path d="M5 10h14M9 10l3 11.5L15 10M9 10l3-7.5 3 7.5"/>',
+  kicks:'<circle cx="12" cy="12" r="8.5"/><path d="M9.5 7.5v9M14.5 7.5L10 12l4.5 4.5"/>',
+  raid:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.2c2.6.2 4.5 2.4 4.5 5.3"/>'};
+var SAMPLE={follow:["twitch","NightOwlTV",{}],sub:["kick","Kezza_Plays",{}],resub:["twitch","Morag",{months:14,msg:"14 months and still not missed a stream"}],
+  gift:["kick","Big_Dave",{to:"LateShift"}],bomb:["twitch","ChattyCath",{amount:10}],cheer:["twitch","pixelpete",{amount:500,msg:"that clutch was unreal"}],
+  kicks:["kick","Loco_Lou",{amount:100,msg:"GG [emote:37227:LULW]"}],raid:["kick","SquadUpSam",{amount:42}]};
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function lum(h){var c=[0,2,4].map(function(i){var v=parseInt(h.slice(i,i+2),16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+function overlay(){
+  var box=document.getElementById("ovr"),cur=null,curT=0,cfg,ws=null,live=false,queue=[],busy=false,seen={},kickHold={},kickMute={};
+  function read(){
+    var p=new URLSearchParams(location.hash.slice(1));
+    var g=p.get("g")||"platform";if(g!=="platform"&&!/^[0-9a-fA-F]{6}$/.test(g))g="platform";
+    var o=parseInt(p.get("o"),10);if(isNaN(o))o=88;
+    var vol=parseInt(p.get("vol"),10);if(isNaN(vol))vol=50;
+    cfg={ly:p.get("ly")==="slide"?"slide":"pop",g:g,o:Math.max(0,Math.min(100,o))/100,
+      fs:Math.max(12,Math.min(64,parseInt(p.get("fs"),10)||26)),dur:Math.max(2,Math.min(30,parseInt(p.get("dur"),10)||6)),
+      snd:p.get("snd")!=="0",vol:Math.max(0,Math.min(100,vol))/100,msg:p.get("msg")!=="0",pf:p.get("pf")!=="0",
+      off:(p.get("off")||"").split(","),t:{},min:{},
+      h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1"};
+    TYPES.forEach(function(t){var v=p.get("t_"+t[0]);cfg.t[t[0]]=v!=null&&v.trim()?v:t[3]});
+    for(var k in MINK)cfg.min[k]=Math.max(0,parseInt(p.get(MINK[k]),10)||0);
+    document.documentElement.className="ov ly-"+cfg.ly;box.style.setProperty("--fs",cfg.fs+"px");
+  }
+  function el(t,c){var e=document.createElement(t);if(c)e.className=c;return e}
+  function safeUrl(u){return typeof u==="string"&&/^https:\/\//.test(u)?u:""}
+  function emoteImg(url,alt){var i=el("img","em");i.src=url;i.alt=alt||"";return i}
+  function addText(node,t){
+    var re=/\[emote:(\d+):([^\]]*)\]/g,last=0,m;
+    while((m=re.exec(t))){if(m.index>last)node.appendChild(document.createTextNode(t.slice(last,m.index)));node.appendChild(emoteImg("https://files.kick.com/emotes/"+m[1]+"/fullsize",m[2]));last=re.lastIndex}
+    if(last<t.length)node.appendChild(document.createTextNode(t.slice(last)));
+  }
+
+  /* ---- sound: a short chime made in the browser, different per alert ---- */
+  var actx=null;
+  var NOTES={follow:[659,880],sub:[523,659,784],resub:[523,784,1047],gift:[587,740,880],bomb:[587,740,880,1175,1480],cheer:[784,988,1319],kicks:[698,880,1047,1397],raid:[392,523,659,784,1047]};
+  function chime(type){
+    if(!cfg.snd||!cfg.vol)return;
+    try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){return}
+    var t0=actx.currentTime+.03,ns=NOTES[type]||NOTES.follow,peak=.22*cfg.vol;
+    ns.forEach(function(f,i){
+      var o=actx.createOscillator(),o2=actx.createOscillator(),g=actx.createGain(),st=t0+i*.11;
+      o.type="triangle";o.frequency.value=f;o2.type="sine";o2.frequency.value=f*2;
+      g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(peak,st+.015);g.gain.exponentialRampToValueAtTime(.0001,st+(i===ns.length-1?1.1:.45));
+      var g2=actx.createGain();g2.gain.value=.18;o.connect(g);o2.connect(g2);g2.connect(g);g.connect(actx.destination);
+      o.start(st);o2.start(st);o.stop(st+1.2);o2.stop(st+1.2);
+    });
+  }
+
+  /* ---- the alert itself ---- */
+  function fill(tpl,a){return tpl.replace(/\{(amount|months|to|name)\}/gi,function(_,k){k=k.toLowerCase();var v=a[k];return v==null||v===""?"":String(v)}).replace(/\s{2,}/g," ").trim()}
+  function show(a){
+    var pc=a.src==="kick"?"53FC18":"9146FF",g=cfg.g==="platform"?pc:cfg.g.toUpperCase();
+    var c=el("div","al");c.style.setProperty("--gr",hx2rgb(g));c.style.setProperty("--o",cfg.o);c.style.setProperty("--ink",lum(g)>.35?"#000":"#fff");c.style.setProperty("--dur",cfg.dur+"s");
+    var ic=el("div","ic");ic.innerHTML='<svg viewBox="0 0 24 24">'+ICON[a.type]+'</svg>';
+    if(a.type==="bomb"&&a.amount){var n=el("b");n.textContent="×"+a.amount;ic.appendChild(n)}
+    c.appendChild(ic);
+    var tx=el("div","tx"),tt=el("div","tt");
+    if(cfg.pf){var pf=el("span","pf "+(a.src==="kick"?"kk":"tw"));pf.innerHTML=a.src==="kick"?KK_SVG:TW_SVG;tt.appendChild(pf)}
+    var line=el("span");line.textContent=fill(cfg.t[a.type],a);tt.appendChild(line);
+    if(a.tier){var ti=el("span","tier");ti.textContent=a.tier;tt.appendChild(ti)}
+    var nm=el("div","nm");nm.textContent=a.name;
+    tx.appendChild(tt);tx.appendChild(nm);
+    if(cfg.msg&&a.msg){var ms=el("div","ms");addText(ms,a.msg);tx.appendChild(ms)}
+    c.appendChild(tx);c.appendChild(el("div","tm"));
+    box.innerHTML="";box.appendChild(c);chime(a.type);cur=c;
+    curT=setTimeout(function(){c.classList.add("out");curT=setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);cur=null;busy=false;curT=setTimeout(next,350)},480)},cfg.dur*1000);
+  }
+  function next(){if(busy||!queue.length)return;busy=true;show(queue.shift())}
+  function push(a,force){
+    if(!a||!a.name)return;
+    if(!force&&cfg.off.indexOf(a.type)>=0)return;
+    if(!force&&cfg.min[a.type]&&(+a.amount||0)<cfg.min[a.type])return;
+    if(queue.length<60)queue.push(a);next();
+  }
+
+  /* ---- reading Streamer.bot's events ---- */
+  function nm(o){if(!o||typeof o!=="object")return "";return String(o.name||o.displayName||o.display_name||o.userName||o.login||o.username||o.slug||"")}
+  function who(d){return nm(d.user)||d.user_name||d.userName||d.displayName||d.display_name||d.username||nm(d.targetUser)||nm(d.follower)||""}
+  function num(){for(var i=0;i<arguments.length;i++){var v=parseInt(arguments[i],10);if(!isNaN(v)&&v>0)return v}return 0}
+  function txt(d){var m=d.message&&typeof d.message==="object"?d.message:null;var t=typeof d.text==="string"?d.text:typeof d.message==="string"?d.message:m&&typeof m.message==="string"?m.message:"";return t.slice(0,240)}
+  function anon(d){return !!(d.isAnonymous||d.anonymous||d.gifterIsAnonymous)}
+  function tier(d){if(d.isPrime||d.is_prime)return "Prime";var s=String(d.subTier||d.sub_tier||d.tier||"");return /3/.test(s)?"Tier 3":/2/.test(s)?"Tier 2":""}
+  function stripCheer(t,d){
+    var names=(d.cheerEmotes||[]).map(function(c){return String(c.Name||c.name||"").replace(/[^A-Za-z]/g,"")}).filter(Boolean);
+    var re=names.length?new RegExp("(^|\\s)("+names.join("|")+")\\d+(?=\\s|$)","gi"):/(^|\s)cheer\d+(?=\s|$)/gi;
+    return t.replace(re,"$1").replace(/\s{2,}/g," ").trim();
+  }
+  function onceOnly(d){var id=d.messageId||d.id||"";if(!id)return true;id=String(id);if(seen[id])return false;seen[id]=Date.now();
+    var ks=Object.keys(seen);if(ks.length>300)ks.slice(0,100).forEach(function(k){delete seen[k]});return true}
+  function twitch(type,d){
+    switch(type){
+      case "Follow":return {type:"follow",name:who(d)};
+      case "Sub":return {type:"sub",name:who(d),tier:tier(d)};
+      case "ReSub":return {type:"resub",name:who(d),months:num(d.cumulativeMonths,d.cumulative,d.durationMonths,d.monthsSubscribed),tier:tier(d),msg:txt(d)};
+      case "GiftSub":
+        if(d.fromCommunitySubGift||d.from_community_sub_gift)return null; // part of a gift bomb, shown once by GiftBomb
+        return {type:"gift",name:anon(d)?"Anonymous":who(d),to:nm(d.recipient)||d.recipientDisplayName||d.recipientUser||"",tier:tier(d)};
+      case "GiftBomb":return {type:"bomb",name:anon(d)?"Anonymous":who(d),amount:num(d.total,d.gifts,d.count,(d.recipients||[]).length),tier:tier(d)};
+      case "Cheer":{var bits=num(d.bits,d.message&&d.message.bits);return {type:"cheer",name:anon(d)?"Anonymous":who(d),amount:bits,msg:stripCheer(txt(d),d)}}
+      case "Raid":return {type:"raid",name:nm(d.raider)||d.from_broadcaster_user_name||d.fromBroadcasterUserName||who(d),amount:num(d.viewers,d.viewerCount)};
+    }
+    return null;
+  }
+  function kick(type,d){
+    switch(type){
+      case "Follow":return {type:"follow",name:who(d)};
+      case "Subscription":return {type:"sub",name:who(d)};
+      case "Resubscription":return {type:"resub",name:who(d),months:num(d.duration,d.months,d.cumulativeMonths),msg:txt(d)};
+      case "GiftSubscription":{
+        var g=anon(d)?"Anonymous":who(d),key=g.toLowerCase(),r=d.recipient||(d.recipients&&d.recipients[0]);
+        var mu=kickMute[key];if(mu&&mu.left>0&&mu.until>Date.now()){mu.left--;return null}  // already shown as part of a mass gift
+        var a={src:"kick",type:"gift",name:g,to:nm(r)};
+        // hold it a moment, in case it turns out to be part of a mass gift
+        var h=kickHold[key]||(kickHold[key]={list:[],t:0});h.list.push(a);clearTimeout(h.t);
+        h.t=setTimeout(function(){delete kickHold[key];if(h.list.length===1)push(h.list[0]);else push({src:"kick",type:"bomb",name:g,amount:h.list.length})},1500);
+        return "held";
+      }
+      case "MassGiftSubscription":{
+        var gg=anon(d)?"Anonymous":who(d),k2=gg.toLowerCase(),n=num((d.recipients||[]).length,d.quantity,d.total,d.count,d.amount);
+        if(kickHold[k2]){clearTimeout(kickHold[k2].t);n=Math.max(n,kickHold[k2].list.length);delete kickHold[k2]}
+        kickMute[k2]={until:Date.now()+20000,left:n};
+        return {type:"bomb",name:gg,amount:n};
+      }
+      case "KicksGifted":{
+        var gift=d.gift&&typeof d.gift==="object"?d.gift:{};
+        return {type:"kicks",name:anon(d)?"Anonymous":(who(d)||nm(d.sender)),amount:num(d.amount,d.kicks,d.quantity,d.total,gift.amount,gift.kicks,gift.value),msg:txt(d)};
+      }
+    }
+    return null;
+  }
+  function handle(src,type,d){
+    if(!onceOnly(d))return;
+    var a=src==="kick"?kick(type,d):twitch(type,d);
+    if(!a||a==="held")return;a.src=src;push(a);
+  }
+  async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
+  function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+  var EVENTS=[["Twitch","Follow"],["Twitch","Sub"],["Twitch","ReSub"],["Twitch","GiftSub"],["Twitch","GiftBomb"],["Twitch","Cheer"],["Twitch","Raid"],
+    ["Kick","Follow"],["Kick","Subscription"],["Kick","Resubscription"],["Kick","GiftSubscription"],["Kick","MassGiftSubscription"],["Kick","KicksGifted"]];
+  function subscribe(){
+    if(live)return;live=true;
+    // one request per event, so an event a Streamer.bot version doesn't have can't block the others
+    EVENTS.forEach(function(e,i){var ev={};ev[e[0]]=[e[1]];send({request:"Subscribe",id:"al-"+i,events:ev})});
+  }
+  function connect(){
+    live=false;
+    try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.port+"/")}catch(e){setTimeout(connect,5000);return}
+    var helloT=setTimeout(subscribe,1500);
+    ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.request==="Hello"){clearTimeout(helloT);if(m.authentication&&cfg.pw){var a=m.authentication;var s=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"al-auth",authentication:await sha(s+a.challenge)})}else subscribe();return}
+      if(m.id==="al-auth"){subscribe();return}
+      if(!m.event||!m.data)return;
+      var src=String(m.event.source||"").toLowerCase();
+      if(src==="twitch"||src==="kick")handle(src,String(m.event.type||""),m.data);
+    };
+    ws.onclose=function(){clearTimeout(helloT);live=false;setTimeout(connect,3000)};
+    ws.onerror=function(){try{ws.close()}catch(x){}};
+  }
+  function sample(type){var s=SAMPLE[type],a={type:type,src:s[0],name:s[1]};for(var k in s[2])a[k]=s[2][k];if(type==="sub"&&s[0]==="twitch")a.tier="Tier 2";return a}
+  read();
+  if(cfg.demo){
+    var order=["follow","bomb","cheer","sub","raid","resub","kicks","gift"],i=0,auto=true;cfg.snd=cfg.snd&&false;
+    var loud=new URLSearchParams(location.hash.slice(1)).get("snd")!=="0";
+    window.addEventListener("message",function(e){var d=e.data;if(!d||typeof d.al!=="string"||!SAMPLE[d.al])return;auto=false;cfg.snd=loud;queue=[];clearTimeout(curT);box.innerHTML="";cur=null;busy=false;push(sample(d.al),true)});
+    (function loop(){if(auto&&!busy&&!queue.length)push(sample(order[i++%order.length]));setTimeout(loop,700)})();
+    return;
+  }
+  connect();
+}
+
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={ly:"pop",g:"platform",o:88,fs:26,dur:6,snd:1,vol:50,msg:1,pf:1,off:[],t:{},mb:0,mk:0,mr:0,h:"127.0.0.1",p:"8080"};
+  try{var sv=JSON.parse(ls("al_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  if(!Array.isArray(S.off))S.off=[];if(!S.t||typeof S.t!=="object")S.t={};
+  // alert list
+  var list=$("alList");
+  TYPES.forEach(function(t){
+    var r=document.createElement("div");r.className="al-row";r.dataset.k=t[0];
+    r.innerHTML='<input type="checkbox" aria-label="Show '+t[1]+' alerts"><div class="n"></div><input class="tin" spellcheck="false">'+(t[4]?'<label class="mn">Min <input class="tin" type="number" min="0" step="1" inputmode="numeric"></label>':'<span></span>');
+    r.querySelector(".n").innerHTML=t[1]+"<small>"+t[2]+"</small>";
+    var cb=r.querySelector('input[type=checkbox]'),line=r.querySelector(".tin"),mn=r.querySelector(".mn input");
+    line.placeholder=t[3];line.setAttribute("aria-label",t[1]+" wording");line.value=S.t[t[0]]||"";
+    cb.addEventListener("change",function(){var i=S.off.indexOf(t[0]);if(cb.checked&&i>=0)S.off.splice(i,1);if(!cb.checked&&i<0)S.off.push(t[0]);sync()});
+    line.addEventListener("input",function(){var v=line.value.trim();if(v&&v!==t[3])S.t[t[0]]=v;else delete S.t[t[0]];sync()});
+    if(mn){mn.setAttribute("aria-label","Minimum "+t[4]);mn.value=S[MINK[t[0]]]||"";mn.placeholder="0";mn.addEventListener("input",function(){S[MINK[t[0]]]=Math.max(0,parseInt(mn.value,10)||0);sync()})}
+    list.appendChild(r);
+  });
+  // glow swatches
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);
+    if(g[0]==="platform")b.style.background="conic-gradient(#9146FF 0 50%,#53FC18 0)";else b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
+  var nmL=document.createElement("span");nmL.className="name";sw.appendChild(nmL);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  $("lySeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.ly=b.dataset.v;sync()}});
+  [["op","o"],["fs","fs"],["dur","dur"],["vol","vol"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=+this.value;sync()})});
+  [["optSnd","snd"],["optMsg","msg"],["optPf","pf"]].forEach(function(x){$(x[0]).addEventListener("change",function(){S[x[1]]=this.checked?1:0;sync()})});
+  [["host","h"],["port","p"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value.trim();sync()})});
+  $("pw").addEventListener("input",sync);
+  // test buttons
+  var tests=$("tests");
+  TYPES.forEach(function(t){var b=document.createElement("button");b.type="button";var src=SAMPLE[t[0]][0];
+    b.innerHTML='<i style="background:'+(src==="kick"?"#53FC18":"#9146FF")+'"></i>'+t[1];b.title="Test a "+(src==="kick"?"Kick":"Twitch")+" "+t[1].toLowerCase();
+    b.addEventListener("click",function(){var f=$("prevFrame");if(f.contentWindow)f.contentWindow.postMessage({al:t[0]},"*")});tests.appendChild(b)});
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){var el=$(b.dataset.copy),o=b.textContent;
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select()})});
+  $("host").value=S.h;$("port").value=S.p;
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");p.set("ly",S.ly);p.set("g",S.g);
+    if(S.o!==88)p.set("o",String(S.o));if(S.fs!==26)p.set("fs",String(S.fs));if(S.dur!==6)p.set("dur",String(S.dur));
+    if(!S.snd)p.set("snd","0");else if(S.vol!==50)p.set("vol",String(S.vol));if(!S.msg)p.set("msg","0");if(!S.pf)p.set("pf","0");
+    if(S.off.length)p.set("off",S.off.join(","));["mb","mk","mr"].forEach(function(k){if(S[k])p.set(k,String(S[k]))});
+    TYPES.forEach(function(t){if(S.t[t[0]])p.set("t_"+t[0],S.t[t[0]])});
+    if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw);
+    for(var k in extra)p.set(k,extra[k]);return p.toString()}
+  function frame(el,h){var u=BASE+"#"+h;if(!el.dataset.on){el.src=u;el.dataset.on=1}else{el.src="about:blank";setTimeout(function(){el.src=u},30)}}
+  var pvT=null;
+  function sync(){
+    ls("al_cfg",JSON.stringify(S));
+    $("lySeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.ly)});
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nmL.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("op").value=S.o;$("opV").textContent=S.o+"%";$("fs").value=S.fs;$("fsV").textContent=S.fs;$("dur").value=S.dur;$("durV").textContent=S.dur+" seconds";
+    $("vol").value=S.vol;$("volV").textContent=S.vol+"%";$("optSnd").checked=!!S.snd;$("volBox").hidden=!S.snd;$("optMsg").checked=!!S.msg;$("optPf").checked=!!S.pf;
+    list.querySelectorAll(".al-row").forEach(function(r){var on=S.off.indexOf(r.dataset.k)<0;r.querySelector('input[type=checkbox]').checked=on;r.classList.toggle("off",!on)});
+    $("obsUrl").value=BASE+"#"+hash({});
+    clearTimeout(pvT);pvT=setTimeout(function(){frame($("prevFrame"),hash({demo:"1"}))},300);
+  }
+  frame($("heroFrame"),"ov=1&demo=1&ly=pop&g=platform&snd=0&fs=22");
+  sync();
+}
+})();
+</script>
+</body>
+</html>
