@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credits: free movie-style end credits for OBS</title>
+<meta name="description" content="Free movie-style end credits for OBS by itsCRA1G. Rolls everyone who raided, subbed, gifted, cheered, followed and chatted this stream, on Twitch and Kick, through Streamer.bot.">
+<meta property="og:title" content="Credits: free movie-style end credits for OBS">
+<meta property="og:description" content="Roll the credits on your stream, with everyone who took part. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --warn:#FFB020; --bad:#FF4D4D;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:44px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,58px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+h3{font:700 19px var(--display);color:var(--fg);margin:28px 0 10px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.screen{position:relative;aspect-ratio:16/9;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:repeating-conic-gradient(#14171d 0 25%,#0e1015 0 50%) 0 0/24px 24px;max-width:100%}
+.screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+p{margin:0 0 14px;max-width:46em}
+ol.steps,ul.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+.steps ul{margin:6px 0 0;padding-left:20px}.steps ul li{margin:0 0 3px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn:hover{background:#8CC4FF;color:#000}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}
+.btn.ghost:hover{border-color:var(--acc)}
+.tin,textarea.tin{font:15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:9px 10px;min-width:0;width:100%}
+textarea.tin{resize:vertical;min-height:92px;line-height:1.5}
+.tin:focus{outline:2px solid var(--acc);outline-offset:1px}
+.cgrid{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.cgrid{grid-template-columns:1fr}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.secs{display:flex;flex-direction:column;gap:6px}
+.secrow{display:grid;grid-template-columns:22px minmax(0,1fr) 92px;gap:8px;align-items:center}
+.secrow input[type=checkbox]{width:18px;height:18px;accent-color:var(--acc)}
+.secrow span{font-size:12px;color:var(--mute)}
+details{max-width:46em}
+summary{cursor:pointer;font-weight:600;color:var(--fg);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 100px;gap:8px;margin-top:10px}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.code{background:var(--tile);border:1px solid var(--edge);border-radius:14px;margin:12px 0 18px}
+.code .top{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--edge)}
+.code .top span{font:600 13px var(--mono);color:var(--mute);margin-right:auto}
+.code pre{margin:0;padding:16px;overflow:auto;max-height:420px;font:13px/1.55 var(--mono);color:var(--body)}
+.code .c{color:#6B7689}.code .s{color:#3DDC97}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:block;position:fixed;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
+.cr{--g:#4DA3FF;--gr:77,163,255;position:absolute;inset:0;color:#F2F5F9;overflow:hidden}
+.cr .bgx{position:absolute;inset:0;background:#000}
+.cr.glow .bgx{background:radial-gradient(70% 60% at 50% 45%,rgba(var(--gr),.10),transparent 70%),linear-gradient(180deg,#07080c,#030406)}
+.cr.clear .bgx{display:none}
+.cr.clear{text-shadow:0 2px 12px rgba(0,0,0,.95),0 0 3px rgba(0,0,0,.95)}
+.cr .roll{position:absolute;left:0;right:0;top:1080px;display:flex;flex-direction:column;align-items:center;gap:110px;padding-bottom:200px;will-change:transform}
+.cr .sec{display:flex;flex-direction:column;align-items:center;gap:18px;width:1400px;text-align:center}
+.cr .hd{margin-bottom:14px}
+.cr .row{display:grid;grid-template-columns:1fr 1fr;gap:48px;width:1100px;align-items:baseline}
+.cr .row .l{text-align:right}.cr .row .r{text-align:left}
+.cr .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 60px;width:1300px}
+.cr .one{font-size:1em}
+.cr .fin{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;opacity:0;transition:opacity 1.6s ease;text-align:center;padding:0 160px}
+.cr .fin.on{opacity:1}
+/* classic */
+.cr.classic .hd{font:700 34px/1.2 "Cinzel",Georgia,serif;letter-spacing:10px;text-transform:uppercase;color:#D9C9A3}
+.cr.classic .nm,.cr.classic .row,.cr.classic .grid{font:500 46px/1.25 "Cormorant Garamond",Georgia,serif;color:#F4F1EA}
+.cr.classic .grid{font-size:38px}
+.cr.classic .row .l{font:500 italic 40px/1.25 "Cormorant Garamond",Georgia,serif;color:#BDB7A9}
+.cr.classic .star{font:600 96px/1.1 "Cormorant Garamond",Georgia,serif;letter-spacing:2px}
+.cr.classic .ft{font:700 96px/1.1 "Cinzel",Georgia,serif;letter-spacing:12px;color:#F4F1EA}
+.cr.classic .fl{font:500 italic 46px "Cormorant Garamond",Georgia,serif;color:#D9C9A3}
+.cr.classic .pres{font:500 italic 40px "Cormorant Garamond",Georgia,serif;color:#BDB7A9}
+/* glow */
+.cr.glow .hd{font:700 30px var(--text);letter-spacing:9px;text-transform:uppercase;color:var(--g);text-shadow:0 0 22px rgba(var(--gr),.6)}
+.cr.glow .nm,.cr.glow .row,.cr.glow .grid{font:600 46px/1.25 var(--display);color:#F2F5F9}
+.cr.glow .grid{font-size:36px;font-weight:500;color:#D7DDE6}
+.cr.glow .row .l{font:500 38px/1.25 var(--text);color:#AEB6C4}
+.cr.glow .star{font:700 104px/1.05 var(--display);letter-spacing:-2px}
+.cr.glow .ft{font:700 110px/1.05 var(--display);letter-spacing:-2px}
+.cr.glow .fl{font:500 44px var(--text);color:var(--g)}
+.cr.glow .pres{font:600 30px var(--text);letter-spacing:8px;text-transform:uppercase;color:#AEB6C4}
+.cr.glow .rule{width:340px;height:5px;border-radius:5px;background:var(--g);box-shadow:0 0 24px rgba(var(--gr),.9)}
+.cr.classic .rule{width:220px;height:1px;background:#D9C9A3;opacity:.7}
+</style>
+</head>
+<body>
+<div id="ovr"><div id="cr" class="cr classic"><div class="bgx"></div><div class="roll" id="roll"></div><div class="fin" id="fin"></div></div></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Credits</a>
+  <nav><a href="#sb">Streamer.bot</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
+    <h1>Roll the credits on your stream.</h1>
+    <p class="lead">Movie-style end credits with everyone who took part this stream: raiders, subs, gifters, cheers and Kicks, new followers and everyone who chatted. Twitch and Kick together, through Streamer.bot.</p>
+    <div class="chips"><span class="chip">Classic film or glow style</span><span class="chip">Your own section titles</span><span class="chip">Special thanks</span><span class="chip">Starts fresh each stream</span></div>
+  </div>
+  <div class="screen"><iframe id="heroFrame" title="Credits preview" tabindex="-1"></iframe></div>
+</div></div>
+
+<main class="wrap">
+  <section id="sb">
+    <div class="sec-head"><span class="num">1</span><h2>Add it to Streamer.bot</h2></div>
+    <p>Streamer.bot collects the names during your stream and hands them to the credits when the scene appears. You need <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> 1.0 or later, connected to Twitch, Kick or both.</p>
+    <h3>Turn on the WebSocket server</h3>
+    <ol class="steps">
+      <li>In Streamer.bot, open <strong>Servers/Clients → WebSocket Server</strong>.</li>
+      <li>Tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Leave it on <code>127.0.0.1</code> port <code>8080</code> unless you've changed it.</li>
+    </ol>
+    <h3>The Credits action</h3>
+    <details class="manual" open><summary>Set it up</summary>
+    <ol class="steps" style="margin-top:14px">
+      <li>In <strong>Actions</strong>, right-click and pick <strong>Add</strong>. Name it exactly <strong>Credits</strong>, because the overlay asks for it by name.</li>
+      <li>Right-click <strong>Triggers</strong> and add each of these (skip a platform you don't use):
+        <ul><li><strong>Twitch:</strong> Chat Message, Follow, Subscription, Resubscription, Gift Subscription, Cheer, Raid, Stream Online</li>
+        <li><strong>Kick:</strong> Chat Message, Follow, Subscription, Resubscription, Gift Subscription, Mass Gift Subscription, Kicks Gifted, Stream Online</li></ul>
+        Skip Twitch's <em>Gift Bomb</em>: each sub in a gift bomb already arrives as its own Gift Subscription.</li>
+      <li>Right-click <strong>Sub-Actions</strong>, pick <strong>Core → C# → Execute C# Code</strong>, paste this code over everything, press <strong>Compile</strong>, then <strong>Save and Compile</strong>.</li>
+    </ol>
+    <div class="code"><div class="top"><span>Credits.cs</span><a class="btn ghost" href="Credits.cs" download>Download</a><button class="btn" data-copy="src1">Copy code</button></div><pre id="src1"><span class="c">// Credits for Streamer.bot, free from itsCRA1G (itscra1g.github.io/credits)</span>
+<span class="c">// Collects everyone who took part this stream, and hands the list to the Credits overlay.</span>
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+public class CPHInline
+{
+<span class="c">    // ===== Change these to suit your stream =====</span>
+
+<span class="c">    // Accounts to leave out of the credits (bots, your own accounts). Lower case.</span>
+    private static readonly string[] Ignore = new[]
+    {
+        <span class="s">"streamelements"</span>, <span class="s">"streamlabs"</span>, <span class="s">"nightbot"</span>, <span class="s">"moobot"</span>, <span class="s">"fossabot"</span>, <span class="s">"wizebot"</span>,
+        <span class="s">"soundalerts"</span>, <span class="s">"sery_bot"</span>, <span class="s">"botrixoficial"</span>, <span class="s">"kicbot"</span>, <span class="s">"streamerbot"</span>, <span class="s">"commanderroot"</span>
+    };
+
+<span class="c">    // ===== Nothing to change below here =====</span>
+
+    private const string Var = <span class="s">"credits_"</span>;
+    private static readonly string[] Lists = { <span class="s">"raids"</span>, <span class="s">"subs"</span>, <span class="s">"gifts"</span>, <span class="s">"tips"</span>, <span class="s">"follows"</span>, <span class="s">"chat"</span> };
+
+    public bool Execute()
+    {
+        string mode = Arg(<span class="s">"mode"</span>, <span class="s">""</span>);
+        if (mode == <span class="s">"get"</span>) { Send(); return true; }
+        if (mode == <span class="s">"reset"</span>) { Reset(); return true; }
+
+        string ev = EventName();
+        string user = Arg(<span class="s">"user"</span>, Arg(<span class="s">"userName"</span>, <span class="s">""</span>));
+        if (ev.Contains(<span class="s">"StreamOnline"</span>)) { Reset(); return true; }
+        if (user == <span class="s">""</span> || Ignored(user)) return true;
+
+        if (ev.Contains(<span class="s">"GiftBomb"</span>)) return true;   // each gift also arrives as its own Gift Sub
+        if (ev.Contains(<span class="s">"MassGift"</span>))
+        {
+            int added = 0;
+            for (int i = 0; i &lt; 500; i++)
+            {
+                string id = Arg(<span class="s">"recipient."</span> + i + <span class="s">".userId"</span>, Arg(<span class="s">"recipient."</span> + i + <span class="s">".userName"</span>, <span class="s">""</span>));
+                if (id == <span class="s">""</span>) break;
+                if (FirstTime(<span class="s">"kick:"</span> + id)) added++;
+            }
+            if (added == 0) int.TryParse(Arg(<span class="s">"count"</span>, Arg(<span class="s">"gifts"</span>, <span class="s">"0"</span>)), out added);
+            Bump(<span class="s">"gifts"</span>, user, added);
+            return true;
+        }
+        if (ev.Contains(<span class="s">"GiftSub"</span>))
+        {
+            string id = Arg(<span class="s">"recipient.userId"</span>, Arg(<span class="s">"recipientId"</span>, Arg(<span class="s">"recipientUserName"</span>, <span class="s">""</span>)));
+            string plat = ev.Contains(<span class="s">"Kick"</span>) ? <span class="s">"kick:"</span> : <span class="s">"twitch:"</span>;
+            if (Arg(<span class="s">"anonymous"</span>, <span class="s">"False"</span>).ToLower() == <span class="s">"true"</span>) user = <span class="s">"Anonymous"</span>;
+            if (id == <span class="s">""</span> || FirstTime(plat + id)) Bump(<span class="s">"gifts"</span>, user, 1);
+            return true;
+        }
+        if (ev.Contains(<span class="s">"ReSub"</span>) || ev.Contains(<span class="s">"Resub"</span>) || ev.Contains(<span class="s">"Sub"</span>)) { Bump(<span class="s">"subs"</span>, user, 1); return true; }
+        if (ev.Contains(<span class="s">"Cheer"</span>)) { Bump(<span class="s">"tips"</span>, user, Num(<span class="s">"bits"</span>)); return true; }
+        if (ev.Contains(<span class="s">"Kicks"</span>)) { Bump(<span class="s">"tips"</span>, user, Num(<span class="s">"kicks"</span>, Num(<span class="s">"amount"</span>, Num(<span class="s">"quantity"</span>)))); return true; }
+        if (ev.Contains(<span class="s">"Raid"</span>)) { Bump(<span class="s">"raids"</span>, user, Math.Max(1, Num(<span class="s">"viewers"</span>))); return true; }
+        if (ev.Contains(<span class="s">"Follow"</span>)) { Bump(<span class="s">"follows"</span>, user, 1); return true; }
+        if (ev.Contains(<span class="s">"Chat"</span>) || ev.Contains(<span class="s">"Message"</span>)) { Bump(<span class="s">"chat"</span>, user, 1); return true; }
+        return true;
+    }
+
+<span class="c">    // Which trigger ran this action, e.g. "TwitchChatMessage" or "KickFollow".</span>
+    private string EventName()
+    {
+        foreach (string m in new[] { <span class="s">"GetEventType"</span>, <span class="s">"GetSource"</span> })
+        {
+            try
+            {
+                var mi = CPH.GetType().GetMethod(m, Type.EmptyTypes);
+                if (mi == null) continue;
+                object r = mi.Invoke(CPH, null);
+                string s = r == null ? <span class="s">""</span> : r.ToString();
+                if (s != <span class="s">""</span> &amp;&amp; s != <span class="s">"None"</span> &amp;&amp; s != <span class="s">"Unknown"</span> &amp;&amp; m == <span class="s">"GetEventType"</span>) return s;
+            }
+            catch (Exception) { }
+        }
+        return Arg(<span class="s">"__source"</span>, Arg(<span class="s">"triggerName"</span>, <span class="s">""</span>)).Replace(<span class="s">" "</span>, <span class="s">""</span>);
+    }
+
+<span class="c">    // ----- the lists, stored as "name&lt;TAB&gt;number" lines -----</span>
+
+    private Dictionary&lt;string, int&gt; Load(string list)
+    {
+        var d = new Dictionary&lt;string, int&gt;(StringComparer.OrdinalIgnoreCase);
+        string raw = CPH.GetGlobalVar&lt;string&gt;(Var + list, true) ?? <span class="s">""</span>;
+        foreach (string line in raw.Split('\n'))
+        {
+            int t = line.LastIndexOf('\t');
+            if (t &lt; 1) continue;
+            int n; int.TryParse(line.Substring(t + 1), out n);
+            d[line.Substring(0, t)] = n;
+        }
+        return d;
+    }
+
+    private void Save(string list, Dictionary&lt;string, int&gt; d)
+    {
+        var sb = new StringBuilder();
+        foreach (var kv in d) sb.Append(kv.Key.Replace(<span class="s">"\t"</span>, <span class="s">" "</span>).Replace(<span class="s">"\n"</span>, <span class="s">" "</span>)).Append('\t').Append(kv.Value).Append('\n');
+        CPH.SetGlobalVar(Var + list, sb.ToString(), true);
+    }
+
+    private void Bump(string list, string user, int by)
+    {
+        if (by &lt;= 0) return;
+        var d = Load(list);
+        int n; d.TryGetValue(user, out n);
+        d[user] = n + by;
+        Save(list, d);
+    }
+
+    private void Reset()
+    {
+        foreach (string l in Lists) CPH.SetGlobalVar(Var + l, <span class="s">""</span>, true);
+        CPH.SetGlobalVar(Var + <span class="s">"seen"</span>, <span class="s">""</span>, false);
+    }
+
+    private void Send()
+    {
+        var sb = new StringBuilder(<span class="s">"{\"credits\":{"</span>);
+        sb.Append(<span class="s">"\"streamer\":"</span>).Append(J(Arg(<span class="s">"broadcastUser"</span>, Arg(<span class="s">"broadcastUserName"</span>, <span class="s">""</span>))));
+        foreach (string l in Lists)
+        {
+            sb.Append(<span class="s">",\""</span>).Append(l).Append(<span class="s">"\":["</span>);
+            bool first = true;
+            foreach (var kv in Load(l))
+            {
+                if (!first) sb.Append(',');
+                sb.Append('[').Append(J(kv.Key)).Append(',').Append(kv.Value).Append(']');
+                first = false;
+            }
+            sb.Append(']');
+        }
+        sb.Append(<span class="s">"}}"</span>);
+        CPH.WebsocketBroadcastJson(sb.ToString());
+    }
+
+<span class="c">    // ----- helpers -----</span>
+
+    private bool Ignored(string user)
+    {
+        string u = user.ToLower();
+        foreach (string s in Ignore) if (u == s) return true;
+        string me = Arg(<span class="s">"broadcastUserName"</span>, Arg(<span class="s">"broadcastUser"</span>, <span class="s">""</span>)).ToLower();
+        return me != <span class="s">""</span> &amp;&amp; u == me;
+    }
+
+<span class="c">    // Kick can report a gifted sub twice (single and mass), so count each recipient once a minute.</span>
+    private bool FirstTime(string id)
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        string seen = CPH.GetGlobalVar&lt;string&gt;(Var + <span class="s">"seen"</span>, false) ?? <span class="s">""</span>;
+        var keep = new List&lt;string&gt;();
+        bool found = false;
+        foreach (string entry in seen.Split(';'))
+        {
+            int at = entry.LastIndexOf('@');
+            if (at &lt; 1) continue;
+            long t;
+            if (!long.TryParse(entry.Substring(at + 1), out t) || now - t &gt; 60) continue;
+            if (entry.Substring(0, at) == id) found = true;
+            keep.Add(entry);
+        }
+        if (!found) keep.Add(id + <span class="s">"@"</span> + now);
+        CPH.SetGlobalVar(Var + <span class="s">"seen"</span>, string.Join(<span class="s">";"</span>, keep), false);
+        return !found;
+    }
+
+    private int Num(string key, int fallback = 0)
+    {
+        int n;
+        return int.TryParse(Arg(key, <span class="s">""</span>), out n) ? n : fallback;
+    }
+
+    private string Arg(string key, string fallback)
+    {
+        object v;
+        if (args.TryGetValue(key, out v) &amp;&amp; v != null &amp;&amp; v.ToString().Length &gt; 0) return v.ToString();
+        return fallback;
+    }
+
+    private static string J(string s)
+    {
+        var sb = new StringBuilder(<span class="s">"\""</span>);
+        foreach (char c in s ?? <span class="s">""</span>)
+        {
+            if (c == '<span class="s">"') sb.Append("</span>\\\<span class="s">""</span>);
+            else if (c == '\\') sb.Append(<span class="s">"\\\\"</span>);
+            else if (c &lt; 32) sb.Append(' ');
+            else sb.Append(c);
+        }
+        return sb.Append(<span class="s">"\""</span>).ToString();
+    }
+}</pre></div>
+    </details>
+    <p style="margin-top:16px">The list empties itself when you go live, so each stream's credits only show that stream. Bots like Nightbot and StreamElements are left out; add more to the <code>Ignore</code> list at the top of the code.</p>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">2</span><h2>Style your credits</h2></div>
+    <div class="cgrid">
+      <div class="ctl">
+        <div><div class="lbl">Style</div><div class="seg" id="styleSeg"><button data-v="classic" aria-pressed="true">Classic film</button><button data-v="glow" aria-pressed="false">Glow</button></div></div>
+        <div id="glowBox" hidden><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Background</div><div class="seg" id="bgSeg"><button data-v="solid" aria-pressed="true">Solid</button><button data-v="clear" aria-pressed="false">Transparent</button></div></div>
+        <div><div class="lbl">Speed</div><div class="seg" id="spSeg"><button data-v="50">Slow</button><button data-v="80" aria-pressed="true">Medium</button><button data-v="120">Fast</button></div></div>
+        <div><div class="lbl">Your name (Starring)</div><input class="tin" id="name" maxlength="40" placeholder="Leave empty to use your Twitch name"></div>
+        <div><div class="lbl">Sections</div><div class="secs" id="secs"></div><div class="hint">Untick a section to leave it out. Empty sections are skipped anyway.</div></div>
+        <div><div class="lbl">Special thanks (one per line)</div><textarea class="tin" id="thanks" placeholder="Mods: Name, Name&#10;Everyone in the Discord"></textarea><div class="hint">Use a colon to split a role from names, like <em>Mods: Rese, Shingo</em>.</div></div>
+        <div><div class="lbl">Final card</div><input class="tin" id="ftitle" maxlength="60"><input class="tin" id="fline" maxlength="120" style="margin-top:8px" placeholder="e.g. Next stream: Sunday 7pm"></div>
+        <details><summary>Streamer.bot connection (only if you changed it)</summary>
+          <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
+          <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
+        </details>
+      </div>
+      <div>
+        <div class="screen"><iframe id="prevFrame" title="Credits preview" tabindex="-1"></iframe></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap"><button class="btn ghost" id="replay">Replay preview</button><span class="hint" style="margin:0">Preview uses made-up names.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">3</span><h2>Add it to OBS</h2></div>
+    <p>Your credits link, with your style built in:</p>
+    <div class="copy"><input id="obsUrl" readonly aria-label="OBS link"><button class="btn" data-copy="obsUrl">Copy</button></div>
+    <ol class="steps">
+      <li>Make a scene called <em>Credits</em>. Press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+      <li>Paste the link into <strong>URL</strong> and set the size to <strong>1920 × 1080</strong>.</li>
+      <li>Tick <strong>Refresh browser when scene becomes active</strong>, so the credits roll from the top with the latest names each time you switch to it.</li>
+      <li>Test it: switch to the scene. With Streamer.bot running, you'll see this stream's names; the first time, you may only see yourself and your special thanks.</li>
+    </ol>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>Only my name and special thanks roll</td><td>Streamer.bot isn't connected, or nothing's been collected yet. Check it's running with the WebSocket server started, and that the action is called exactly <strong>Credits</strong>.</td></tr>
+      <tr><td>A bot shows up in Featuring</td><td>Add its name, in lower case, to the <code>Ignore</code> list at the top of the code.</td></tr>
+      <tr><td>Names from last stream show up</td><td>Check the action has the <strong>Stream Online</strong> trigger, which clears the list when you go live.</td></tr>
+      <tr><td>The credits don't restart</td><td>Tick <strong>Refresh browser when scene becomes active</strong> in the browser source.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot, Twitch or Kick.</div></footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var SECS=[["raids","Raided by"],["subs","New Subscribers"],["gifts","Gifted Subs"],["tips","Cheers & Tips"],["follows","New Followers"],["chat","Featuring"]];
+var GLOWS=[["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+var BASE=location.origin+location.pathname;
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+function overlay(){
+  var $=function(i){return document.getElementById(i)},cr=$("cr"),ovr=$("ovr");
+  var cfg,ws=null,live=false,started=false,waitT=null;
+  function fit(){ovr.style.transform="scale("+Math.min(innerWidth/1920,innerHeight/1080)+")"}
+  addEventListener("resize",fit);
+  function read(){
+    var p=new URLSearchParams(location.hash.slice(1));
+    var g=p.get("g")||"4DA3FF";if(!/^[0-9a-fA-F]{6}$/.test(g))g="4DA3FF";
+    var titles={};SECS.forEach(function(s){titles[s[0]]=p.has("t_"+s[0])?p.get("t_"+s[0]):s[1]});
+    cfg={st:p.get("st")==="glow"?"glow":"classic",g:g,clear:p.get("bg")==="clear",sp:Math.max(20,Math.min(300,parseInt(p.get("sp"),10)||80)),
+      n:p.get("n")||"",titles:titles,off:(p.get("x")||"").split(",").filter(Boolean),th:p.getAll("th").filter(Boolean),
+      ft:p.has("ft")?p.get("ft"):"Thanks for watching",fl:p.get("fl")||"",h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1"};
+    cr.className="cr "+cfg.st+(cfg.clear?" clear":"");cr.style.setProperty("--g","#"+g);cr.style.setProperty("--gr",hx2rgb(g));fit();
+  }
+  function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+  function sorted(a){return (a||[]).filter(function(x){return x&&x[0]}).sort(function(x,y){return (y[1]||0)-(x[1]||0)||String(x[0]).localeCompare(String(y[0]))})}
+  function build(d){
+    var roll=$("roll"),fin=$("fin");roll.innerHTML="";fin.innerHTML="";fin.classList.remove("on");
+    roll.style.transition="none";roll.style.transform="translateY(0)";
+    var star=cfg.n||d.streamer||"You";
+    var s0=el("div","sec");s0.appendChild(el("div","pres",cfg.st==="classic"?"a stream by":"A stream by"));s0.appendChild(el("div","star",star));s0.appendChild(el("div","rule"));roll.appendChild(s0);
+    SECS.forEach(function(s){
+      var k=s[0];if(cfg.off.indexOf(k)>=0)return;var list=sorted(d[k]);if(!list.length)return;
+      var sec=el("div","sec");sec.appendChild(el("div","hd",cfg.titles[k]||s[1]));
+      if(k==="raids"||k==="gifts"){list.forEach(function(x){var r=el("div","row");r.appendChild(el("div","l",k==="raids"?x[1]+(x[1]===1?" raider":" raiders"):x[1]+" gifted"));r.appendChild(el("div","r",x[0]));sec.appendChild(r)})}
+      else if(k==="chat"||list.length>8){var gr=el("div","grid");list.forEach(function(x){gr.appendChild(el("div","",x[0]))});if(list.length<3)gr.style.gridTemplateColumns="repeat("+list.length+",auto)";sec.appendChild(gr)}
+      else list.forEach(function(x){sec.appendChild(el("div","nm",x[0]))});
+      roll.appendChild(sec);
+    });
+    if(cfg.th.length){var t=el("div","sec");t.appendChild(el("div","hd","Special Thanks"));
+      cfg.th.forEach(function(line){var i=line.indexOf(":");if(i>0){var r=el("div","row");r.appendChild(el("div","l",line.slice(0,i).trim()));r.appendChild(el("div","r",line.slice(i+1).trim()));t.appendChild(r)}else t.appendChild(el("div","nm",line))});roll.appendChild(t)}
+    fin.appendChild(el("div","ft",cfg.ft));if(cfg.fl)fin.appendChild(el("div","fl",cfg.fl));fin.appendChild(el("div","rule"));
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      var H=roll.scrollHeight,dist=H+1080,dur=dist/cfg.sp;
+      roll.style.transition="transform "+dur+"s linear";roll.style.transform="translateY(-"+dist+"px)";
+      clearTimeout(waitT);waitT=setTimeout(function(){fin.classList.add("on")},Math.max(0,dur-1.2)*1000);
+    })});
+  }
+  function go(d){if(started)return;started=true;var f=function(){build(d||{})};if(document.fonts&&document.fonts.ready)document.fonts.ready.then(f);else f()}
+  async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
+  function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+  function subscribe(){if(live)return;live=true;send({request:"Subscribe",id:"cr-sub",events:{General:["Custom"]}});send({request:"DoAction",id:"cr-get",action:{name:"Credits"},args:{mode:"get"}})}
+  function connect(){
+    try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.port+"/")}catch(e){return}
+    var helloT=setTimeout(subscribe,1500);
+    ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.request==="Hello"){clearTimeout(helloT);if(m.authentication&&cfg.pw){var a=m.authentication;var sec=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"cr-auth",authentication:await sha(sec+a.challenge)})}else subscribe();return}
+      if(m.id==="cr-auth"){subscribe();return}
+      if(m.event&&m.event.source==="General"&&m.event.type==="Custom"){var d=m.data;if(typeof d==="string"){try{d=JSON.parse(d)}catch(x){return}}if(d&&d.data&&d.data.credits)d=d.data;if(d&&d.credits)go(d.credits)}};
+    ws.onerror=function(){try{ws.close()}catch(x){}};
+  }
+  var DEMO={streamer:"YourName",raids:[["NightOwlTV",34],["Kezza_Plays",12]],subs:[["pixelpete",1],["Morag",1],["LateShift",1]],gifts:[["GenerousGary",5],["Anonymous",1]],
+    tips:[["CheerBear",500],["KickKing",100]],follows:[["newbie_one",1],["FirstTimer",1],["hello_there",1],["QuietLurker",1]],
+    chat:[["ChattyCath",40],["NightOwlTV",31],["Morag",22],["pixelpete",18],["Big_Dave",12],["LateShift",9],["Kezza_Plays",7],["moddy_mcmod",6],["GenerousGary",4],["CheerBear",3],["hello_there",2],["FirstTimer",1]]};
+  addEventListener("hashchange",function(){read();started=false;go(cfg.demo?DEMO:{})});
+  read();
+  if(cfg.demo){go(DEMO);return}
+  connect();
+  setTimeout(function(){go({})},5000);
+}
+
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={st:"classic",g:"4DA3FF",bg:"solid",sp:80,n:"",titles:{},off:[],th:"",ft:"Thanks for watching",fl:"",h:"127.0.0.1",p:"8080"};
+  SECS.forEach(function(s){S.titles[s[0]]=s[1]});
+  try{var sv=JSON.parse(ls("cr_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  var box=$("secs");
+  SECS.forEach(function(s){var r=document.createElement("label");r.className="secrow";
+    r.innerHTML='<input type="checkbox"><input class="tin"><span></span>';var cb=r.children[0],ti=r.children[1];r.children[2].textContent=s[0]==="chat"?"chatters":s[0]==="tips"?"bits & Kicks":s[0];
+    cb.checked=S.off.indexOf(s[0])<0;ti.value=S.titles[s[0]];ti.maxLength=40;ti.setAttribute("aria-label",s[1]+" title");
+    cb.addEventListener("change",function(){S.off=S.off.filter(function(x){return x!==s[0]});if(!cb.checked)S.off.push(s[0]);sync()});
+    ti.addEventListener("input",function(){S.titles[s[0]]=ti.value;sync()});box.appendChild(r)});
+  $("name").value=S.n;$("thanks").value=S.th;$("ftitle").value=S.ft;$("fline").value=S.fl;$("host").value=S.h;$("port").value=S.p;
+  [["name","n"],["thanks","th"],["ftitle","ft"],["fline","fl"],["host","h"],["port","p"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value;sync()})});
+  $("pw").addEventListener("input",sync);
+  function seg(id,key,num){$(id).addEventListener("click",function(e){var b=e.target.closest("button");if(b){S[key]=num?+b.dataset.v:b.dataset.v;sync()}})}
+  seg("styleSeg","st");seg("bgSeg","bg");seg("spSeg","sp",true);
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
+  var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){
+    var el=$(b.dataset.copy),t=el.tagName==="INPUT"?el.value:el.innerText.trim(),o=b.textContent,done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){});
+  })});
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");p.set("st",S.st);if(S.st==="glow")p.set("g",S.g);if(S.bg==="clear")p.set("bg","clear");if(S.sp!==80)p.set("sp",String(S.sp));
+    if(S.n.trim())p.set("n",S.n.trim());SECS.forEach(function(s){var t=(S.titles[s[0]]||"").trim();if(t&&t!==s[1])p.set("t_"+s[0],t)});if(S.off.length)p.set("x",S.off.join(","));
+    S.th.split("\n").map(function(x){return x.trim()}).filter(Boolean).slice(0,30).forEach(function(l){p.append("th",l)});
+    if(S.ft!=="Thanks for watching")p.set("ft",S.ft);if(S.fl.trim())p.set("fl",S.fl.trim());
+    if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw);
+    for(var k in extra)p.set(k,extra[k]);return p.toString()}
+  function frame(el,h,force){var u=BASE+"#"+h;if(!el.dataset.on){el.src=u;el.dataset.on=1}else if(force)el.contentWindow.location.reload();else el.contentWindow.location.replace(u)}
+  var pvT=null;
+  function sync(){
+    ls("cr_cfg",JSON.stringify(S));
+    ["styleSeg","bgSeg","spSeg"].forEach(function(id){var key={styleSeg:"st",bgSeg:"bg",spSeg:"sp"}[id];$(id).querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.v)===String(S[key]))})});
+    $("glowBox").hidden=S.st!=="glow";
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("obsUrl").value=BASE+"#"+hash({});
+    clearTimeout(pvT);pvT=setTimeout(function(){frame($("prevFrame"),hash({demo:"1",sp:String(S.sp*2.5)}))},300);
+  }
+  $("replay").addEventListener("click",function(){var f=$("prevFrame");f.contentWindow.location.replace(BASE+"#"+hash({demo:"1",sp:String(S.sp*2.5),r:String(Date.now())}))});
+  frame($("heroFrame"),"ov=1&demo=1&st=classic&sp=160&n=YourName&fl=Next%20stream%3A%20Sunday%207pm&th=Mods%3A%20Name%2C%20Name");
+  sync();
+}
+})();
+</script>
+</body>
+</html>
