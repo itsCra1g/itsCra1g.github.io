@@ -87,6 +87,9 @@ code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px so
 .sw{display:flex;gap:8px;flex-wrap:wrap}
 .sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
 .sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
 .sw button.brandc{background:conic-gradient(#9146FF 0 25%,#53FC18 0 50%,#FF0000 0 75%,#FE2C55 0)}
 .sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
 input[type=range]{width:100%;accent-color:var(--acc)}
@@ -295,6 +298,8 @@ function setup(){
   })});
   var sw=$("glowSw");
   GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);if(g[0]==="brand")b.className="brandc";else b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
   var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
   sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
   $("layoutSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.l=b.dataset.v;sync()}});
@@ -312,7 +317,8 @@ function setup(){
     $("layoutSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.l)});
     $("fmtSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.f)});
     sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
-    nm.textContent=(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
     $("op").value=S.o;$("opV").textContent=S.o+"%";$("sec").value=S.t;$("secV").textContent=S.t+" seconds";
     $("ev").value=S.e;$("evV").textContent=S.e?"every "+S.e+(S.e===1?" minute":" minutes"):"all the time";
     var real=S.list.filter(function(x){return x.h});
