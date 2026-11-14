@@ -22,6 +22,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth;scroll-padding-top:84px}
 body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
 a{color:var(--acc)}a:hover{color:#8CC4FF}
@@ -98,6 +99,11 @@ details{max-width:46em}summary{cursor:pointer;font-weight:600;color:var(--fg);fo
 .al-row.off .tin,.al-row.off .mn{opacity:.4}
 @media (max-width:640px){.al-row{grid-template-columns:auto minmax(0,1fr)}.al-row .tin,.al-row .mn{grid-column:1/-1}}
 .tw{overflow-x:auto}
+.login{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 12px}
+.btn.tw{background:#9146FF;color:#fff}.btn.tw:hover{background:#A970FF}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid #FFB020;border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.copy button[disabled]{opacity:.45;cursor:not-allowed}
 table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
 td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
 th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
@@ -164,13 +170,22 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
 
 <main class="wrap">
   <section id="setup">
-    <div class="sec-head"><span class="num">1</span><h2>Turn on Streamer.bot's WebSocket server</h2></div>
-    <p>Alerts come straight from <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> (1.0 or later), connected to Twitch, Kick or both. There's no action or code to add.</p>
-    <ol class="steps">
-      <li>In Streamer.bot, open <strong>Servers/Clients → WebSocket Server</strong>.</li>
-      <li>Tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Leave it on <code>127.0.0.1</code> port <code>8080</code> unless you've changed it.</li>
-    </ol>
-    <p>Already set up for Combined Chat, Sub Goal or Credits? Then you're done.</p>
+    <div class="sec-head"><span class="num">1</span><h2>Connect your alerts</h2></div>
+    <div class="seg" id="modeSeg" style="margin-bottom:18px"><button data-v="sb" aria-pressed="true">Streamer.bot: Twitch + Kick</button><button data-v="tw" aria-pressed="false">Twitch only: no Streamer.bot</button></div>
+    <div id="modeSb">
+      <p>Alerts come straight from <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> (1.0 or later), connected to Twitch, Kick or both. There's no action or code to add.</p>
+      <ol class="steps">
+        <li>In Streamer.bot, open <strong>Servers/Clients → WebSocket Server</strong>.</li>
+        <li>Tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Leave it on <code>127.0.0.1</code> port <code>8080</code> unless you've changed it.</li>
+      </ol>
+      <p>Already set up for Combined Chat, Sub Goal or Credits? Then you're done.</p>
+    </div>
+    <div id="modeTw" hidden>
+      <p>Only stream on Twitch? Log in with Twitch and the alerts come straight from Twitch, with nothing else to install.</p>
+      <div class="login"><button class="btn tw" id="twIn" type="button">Log in with Twitch</button><span id="twState" class="hint" style="margin:0"></span><button class="btn ghost" id="twOut" type="button" hidden>Log out</button></div>
+      <p class="hint">This lets the overlay read your follows, subs, cheers and raids. It can't post, change or see anything else. Twitch logins like this last about 60 days: when it runs out, the overlay tells you, so come back here, log in again and paste the new link into OBS.</p>
+      <div class="note" id="twWarn" hidden>Your OBS link now has your Twitch login in it. Keep it private: don't share it or show it on stream.</div>
+    </div>
   </section>
 
   <section id="alerts">
@@ -198,7 +213,7 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
           <label><input type="checkbox" id="optMsg" checked>Show viewers' messages (resubs, cheers, Kicks)</label>
           <label><input type="checkbox" id="optPf" checked>Twitch / Kick icon on each alert</label>
         </div>
-        <details><summary>Streamer.bot connection (only if you changed it)</summary>
+        <details id="sbConn"><summary>Streamer.bot connection (only if you changed it)</summary>
           <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
           <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
         </details>
@@ -228,6 +243,7 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
     <div class="tw"><table>
       <tr><th>What you see</th><th>What to do</th></tr>
       <tr><td>No alerts show</td><td>Check Streamer.bot is running, its WebSocket server is started, and it's connected to Twitch or Kick. If you changed the address, port or set a password, enter them in step 3 and copy the link again.</td></tr>
+      <tr><td>Twitch only: "Twitch login expired" shows</td><td>Come back to this page, press <strong>Log in with Twitch</strong> and paste the new link into OBS.</td></tr>
       <tr><td>Only one platform alerts</td><td>Check Streamer.bot is connected to both Twitch and Kick (Platforms tab).</td></tr>
       <tr><td>No sound on stream</td><td>Tick <strong>Control audio via OBS</strong> on the browser source and check it isn't muted in the audio mixer.</td></tr>
       <tr><td>Alerts double up with another tool</td><td>Turn that alert type off here, or in the other tool, so only one shows it.</td></tr>
@@ -255,6 +271,7 @@ var TYPES=[
 var DEF={};TYPES.forEach(function(t){DEF[t[0]]=t[3]});
 var MINK={cheer:"mb",kicks:"mk",raid:"mr"};
 var BASE=location.origin+location.pathname;
+var TW_CID="zknz506nc6j1bzvv8uihyn1j84fz9z",TW_SCOPES="moderator:read:followers channel:read:subscriptions bits:read";
 var TW_SVG='<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>';
 var KK_SVG='<svg viewBox="0 0 24 24"><path d="M1.5 1.5h7.2v4.8h2.4V3.9h2.4V1.5h9v7.2h-2.4v2.4h-2.4v1.8h2.4v2.4h2.4v7.2h-9v-2.4h-2.4v-2.4H8.7v4.8H1.5z"/></svg>';
 var ICON={
@@ -286,7 +303,7 @@ function overlay(){
       fs:Math.max(12,Math.min(64,parseInt(p.get("fs"),10)||26)),dur:Math.max(2,Math.min(30,parseInt(p.get("dur"),10)||6)),
       snd:p.get("snd")!=="0",vol:Math.max(0,Math.min(100,vol))/100,msg:p.get("msg")!=="0",pf:p.get("pf")!=="0",
       off:(p.get("off")||"").split(","),t:{},min:{},
-      h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1"};
+      h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1",tk:(p.get("tk")||"").replace(/[^A-Za-z0-9]/g,"")};
     TYPES.forEach(function(t){var v=p.get("t_"+t[0]);cfg.t[t[0]]=v!=null&&v.trim()?v:t[3]});
     for(var k in MINK)cfg.min[k]=Math.max(0,parseInt(p.get(MINK[k]),10)||0);
     document.documentElement.className="ov ly-"+cfg.ly;box.style.setProperty("--fs",cfg.fs+"px");
@@ -317,16 +334,18 @@ function overlay(){
   }
 
   /* ---- the alert itself ---- */
-  function fill(tpl,a){return tpl.replace(/\{(amount|months|to|name)\}/gi,function(_,k){k=k.toLowerCase();var v=a[k];return v==null||v===""?"":String(v)}).replace(/\s{2,}/g," ").trim()}
+  function fill(tpl,a){
+    if(a.type==="gift"&&!a.to)tpl=tpl.replace(/\s*(to\s*)?\{to\}/i,"");return tpl.replace(/\{(amount|months|to|name)\}/gi,function(_,k){k=k.toLowerCase();var v=a[k];return v==null||v===""?"":String(v)}).replace(/\s{2,}/g," ").trim()}
   function show(a){
     var pc=a.src==="kick"?"53FC18":"9146FF",g=cfg.g==="platform"?pc:cfg.g.toUpperCase();
     var c=el("div","al");c.style.setProperty("--gr",hx2rgb(g));c.style.setProperty("--o",cfg.o);c.style.setProperty("--ink",lum(g)>.35?"#000":"#fff");c.style.setProperty("--dur",cfg.dur+"s");
     var ic=el("div","ic");ic.innerHTML='<svg viewBox="0 0 24 24">'+ICON[a.type]+'</svg>';
+    if(a.type==="note")ic.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>';
     if(a.type==="bomb"&&a.amount){var n=el("b");n.textContent="×"+a.amount;ic.appendChild(n)}
     c.appendChild(ic);
     var tx=el("div","tx"),tt=el("div","tt");
     if(cfg.pf){var pf=el("span","pf "+(a.src==="kick"?"kk":"tw"));pf.innerHTML=a.src==="kick"?KK_SVG:TW_SVG;tt.appendChild(pf)}
-    var line=el("span");line.textContent=fill(cfg.t[a.type],a);tt.appendChild(line);
+    var line=el("span");line.textContent=a.line||fill(cfg.t[a.type],a);tt.appendChild(line);
     if(a.tier){var ti=el("span","tier");ti.textContent=a.tier;tt.appendChild(ti)}
     var nm=el("div","nm");nm.textContent=a.name;
     tx.appendChild(tt);tx.appendChild(nm);
@@ -435,20 +454,112 @@ function overlay(){
     (function loop(){if(auto&&!busy&&!queue.length)push(sample(order[i++%order.length]));setTimeout(loop,700)})();
     return;
   }
+  if(cfg.tk){twitchDirect();return}
   connect();
+
+  /* ---- Twitch only: straight from Twitch's EventSub, no Streamer.bot ---- */
+  function twitchDirect(){
+    var uid="",sock=null,kaT=0,kaS=30,warned=false,gift=null,bombLeft=0,bombT=0;
+    function hdr(){return {"Authorization":"Bearer "+cfg.tk,"Client-Id":TW_CID,"Content-Type":"application/json"}}
+    function expired(){if(warned)return;warned=true;queue.unshift({src:"twitch",type:"note",name:"Twitch login expired",line:"Alerts paused",msg:"Open the Alerts page, log in with Twitch again and paste the new link into OBS."});cfg.msg=true;next()}
+    function validate(){return fetch("https://id.twitch.tv/oauth2/validate",{headers:{Authorization:"OAuth "+cfg.tk}}).then(function(r){if(r.status===401)return false;if(!r.ok)throw 0;return r.json()})}
+    function start(){validate().then(function(v){if(!v){expired();return}uid=v.user_id;open("wss://eventsub.wss.twitch.tv/ws",false)}).catch(function(){setTimeout(start,15000)})}
+    setInterval(function(){validate().then(function(v){if(v===false)expired()}).catch(function(){})},3600000);
+    var SUBS=[["channel.follow","2",{moderator_user_id:1}],["channel.subscribe","1"],["channel.subscription.gift","1"],["channel.subscription.message","1"],["channel.cheer","1"],["channel.raid","1",{to:1}]];
+    function subscribe(sid){
+      SUBS.forEach(function(s){
+        var c={};if(s[2]&&s[2].to)c.to_broadcaster_user_id=uid;else c.broadcaster_user_id=uid;if(s[2]&&s[2].moderator_user_id)c.moderator_user_id=uid;
+        fetch("https://api.twitch.tv/helix/eventsub/subscriptions",{method:"POST",headers:hdr(),body:JSON.stringify({type:s[0],version:s[1],condition:c,transport:{method:"websocket",session_id:sid}})})
+          .then(function(r){if(r.status===401)expired()}).catch(function(){});
+      });
+    }
+    function alive(){clearTimeout(kaT);kaT=setTimeout(function(){try{sock&&sock.close()}catch(e){}},(kaS+10)*1000)}
+    function open(url,isRe){
+      var old=sock,w;try{w=new WebSocket(url)}catch(e){setTimeout(start,5000);return}
+      w.onmessage=function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}var md=m.metadata||{},pl=m.payload||{};
+        if(w!==sock&&md.message_type!=="session_welcome")return;
+        switch(md.message_type){
+          case "session_welcome":sock=w;kaS=(pl.session&&pl.session.keepalive_timeout_seconds)||30;alive();
+            if(old&&old!==w){old.onclose=null;try{old.close()}catch(x){}}
+            if(!isRe)subscribe(pl.session.id);break;
+          case "session_keepalive":alive();break;
+          case "notification":alive();if(onceOnly({messageId:md.message_id}))tw(pl.subscription&&pl.subscription.type,pl.event||{});break;
+          case "session_reconnect":open(pl.session.reconnect_url,true);break;
+          case "revocation":break;
+        }
+      };
+      w.onclose=function(){if(w!==sock&&sock)return;clearTimeout(kaT);sock=null;setTimeout(start,3000)};
+      if(!old)sock=w;
+    }
+    function tierOf(t){return t==="3000"?"Tier 3":t==="2000"?"Tier 2":""}
+    function tw(type,e){
+      var a=null;
+      switch(type){
+        case "channel.follow":a={type:"follow",name:e.user_name||e.user_login};break;
+        case "channel.subscribe":
+          if(e.is_gift){if(bombLeft>0){bombLeft--;return}if(gift&&!gift.a.to){gift.a.to=e.user_name||e.user_login;clearTimeout(gift.t);var g=gift.a;gift=null;push(g)}return}
+          a={type:"sub",name:e.user_name||e.user_login,tier:tierOf(e.tier)};break;
+        case "channel.subscription.message":a={type:"resub",name:e.user_name||e.user_login,months:e.cumulative_months||e.duration_months||0,tier:tierOf(e.tier),msg:String((e.message&&e.message.text)||"").slice(0,240)};break;
+        case "channel.subscription.gift":{
+          var who=e.is_anonymous?"Anonymous":(e.user_name||e.user_login),n=+e.total||1;
+          if(n>1){bombLeft+=n;clearTimeout(bombT);bombT=setTimeout(function(){bombLeft=0},10000);a={type:"bomb",name:who,amount:n,tier:tierOf(e.tier)};break}
+          var ga={src:"twitch",type:"gift",name:who,to:"",tier:tierOf(e.tier)};
+          if(gift){clearTimeout(gift.t);push(gift.a)}
+          gift={a:ga,t:setTimeout(function(){if(gift){var x=gift.a;gift=null;push(x)}},2000)};return;
+        }
+        case "channel.cheer":a={type:"cheer",name:e.is_anonymous?"Anonymous":(e.user_name||e.user_login),amount:+e.bits||0,msg:stripCheer(String(e.message||"").slice(0,240),{})};break;
+        case "channel.raid":a={type:"raid",name:e.from_broadcaster_user_name||e.from_broadcaster_user_login,amount:+e.viewers||0};break;
+      }
+      if(a){a.src="twitch";push(a)}
+    }
+    start();
+  }
 }
 
 function setup(){
   var $=function(id){return document.getElementById(id)};
-  var S={ly:"pop",g:"platform",o:88,fs:26,dur:6,snd:1,vol:50,msg:1,pf:1,off:[],t:{},mb:0,mk:0,mr:0,h:"127.0.0.1",p:"8080"};
+  var S={mode:"sb",ly:"pop",g:"platform",o:88,fs:26,dur:6,snd:1,vol:50,msg:1,pf:1,off:[],t:{},mb:0,mk:0,mr:0,h:"127.0.0.1",p:"8080"};
   try{var sv=JSON.parse(ls("al_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
   if(!Array.isArray(S.off))S.off=[];if(!S.t||typeof S.t!=="object")S.t={};
+  // Twitch login
+  var TK=null;try{TK=JSON.parse(ls("al_tk")||"null")}catch(e){}
+  var hp=new URLSearchParams(location.hash.slice(1)),loginMsg="";
+  if(hp.get("access_token")||hp.get("error")){
+    var st="";try{st=sessionStorage.getItem("al_state")||""}catch(e){}
+    if(hp.get("access_token")&&st&&hp.get("state")===st){TK={tk:hp.get("access_token").replace(/[^A-Za-z0-9]/g,""),login:"",exp:0};S.mode="tw"}
+    else if(hp.get("error")){loginMsg="Twitch login was cancelled.";S.mode="tw"}
+    else loginMsg="That login didn't match, so it wasn't used. Please try again.";
+    try{sessionStorage.removeItem("al_state");history.replaceState(null,"",location.pathname+"#setup")}catch(e){}
+  }
+  function saveTk(){ls("al_tk",TK?JSON.stringify(TK):"");if(!TK)try{localStorage.removeItem("al_tk")}catch(e){}}
+  function checkTk(){
+    if(!TK){twUi();return}
+    fetch("https://id.twitch.tv/oauth2/validate",{headers:{Authorization:"OAuth "+TK.tk}}).then(function(r){
+      if(r.status===401){TK=null;saveTk();loginMsg="Your Twitch login has run out. Log in again.";sync();return}
+      return r.ok&&r.json().then(function(v){TK.login=v.login||TK.login;TK.exp=Date.now()+(v.expires_in||0)*1000;saveTk();sync()});
+    }).catch(function(){});
+    twUi();
+  }
+  function twUi(){
+    var on=!!TK;$("twIn").textContent=on?"Log in again":"Log in with Twitch";$("twOut").hidden=!on;$("twWarn").hidden=!on;
+    $("twState").textContent=on?("Logged in"+(TK.login?" as "+TK.login:"")+(TK.exp?". Works until "+new Date(TK.exp).toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}):"")+"."):loginMsg;
+  }
+  $("twIn").addEventListener("click",function(){
+    var st=Array.from(crypto.getRandomValues(new Uint8Array(16)),function(b){return b.toString(16).padStart(2,"0")}).join("");
+    try{sessionStorage.setItem("al_state",st)}catch(e){}
+    location.href="https://id.twitch.tv/oauth2/authorize?"+new URLSearchParams({response_type:"token",client_id:TW_CID,redirect_uri:BASE,scope:TW_SCOPES,state:st,force_verify:"true"}).toString();
+  });
+  $("twOut").addEventListener("click",function(){
+    if(TK)fetch("https://id.twitch.tv/oauth2/revoke",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"client_id="+TW_CID+"&token="+TK.tk}).catch(function(){});
+    TK=null;saveTk();loginMsg="Logged out.";sync();
+  });
+  $("modeSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.mode=b.dataset.v;sync()}});
   // alert list
   var list=$("alList");
   TYPES.forEach(function(t){
     var r=document.createElement("div");r.className="al-row";r.dataset.k=t[0];
     r.innerHTML='<input type="checkbox" aria-label="Show '+t[1]+' alerts"><div class="n"></div><input class="tin" spellcheck="false">'+(t[4]?'<label class="mn">Min <input class="tin" type="number" min="0" step="1" inputmode="numeric"></label>':'<span></span>');
-    r.querySelector(".n").innerHTML=t[1]+"<small>"+t[2]+"</small>";
+    r.querySelector(".n").innerHTML=t[1]+'<small data-w="'+t[2]+'">'+t[2]+"</small>";
     var cb=r.querySelector('input[type=checkbox]'),line=r.querySelector(".tin"),mn=r.querySelector(".mn input");
     line.placeholder=t[3];line.setAttribute("aria-label",t[1]+" wording");line.value=S.t[t[0]]||"";
     cb.addEventListener("change",function(){var i=S.off.indexOf(t[0]);if(cb.checked&&i>=0)S.off.splice(i,1);if(!cb.checked&&i<0)S.off.push(t[0]);sync()});
@@ -472,18 +583,18 @@ function setup(){
   // test buttons
   var tests=$("tests");
   TYPES.forEach(function(t){var b=document.createElement("button");b.type="button";var src=SAMPLE[t[0]][0];
-    b.innerHTML='<i style="background:'+(src==="kick"?"#53FC18":"#9146FF")+'"></i>'+t[1];b.title="Test a "+(src==="kick"?"Kick":"Twitch")+" "+t[1].toLowerCase();
+    b.dataset.k=t[0];b.innerHTML='<i style="background:'+(src==="kick"?"#53FC18":"#9146FF")+'"></i>'+t[1];b.title="Test a "+(src==="kick"?"Kick":"Twitch")+" "+t[1].toLowerCase();
     b.addEventListener("click",function(){var f=$("prevFrame");if(f.contentWindow)f.contentWindow.postMessage({al:t[0]},"*")});tests.appendChild(b)});
   document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){var el=$(b.dataset.copy),o=b.textContent;
     var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select()})});
   $("host").value=S.h;$("port").value=S.p;
-  function hash(extra){var p=new URLSearchParams();p.set("ov","1");p.set("ly",S.ly);p.set("g",S.g);
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(S.mode==="tw"&&TK&&!extra.demo)p.set("tk",TK.tk);p.set("ly",S.ly);p.set("g",S.g);
     if(S.o!==88)p.set("o",String(S.o));if(S.fs!==26)p.set("fs",String(S.fs));if(S.dur!==6)p.set("dur",String(S.dur));
     if(!S.snd)p.set("snd","0");else if(S.vol!==50)p.set("vol",String(S.vol));if(!S.msg)p.set("msg","0");if(!S.pf)p.set("pf","0");
-    if(S.off.length)p.set("off",S.off.join(","));["mb","mk","mr"].forEach(function(k){if(S[k])p.set(k,String(S[k]))});
+    var off=S.off.slice();if(S.mode==="tw"&&off.indexOf("kicks")<0)off.push("kicks");if(off.length)p.set("off",off.join(","));["mb","mk","mr"].forEach(function(k){if(S[k])p.set(k,String(S[k]))});
     TYPES.forEach(function(t){if(S.t[t[0]])p.set("t_"+t[0],S.t[t[0]])});
-    if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw);
+    if(S.mode!=="tw"){if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw)}
     for(var k in extra)p.set(k,extra[k]);return p.toString()}
   function frame(el,h){var u=BASE+"#"+h;if(!el.dataset.on){el.src=u;el.dataset.on=1}else{el.src="about:blank";setTimeout(function(){el.src=u},30)}}
   var pvT=null;
@@ -496,11 +607,20 @@ function setup(){
     $("op").value=S.o;$("opV").textContent=S.o+"%";$("fs").value=S.fs;$("fsV").textContent=S.fs;$("dur").value=S.dur;$("durV").textContent=S.dur+" seconds";
     $("vol").value=S.vol;$("volV").textContent=S.vol+"%";$("optSnd").checked=!!S.snd;$("volBox").hidden=!S.snd;$("optMsg").checked=!!S.msg;$("optPf").checked=!!S.pf;
     list.querySelectorAll(".al-row").forEach(function(r){var on=S.off.indexOf(r.dataset.k)<0;r.querySelector('input[type=checkbox]').checked=on;r.classList.toggle("off",!on)});
-    $("obsUrl").value=BASE+"#"+hash({});
+    var tw=S.mode==="tw";
+    $("modeSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.mode)});
+    $("modeSb").hidden=tw;$("modeTw").hidden=!tw;$("sbConn").hidden=tw;
+    list.querySelector('.al-row[data-k=kicks]').hidden=tw;
+    tests.querySelectorAll("button").forEach(function(b){if(b.dataset.k==="kicks")b.hidden=tw});
+    list.querySelectorAll(".al-row small").forEach(function(sm){sm.textContent=tw?(sm.dataset.w==="Kick"?"Kick":"Twitch"):sm.dataset.w});
+    twUi();
+    var ob=$("obsUrl"),cb=document.querySelector('[data-copy=obsUrl]');
+    if(tw&&!TK){ob.type="text";ob.value="Log in with Twitch in step 1 first";cb.disabled=true}
+    else{ob.type=tw?"password":"text";ob.value=BASE+"#"+hash({});cb.disabled=false}
     clearTimeout(pvT);pvT=setTimeout(function(){frame($("prevFrame"),hash({demo:"1"}))},300);
   }
   frame($("heroFrame"),"ov=1&demo=1&ly=pop&g=platform&snd=0&fs=22");
-  sync();
+  sync();checkTk();
 }
 })();
 </script>
