@@ -99,8 +99,9 @@ details{max-width:46em}summary{cursor:pointer;font-weight:600;color:var(--fg);fo
 .al-row.off .tin,.al-row.off .mn{opacity:.4}
 @media (max-width:640px){.al-row{grid-template-columns:auto minmax(0,1fr)}.al-row .tin,.al-row .mn{grid-column:1/-1}}
 .tw{overflow-x:auto}
-.snd-row{display:flex;gap:8px;align-items:center}.snd-row .tin{flex:1}.snd-row .btn{padding:9px 12px}
-.snd-row label{flex:0 0 92px;font-size:13px;font-weight:600;color:var(--fg)}
+.tv-row{display:grid;grid-template-columns:92px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:13px;font-weight:600;color:var(--fg)}.tv-row b{color:var(--mute);font-weight:600;text-align:right}
+.sfbox{background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:14px 14px 4px}.sfbox ol.steps{padding-left:20px;font-size:14.5px}
+textarea.code{display:block;font:12.5px/1.45 var(--mono);resize:vertical;white-space:pre;overflow:auto}
 .login{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 12px}
 .btn.tw{background:#9146FF;color:#fff}.btn.tw:hover{background:#A970FF}
 .btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
@@ -211,13 +212,76 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
         <div class="tog">
           <label><input type="checkbox" id="optSnd" checked>Play a sound</label>
         </div>
-        <div id="volBox"><div class="lbl">Sound volume <b id="volV">50%</b></div><input type="range" id="vol" min="5" max="100" step="5" value="50" aria-label="Sound volume"></div>
-        <div id="ownBox">
-          <div class="lbl">Your own sounds <b>(optional)</b></div>
-          <div class="snd-row"><input class="tin" id="su_all" placeholder="Link to a sound for every alert" spellcheck="false" aria-label="Sound link for every alert"><button class="btn ghost" type="button" data-test="all">Test</button></div>
-          <details style="margin-top:10px"><summary>A different sound for each alert</summary><div id="suList" class="ctl" style="gap:8px;margin-top:10px"></div></details>
-          <div class="hint" id="suMsg" role="status"></div>
-          <div class="hint">Paste a link to an mp3, wav or ogg file. OBS can't play files straight from your PC, so put them online first: Dropbox share links work (we turn them into a direct link for you), and so do files in a GitHub repo. Leave it blank for the built-in chimes. If a link ever fails, the built-in chime plays instead.</div>
+        <div id="sndBox" class="ctl">
+          <div id="srcWrap"><div class="lbl">Sounds</div><div class="seg" id="srcSeg"><button data-v="chime" aria-pressed="true">Built-in chimes</button><button data-v="sb" aria-pressed="false">My sound files</button></div>
+            <div class="hint">My sound files: Streamer.bot plays them from your PC as each alert appears.</div></div>
+          <div id="sfBox" class="sfbox">
+            <ol class="steps">
+              <li>Put your sounds in one folder and name them after the alert: <code>follow</code>, <code>sub</code>, <code>resub</code>, <code>gift</code>, <code>bomb</code>, <code>cheer</code>, <code>kicks</code>, <code>raid</code> (.mp3 or .wav). Add <code>all.mp3</code> to play for any alert without its own sound.</li>
+              <li>In Streamer.bot, right-click in <strong>Actions</strong>, choose <strong>Add</strong> and name it exactly <code>Alerts Sound</code>. It needs no triggers.</li>
+              <li>Right-click in its sub-actions, choose <strong>Core → C# → Execute C# Code</strong>, paste this code over what's there, then press <strong>Compile</strong> and <strong>Save and Compile</strong>.
+                <textarea id="asCode" class="tin code" readonly rows="4" aria-label="Alerts Sound code" style="margin-top:8px">using System;
+using System.IO;
+using System.Globalization;
+
+// Alerts Sound: plays a sound file from your PC when the itsCRA1G Alerts overlay shows an alert.
+// The overlay runs this action with alertType, soundFolder and soundVolume. No triggers needed.
+// Name your files after the alert: follow, sub, resub, gift, bomb, cheer, kicks, raid (.mp3 or .wav).
+// all.mp3 (or all.wav) plays for any alert without its own file.
+public class CPHInline
+{
+    public bool Execute()
+    {
+        string type = Arg(&quot;alertType&quot;).Trim().ToLowerInvariant();
+        string folder = Arg(&quot;soundFolder&quot;).Trim().Trim(&#x27;&quot;&#x27;);
+        double vol;
+        if (!double.TryParse(Arg(&quot;soundVolume&quot;), NumberStyles.Float, CultureInfo.InvariantCulture, out vol)) vol = 1;
+        if (vol &lt;= 0) return true;
+        if (vol &gt; 1) vol = 1;
+
+        foreach (char c in type) if (!char.IsLetter(c)) return true;   // plain names only
+        if (folder == &quot;&quot; || !Directory.Exists(folder))
+        {
+            CPH.LogWarn(&quot;Alerts Sound: can&#x27;t find the folder \&quot;&quot; + folder + &quot;\&quot;&quot;);
+            return true;
+        }
+
+        string file = Find(folder, type);
+        if (file == null) file = Find(folder, &quot;all&quot;);
+        if (file == null) return true;
+
+        CPH.PlaySound(file, (float)vol, false);
+        return true;
+    }
+
+    string Find(string folder, string name)
+    {
+        if (name == &quot;&quot;) return null;
+        string[] exts = { &quot;.mp3&quot;, &quot;.wav&quot; };
+        foreach (string ext in exts)
+        {
+            string path = Path.Combine(folder, name + ext);
+            if (File.Exists(path)) return path;
+        }
+        return null;
+    }
+
+    string Arg(string key)
+    {
+        object v;
+        if (args != null &amp;&amp; args.TryGetValue(key, out v) &amp;&amp; v != null) return v.ToString();
+        return &quot;&quot;;
+    }
+}
+</textarea>
+                <button class="btn ghost" type="button" data-copy="asCode" style="margin-top:8px">Copy code</button></li>
+              <li>Paste the folder's location here. In File Explorer, click the bar at the top of the folder and copy it, e.g. <code>C:\Stream\Alert sounds</code>.
+                <input class="tin" id="sf" placeholder="C:\Stream\Alert sounds" spellcheck="false" aria-label="Sound folder" style="margin-top:8px"></li>
+            </ol>
+            <div class="hint" style="margin-bottom:12px">The preview here plays the built-in chimes. If Streamer.bot can't find the Alerts Sound action, the overlay plays the chime instead.</div>
+          </div>
+          <div id="volBox"><div class="lbl">Overall volume <b id="volV">50%</b></div><input type="range" id="vol" min="5" max="100" step="5" value="50" aria-label="Overall volume"></div>
+          <details><summary>Volume for each alert</summary><div id="tvList" class="ctl" style="gap:10px;margin-top:12px"></div></details>
         </div>
         <div class="tog">
           <label><input type="checkbox" id="optMsg" checked>Show viewers' messages (resubs, cheers, Kicks)</label>
@@ -256,7 +320,7 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
       <tr><td>Twitch only: "Twitch login expired" shows</td><td>Come back to this page, press <strong>Log in with Twitch</strong> and paste the new link into OBS.</td></tr>
       <tr><td>Only one platform alerts</td><td>Check Streamer.bot is connected to both Twitch and Kick (Platforms tab).</td></tr>
       <tr><td>No sound on stream</td><td>Tick <strong>Control audio via OBS</strong> on the browser source and check it isn't muted in the audio mixer.</td></tr>
-      <tr><td>My own sound doesn't play (you hear the chime instead)</td><td>The link has to open the sound file itself, not a page about it. Press <strong>Test</strong> next to it to check. Google Drive and OneDrive share links usually don't work; Dropbox and GitHub do.</td></tr>
+      <tr><td>My sound files don't play</td><td>Check the action is named exactly <strong>Alerts Sound</strong> and compiled, the folder location is right (copy the OBS link again after changing it), and the files are named like <code>raid.mp3</code>. You hear the chime if the action can't be found; nothing plays if the folder or file is missing, and Streamer.bot's log says which.</td></tr>
       <tr><td>Alerts double up with another tool</td><td>Turn that alert type off here, or in the other tool, so only one shows it.</td></tr>
     </table></div>
   </section>
@@ -313,10 +377,10 @@ function overlay(){
     cfg={ly:p.get("ly")==="slide"?"slide":"pop",g:g,o:Math.max(0,Math.min(100,o))/100,
       fs:Math.max(12,Math.min(64,parseInt(p.get("fs"),10)||26)),dur:Math.max(2,Math.min(30,parseInt(p.get("dur"),10)||6)),
       snd:p.get("snd")!=="0",vol:Math.max(0,Math.min(100,vol))/100,msg:p.get("msg")!=="0",pf:p.get("pf")!=="0",
-      off:(p.get("off")||"").split(","),t:{},min:{},su:{},
+      off:(p.get("off")||"").split(","),t:{},min:{},tv:{},sf:p.get("sf")||"",
       h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1",tk:(p.get("tk")||"").replace(/[^A-Za-z0-9]/g,"")};
     TYPES.forEach(function(t){var v=p.get("t_"+t[0]);cfg.t[t[0]]=v!=null&&v.trim()?v:t[3]});
-    ["all"].concat(TYPES.map(function(t){return t[0]})).forEach(function(k){var u=p.get(k==="all"?"su":"su_"+k);if(u&&/^https:\/\//.test(u))cfg.su[k]=u});
+    TYPES.forEach(function(t){var v=parseInt(p.get("tv_"+t[0]),10);cfg.tv[t[0]]=isNaN(v)?1:Math.max(0,Math.min(100,v))/100});
     for(var k in MINK)cfg.min[k]=Math.max(0,parseInt(p.get(MINK[k]),10)||0);
     document.documentElement.className="ov ly-"+cfg.ly;box.style.setProperty("--fs",cfg.fs+"px");
   }
@@ -332,20 +396,20 @@ function overlay(){
   /* ---- sound: a short chime made in the browser, different per alert ---- */
   var actx=null;
   var NOTES={follow:[659,880],sub:[523,659,784],resub:[523,784,1047],gift:[587,740,880],bomb:[587,740,880,1175,1480],cheer:[784,988,1319],kicks:[698,880,1047,1397],raid:[392,523,659,784,1047]};
-  var AUD={};
+  var sndN=0,sndWait={};
   function chime(type){
-    if(!cfg.snd||!cfg.vol)return;
-    var url=cfg.su[type]||cfg.su.all;
-    if(url){
-      var base=AUD[url]||(AUD[url]=new Audio(url)),a=base.cloneNode();a.volume=Math.min(1,cfg.vol);
-      var done=false,fb=function(){if(!done){done=true;builtIn(type)}};
-      var p=a.play();if(p&&p.catch)p.catch(fb);a.onerror=fb;return;
+    if(!cfg.snd)return;
+    var v=cfg.vol*(cfg.tv[type]==null?1:cfg.tv[type]);if(!v)return;
+    // own sound files: ask Streamer.bot to play them; the chime plays if it can't
+    if(cfg.sf&&!cfg.tk&&!cfg.demo&&ws&&ws.readyState===1){
+      var id="al-snd-"+(++sndN);sndWait[id]=type;setTimeout(function(){delete sndWait[id]},5000);
+      send({request:"DoAction",id:id,action:{name:"Alerts Sound"},args:{alertType:type,soundFolder:cfg.sf,soundVolume:Math.round(v*100)/100}});return;
     }
-    builtIn(type);
+    builtIn(type,v);
   }
-  function builtIn(type){
+  function builtIn(type,v){
     try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){return}
-    var t0=actx.currentTime+.03,ns=NOTES[type]||NOTES.follow,peak=.22*cfg.vol;
+    var t0=actx.currentTime+.03,ns=NOTES[type]||NOTES.follow,peak=.22*v;
     ns.forEach(function(f,i){
       var o=actx.createOscillator(),o2=actx.createOscillator(),g=actx.createGain(),st=t0+i*.11;
       o.type="triangle";o.frequency.value=f;o2.type="sine";o2.frequency.value=f*2;
@@ -463,6 +527,7 @@ function overlay(){
     ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
       if(m.request==="Hello"){clearTimeout(helloT);if(m.authentication&&cfg.pw){var a=m.authentication;var s=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"al-auth",authentication:await sha(s+a.challenge)})}else subscribe();return}
       if(m.id==="al-auth"){subscribe();return}
+      if(m.id&&sndWait[m.id]){var st=sndWait[m.id];delete sndWait[m.id];if(m.status&&m.status!=="ok")builtIn(st,cfg.vol*(cfg.tv[st]==null?1:cfg.tv[st]));return}
       if(!m.event||!m.data)return;
       var src=String(m.event.source||"").toLowerCase();
       if(src==="twitch"||src==="kick")handle(src,String(m.event.type||""),m.data);
@@ -472,7 +537,6 @@ function overlay(){
   }
   function sample(type){var s=SAMPLE[type],a={type:type,src:s[0],name:s[1]};for(var k in s[2])a[k]=s[2][k];if(type==="sub"&&s[0]==="twitch")a.tier="Tier 2";return a}
   read();
-  for(var su in cfg.su)if(!AUD[cfg.su[su]]){AUD[cfg.su[su]]=new Audio(cfg.su[su]);AUD[cfg.su[su]].preload="auto"}
   function fit(){box.style.setProperty("--k",Math.min(innerWidth/900,innerHeight/400))}
   fit();addEventListener("resize",fit);
   if(cfg.demo){
@@ -546,29 +610,17 @@ function overlay(){
 
 function setup(){
   var $=function(id){return document.getElementById(id)};
-  var S={mode:"sb",ly:"pop",g:"platform",o:88,fs:26,dur:6,snd:1,vol:50,msg:1,pf:1,off:[],t:{},mb:0,mk:0,mr:0,su:{},h:"127.0.0.1",p:"8080"};
+  var S={mode:"sb",ly:"pop",g:"platform",o:88,fs:26,dur:6,snd:1,vol:50,msg:1,pf:1,off:[],t:{},mb:0,mk:0,mr:0,src:"chime",sf:"",tv:{},h:"127.0.0.1",p:"8080"};
   try{var sv=JSON.parse(ls("al_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
-  if(!Array.isArray(S.off))S.off=[];if(!S.t||typeof S.t!=="object")S.t={};if(!S.su||typeof S.su!=="object")S.su={};
-  // own sounds
-  function sndLink(u){
-    u=String(u||"").trim();if(!u)return "";
-    if(!/^https?:\/\//i.test(u))u="https://"+u;u=u.replace(/^http:/i,"https:");
-    var m=u.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/i);if(m)return "https://raw.githubusercontent.com/"+m[1]+"/"+m[2]+"/"+m[3];
-    if(/^https:\/\/(www\.)?dropbox\.com\//i.test(u)){u=u.replace(/([?&])dl=[01]/,"$1raw=1");if(!/[?&]raw=1/.test(u))u+=(u.indexOf("?")>=0?"&":"?")+"raw=1"}
-    return u;
-  }
-  var suList=$("suList");
-  TYPES.forEach(function(t){var r=document.createElement("div");r.className="snd-row";r.dataset.k=t[0];
-    r.innerHTML='<label for="su_'+t[0]+'"></label><input class="tin" id="su_'+t[0]+'" placeholder="Same as every alert" spellcheck="false"><button class="btn ghost" type="button" data-test="'+t[0]+'">Test</button>';
-    r.querySelector("label").textContent=t[1];suList.appendChild(r)});
-  ["all"].concat(TYPES.map(function(t){return t[0]})).forEach(function(k){var i=$("su_"+k);i.value=S.su[k]||"";
-    i.addEventListener("change",function(){var v=sndLink(i.value);i.value=v;if(v)S.su[k]=v;else delete S.su[k];$("suMsg").textContent="";sync()})});
-  document.querySelectorAll("[data-test]").forEach(function(b){b.addEventListener("click",function(){
-    var k=b.dataset.test,u=sndLink($("su_"+k).value)||(k!=="all"&&S.su.all)||"",msg=$("suMsg");
-    if(!u){msg.textContent="Paste a link first.";return}
-    var a=new Audio(u);a.volume=S.vol/100;msg.textContent="Loading…";
-    a.play().then(function(){msg.textContent="That link plays."}).catch(function(){msg.textContent="That link didn't play. Check it opens the sound file itself (mp3, wav or ogg), not a page about it."});
-  })});
+  if(!Array.isArray(S.off))S.off=[];if(!S.t||typeof S.t!=="object")S.t={};if(!S.tv||typeof S.tv!=="object")S.tv={};
+  // sounds
+  $("srcSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.src=b.dataset.v;sync()}});
+  $("sf").value=S.sf;$("sf").addEventListener("input",function(){S.sf=this.value.trim().replace(/^"|"$/g,"");sync()});
+  var tvList=$("tvList");
+  TYPES.forEach(function(t){var r=document.createElement("label");r.className="tv-row";r.dataset.k=t[0];
+    r.innerHTML='<span></span><input type="range" min="0" max="100" step="5"><b></b>';r.querySelector("span").textContent=t[1];
+    var rg=r.querySelector("input");rg.setAttribute("aria-label",t[1]+" volume");rg.addEventListener("input",function(){var v=+rg.value;if(v===100)delete S.tv[t[0]];else S.tv[t[0]]=v;sync()});
+    tvList.appendChild(r)});
   // Twitch login
   var TK=null;try{TK=JSON.parse(ls("al_tk")||"null")}catch(e){}
   var hp=new URLSearchParams(location.hash.slice(1)),loginMsg="";
@@ -639,7 +691,7 @@ function setup(){
   $("host").value=S.h;$("port").value=S.p;
   function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(S.mode==="tw"&&TK&&!extra.demo)p.set("tk",TK.tk);p.set("ly",S.ly);p.set("g",S.g);
     if(S.o!==88)p.set("o",String(S.o));if(S.fs!==26)p.set("fs",String(S.fs));if(S.dur!==6)p.set("dur",String(S.dur));
-    if(!S.snd)p.set("snd","0");else{if(S.vol!==50)p.set("vol",String(S.vol));for(var sk in S.su)if(S.su[sk])p.set(sk==="all"?"su":"su_"+sk,S.su[sk])}if(!S.msg)p.set("msg","0");if(!S.pf)p.set("pf","0");
+    if(!S.snd)p.set("snd","0");else{if(S.vol!==50)p.set("vol",String(S.vol));for(var tk in S.tv)p.set("tv_"+tk,String(S.tv[tk]));if(S.mode!=="tw"&&S.src==="sb"&&S.sf&&!extra.demo)p.set("sf",S.sf)}if(!S.msg)p.set("msg","0");if(!S.pf)p.set("pf","0");
     var off=S.off.slice();if(S.mode==="tw"&&off.indexOf("kicks")<0)off.push("kicks");if(off.length)p.set("off",off.join(","));["mb","mk","mr"].forEach(function(k){if(S[k])p.set(k,String(S[k]))});
     TYPES.forEach(function(t){if(S.t[t[0]])p.set("t_"+t[0],S.t[t[0]])});
     if(S.mode!=="tw"){if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw)}
@@ -654,7 +706,7 @@ function setup(){
     cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
     nmL.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
     $("op").value=S.o;$("opV").textContent=S.o+"%";$("fs").value=S.fs;$("fsV").textContent=S.fs;$("dur").value=S.dur;$("durV").textContent=S.dur+" seconds";
-    $("vol").value=S.vol;$("volV").textContent=S.vol+"%";$("optSnd").checked=!!S.snd;$("volBox").hidden=!S.snd;$("ownBox").hidden=!S.snd;$("optMsg").checked=!!S.msg;$("optPf").checked=!!S.pf;
+    $("vol").value=S.vol;$("volV").textContent=S.vol+"%";$("optSnd").checked=!!S.snd;$("sndBox").hidden=!S.snd;$("optMsg").checked=!!S.msg;$("optPf").checked=!!S.pf;
     list.querySelectorAll(".al-row").forEach(function(r){var on=S.off.indexOf(r.dataset.k)<0;r.querySelector('input[type=checkbox]').checked=on;r.classList.toggle("off",!on)});
     var tw=S.mode==="tw";
     $("modeSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.mode)});
@@ -663,6 +715,9 @@ function setup(){
     tests.querySelectorAll("button").forEach(function(b){if(b.dataset.k==="kicks")b.hidden=tw});
     list.querySelectorAll(".al-row small").forEach(function(sm){sm.textContent=tw?(sm.dataset.w==="Kick"?"Kick":"Twitch"):sm.dataset.w});
     twUi();
+    $("srcWrap").hidden=tw;$("sfBox").hidden=tw||S.src!=="sb";
+    $("srcSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.src)});
+    tvList.querySelectorAll(".tv-row").forEach(function(r){var k=r.dataset.k,v=S.tv[k]==null?100:S.tv[k];r.querySelector("input").value=v;r.querySelector("b").textContent=v+"%";r.hidden=tw&&k==="kicks"});
     var ob=$("obsUrl"),cb=document.querySelector('[data-copy=obsUrl]');
     if(tw&&!TK){ob.type="text";ob.value="Log in with Twitch in step 1 first";cb.disabled=true}
     else{ob.type=tw?"password":"text";ob.value=BASE+"#"+hash({});cb.disabled=false}
