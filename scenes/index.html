@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scene Pack: Gameplay, Just Chatting and Waiting scenes for OBS</title>
+<meta name="description" content="Free Gameplay, Just Chatting and Waiting scene layouts for OBS by itsCRA1G: camera frames, a chat panel, your socials and your latest Twitch and Kick follower and sub.">
+<meta property="og:title" content="Scene Pack: Gameplay, Just Chatting and Waiting scenes">
+<meta property="og:description" content="Camera frames, chat panel, socials and latest follower and sub, in your colour. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --warn:#FFB020; --bad:#FF4D4D;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:44px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,58px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.screen{position:relative;aspect-ratio:16/9;border-radius:18px;overflow:hidden;border:1px solid var(--edge);background:
+  repeating-conic-gradient(#14171d 0 25%,#0e1015 0 50%) 0 0/24px 24px;max-width:100%}
+.screen iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:28px 0 10px}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn:hover{background:#8CC4FF;color:#000}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}
+.btn.ghost:hover{border-color:var(--acc)}
+.tin,select.tin,textarea.tin{font:15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:9px 10px;min-width:0;width:100%}
+textarea.tin{resize:vertical;min-height:96px;line-height:1.5}
+.tin:focus{outline:2px solid var(--acc);outline-offset:1px}
+.list{display:flex;flex-direction:column;gap:8px;max-width:46em}
+.item{display:grid;grid-template-columns:44px 170px minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:12px;padding:8px}
+.item .ico{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:rgba(var(--pr),.16)}
+.item .ico svg{width:22px;height:22px;fill:var(--pc)}
+.item select,.item input{font:15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:9px 10px;min-width:0;width:100%}
+.item input::placeholder{color:#5d6676}
+.item .acts{display:flex;gap:4px}
+.ib{width:34px;height:34px;border-radius:8px;border:1px solid var(--edge2);background:var(--tile2);color:var(--body);cursor:pointer;font:700 14px var(--text)}
+.ib:hover{border-color:var(--acc);color:var(--fg)}.ib:disabled{opacity:.3;cursor:default;border-color:var(--edge2)}
+.ib.del:hover{border-color:var(--bad);color:var(--bad)}
+@media (max-width:640px){.item{grid-template-columns:44px minmax(0,1fr) auto}.item input{grid-column:1/-1}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.look{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;max-width:46em}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.tabs button{font:700 15px var(--display);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 16px;cursor:pointer}
+.tabs button[aria-selected=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sgrid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.sgrid{grid-template-columns:1fr}}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.links{display:flex;flex-direction:column;gap:10px;max-width:46em}
+.lrow{display:grid;grid-template-columns:140px minmax(0,1fr) auto;gap:8px;align-items:center}
+.lrow b{color:var(--fg);font:700 15px var(--display)}
+.lrow input{font:13px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px;min-width:0}
+@media (max-width:640px){.lrow{grid-template-columns:minmax(0,1fr) auto}.lrow b{grid-column:1/-1}}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:block;position:fixed;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
+.sn{--g:#4DA3FF;--gr:77,163,255;--ink:#000;--r:22px;position:absolute;inset:0;color:#F2F5F9;font-family:var(--text)}
+.sn.sq{--r:0px}
+/* background, with see-through holes cut for the camera (a mask built in code) */
+.sn .bgx{position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 38%,rgba(var(--gr),.16),transparent 70%),linear-gradient(180deg,#07080c,#030406);overflow:hidden}
+.sn .grid{position:absolute;left:-50%;right:-50%;bottom:-6%;height:50%;
+  background-image:linear-gradient(rgba(var(--gr),.28) 2px,transparent 2px),linear-gradient(90deg,rgba(var(--gr),.28) 2px,transparent 2px);background-size:96px 96px;
+  transform:perspective(700px) rotateX(64deg);transform-origin:50% 0;animation:grid 3.6s linear infinite;
+  -webkit-mask-image:linear-gradient(to bottom,transparent,#000 45%);mask-image:linear-gradient(to bottom,transparent,#000 45%)}
+@keyframes grid{to{background-position:0 96px}}
+.sn .blob{position:absolute;width:900px;height:900px;border-radius:50%;filter:blur(120px);opacity:.24;background:rgb(var(--gr));animation:drift 18s ease-in-out infinite alternate}
+.sn .blob.b2{width:700px;height:700px;opacity:.14;background:#B57BFF;animation-duration:24s;animation-direction:alternate-reverse}
+@keyframes drift{0%{transform:translate(-260px,-320px)}100%{transform:translate(1300px,240px)}}
+.sn.clear .bgx,.sn.game .bgx{display:none}
+/* frames */
+.fr{position:absolute;border-radius:var(--r);border:3px solid rgb(var(--gr));box-shadow:0 0 26px -2px rgba(var(--gr),.75),inset 0 0 18px -4px rgba(var(--gr),.6);pointer-events:none}
+.fr .tag{position:absolute;left:22px;bottom:0;transform:translateY(50%);font:800 20px/1 var(--text);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:rgb(var(--gr));padding:9px 16px;border-radius:999px;box-shadow:0 0 20px rgba(var(--gr),.7);white-space:nowrap}
+.sq .fr .tag{border-radius:4px}
+.panel{position:absolute;border-radius:var(--r);background:rgba(8,9,12,.62);border:1px solid rgba(var(--gr),.35);box-shadow:0 0 22px -6px rgba(var(--gr),.6)}
+.panel .ph{position:absolute;left:24px;top:18px;font:700 16px var(--text);letter-spacing:.2em;text-transform:uppercase;color:var(--g)}
+.clear .panel{background:rgba(8,9,12,.5)}
+/* text blocks */
+.kick{font:700 24px var(--text);letter-spacing:.3em;text-transform:uppercase;color:var(--g)}
+.big{font:700 110px/1 var(--display);letter-spacing:-2px;text-wrap:balance}
+.topic{font:700 56px/1.08 var(--display);letter-spacing:-.5px;text-wrap:balance}
+.ln{font:500 34px/1.3 var(--text);color:#C9D0DB;transition:opacity .5s,transform .5s}
+.ln.out{opacity:0;transform:translateY(10px)}
+.away{font:700 64px/1 var(--display);color:var(--g);font-variant-numeric:tabular-nums;text-shadow:0 0 30px rgba(var(--gr),.55)}
+.away small{display:block;font:600 20px var(--text);letter-spacing:.3em;text-transform:uppercase;color:#AEB6C4;text-shadow:none;margin-bottom:8px}
+.clear .kick,.clear .big,.clear .topic,.clear .ln,.clear .away{text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 3px rgba(0,0,0,.9)}
+/* socials + live info */
+.soc{display:flex;flex-wrap:wrap;gap:12px}
+.pill{display:flex;align-items:center;gap:10px;background:rgba(10,11,15,.72);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:7px 18px 7px 7px;font:600 22px var(--text);color:#E8ECF2;white-space:nowrap}
+.pill i{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(var(--pr),.18)}
+.pill svg{width:20px;height:20px;fill:var(--pc)}
+.info{display:flex;flex-wrap:wrap;gap:12px}
+.chipx{display:flex;align-items:center;gap:12px;background:rgba(10,11,15,.72);border:1px solid rgba(var(--gr),.35);border-radius:14px;padding:9px 16px;font:600 22px var(--text);white-space:nowrap;max-width:560px}
+.chipx b{font:700 14px var(--text);letter-spacing:.22em;text-transform:uppercase;color:var(--g)}
+.chipx span{overflow:hidden;text-overflow:ellipsis;color:#fff}
+.chipx .dot{flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:var(--pc,#fff);box-shadow:0 0 10px var(--pc,#fff)}
+.soc.one{flex-wrap:nowrap;overflow:hidden}
+.info.under{position:absolute;top:944px;width:480px;flex-direction:column;gap:10px}
+.info.under .chipx{max-width:480px}
+.chipx.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 0 rgba(var(--gr),.9);border-color:rgb(var(--gr))}100%{box-shadow:0 0 0 18px rgba(var(--gr),0)}}
+/* gameplay info bar */
+.ibar{position:absolute;left:0;right:0;height:60px;display:flex;align-items:center;gap:24px;padding:0 28px;background:linear-gradient(90deg,rgba(7,8,11,.86),rgba(12,14,19,.78));border-color:rgba(var(--gr),.5);border-style:solid;border-width:0}
+.ibar.top{top:0;border-bottom-width:2px;box-shadow:0 6px 24px -10px rgba(var(--gr),.7)}
+.ibar.bottom{bottom:0;border-top-width:2px;box-shadow:0 -6px 24px -10px rgba(var(--gr),.7)}
+.ibar .nm{font:700 24px var(--display);letter-spacing:.04em;white-space:nowrap}
+.ibar .info{flex:1;justify-content:center;flex-wrap:nowrap;min-width:0}
+.ibar .chipx{background:none;border:0;padding:0;font-size:20px}
+.ibar .soc1{min-width:0;display:flex;justify-content:flex-end}
+.ibar .soc1 .pill{background:none;border:0;padding:0;font-size:20px;transition:opacity .45s}
+.ibar .soc1 .pill.out{opacity:0}
+/* preview-only stand-ins for the camera, the game and chat */
+.demo{position:absolute;overflow:hidden;border-radius:var(--r)}
+.demo.cam{background:radial-gradient(60% 70% at 30% 20%,rgba(255,196,140,.25),transparent 60%),radial-gradient(80% 80% at 80% 90%,rgba(77,163,255,.2),transparent 60%),linear-gradient(160deg,#2a2f3a,#12151c)}
+.demo.cam svg{position:absolute;left:50%;bottom:0;width:46%;transform:translateX(-50%);fill:#07090d;opacity:.85}
+.demo.game{inset:0;border-radius:0;background:linear-gradient(180deg,#5d7fa8 0%,#9fb7cc 38%,#6b6f55 39%,#3d4430 70%,#2a2f22 100%)}
+.demo.game:after{content:"";position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px;border:2px solid rgba(255,255,255,.8);border-radius:50%}
+.demo.chat{border-radius:0;background:none;padding:64px 24px 20px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;font:500 21px/1.35 var(--text);color:#D7DCE4}
+.demo.chat b{font-weight:700}
+</style>
+</head>
+<body>
+<div id="ovr"><div id="sn" class="sn"></div></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Scene Pack</a>
+  <nav><a href="#you">Your channel</a><a href="#look">Look</a><a href="#scenes">Scenes</a><a href="#live">Live info</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free OBS overlays · by itsCRA1G</div>
+    <h1>Gameplay, Just Chatting and Waiting scenes.</h1>
+    <p class="lead">Three scene layouts with framed windows for your camera, space for chat, your socials and, with Streamer.bot, your latest follower and sub from Twitch and Kick. Made to match <a href="../screens/">Screens</a>.</p>
+    <div class="chips"><span class="chip">Camera frames</span><span class="chip">Chat panel</span><span class="chip">Latest follower and sub</span><span class="chip">Animated or transparent</span><span class="chip">Matches Screens</span></div>
+  </div>
+  <div class="screen"><iframe id="heroFrame" title="Scene preview" tabindex="-1"></iframe></div>
+</div></div>
+
+<main class="wrap">
+  <section id="you">
+    <div class="sec-head"><span class="num">1</span><h2>Your channel</h2></div>
+    <div class="ctl" style="max-width:46em">
+      <div><div class="lbl">Channel name</div><input class="tin" id="chName" maxlength="30" placeholder="Your name, or leave empty"></div>
+      <div><div class="lbl">Socials</div>
+        <p style="font-size:15px;margin-bottom:10px">Type each username without the @. Using <a href="../screens/">Screens</a> already? Use the same ones so everything matches.</p>
+        <div class="list" id="items"></div>
+        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn ghost" id="addBtn">+ Add a platform</button>
+        <div class="seg" id="fmtSeg"><button data-v="link" aria-pressed="true">twitch.tv/name</button><button data-v="at" aria-pressed="false">@name</button></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="look">
+    <div class="sec-head"><span class="num">2</span><h2>Look</h2></div>
+    <div class="look">
+      <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
+      <div><div class="lbl">Background (Just Chatting and Waiting)</div><div class="seg" id="bgSeg"><button data-v="anim" aria-pressed="true">Animated</button><button data-v="clear" aria-pressed="false">Transparent</button></div>
+        <div class="hint">Transparent shows just the frames, panels and text, so you can put your own background behind them. Gameplay is always see-through.</div></div>
+      <div><div class="lbl">Corners</div><div class="seg" id="crSeg"><button data-v="rd" aria-pressed="true">Rounded</button><button data-v="sq" aria-pressed="false">Square</button></div></div>
+    </div>
+  </section>
+
+  <section id="scenes">
+    <div class="sec-head"><span class="num">3</span><h2>Your scenes</h2></div>
+    <div class="tabs" role="tablist" id="tabs"><button role="tab" data-k="game" aria-selected="true">Gameplay</button><button role="tab" data-k="chat" aria-selected="false">Just Chatting</button><button role="tab" data-k="wait" aria-selected="false">Waiting</button></div>
+    <div class="sgrid">
+      <div class="ctl">
+        <div data-for="game"><div class="lbl">Camera corner</div><div class="seg" id="cpSeg"><button data-v="tl">Top left</button><button data-v="tr">Top right</button><button data-v="bl">Bottom left</button><button data-v="br">Bottom right</button></div></div>
+        <div data-for="game"><div class="lbl">Camera size</div><div class="seg" id="csSeg"><button data-v="s">Small</button><button data-v="m">Medium</button><button data-v="l">Large</button><button data-v="off">No camera</button></div></div>
+        <div data-for="game"><div class="lbl">Info bar</div><div class="seg" id="ibSeg"><button data-v="top">Top</button><button data-v="bottom">Bottom</button><button data-v="off">Off</button></div>
+          <div class="hint">A slim bar with your name, latest follower and sub, and your socials taking turns. Put it where it won't cover your game's HUD.</div></div>
+        <div data-for="game" class="tog"><label><input type="checkbox" id="optNt" checked>Name tag on the camera</label></div>
+        <div data-for="chat"><div class="lbl">Topic</div><input class="tin" id="tpIn" maxlength="70"><div class="hint">To change it, type the new topic here, then paste the new Just Chatting link into OBS.</div></div>
+        <div data-for="chat"><div class="lbl">Chat panel</div><div class="seg" id="chSeg"><button data-v="right">Right</button><button data-v="left">Left</button></div></div>
+        <div data-for="wait"><div class="lbl">Small line above the title</div><input class="tin" id="wkIn" maxlength="30"></div>
+        <div data-for="wait"><div class="lbl">Title</div><input class="tin" id="wtIn" maxlength="40"></div>
+        <div data-for="wait"><div class="lbl">Messages (one per line, they take turns)</div><textarea class="tin" id="wlIn" maxlength="600"></textarea></div>
+        <div data-for="wait" class="tog"><label><input type="checkbox" id="optUp" checked>Show how long you've been away</label></div>
+      </div>
+      <div>
+        <div class="screen"><iframe id="prevFrame" title="Scene preview" tabindex="-1"></iframe></div>
+        <p class="hint">The preview fills the windows with a stand-in camera, game and chat. In OBS they're see-through, so your own sources show.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="live">
+    <div class="sec-head"><span class="num">4</span><h2>Latest follower and sub (optional)</h2></div>
+    <p>With <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> (1.0 or later) running and connected to Twitch, Kick or both, the scenes show your latest follower and latest sub (gifts count, shown as the gifter). Turn on its WebSocket server: <strong>Servers/Clients → WebSocket Server</strong>, tick <strong>Auto Start</strong>, press <strong>Start Server</strong>. There's no action to add.</p>
+    <div class="tog" style="max-width:46em"><label><input type="checkbox" id="optLv" checked>Show latest follower and sub</label></div>
+    <details style="margin-top:12px"><summary>Streamer.bot connection (only if you changed it)</summary>
+      <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
+      <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
+    </details>
+    <p class="hint" style="margin-top:12px">No Streamer.bot? The scenes still work; those spots just stay hidden.</p>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">5</span><h2>Add them to OBS</h2></div>
+    <p>One link per scene, with everything above built in:</p>
+    <div class="links">
+      <div class="lrow"><b>Gameplay</b><input id="u-game" readonly aria-label="Gameplay link"><button class="btn" data-copy="u-game">Copy</button></div>
+      <div class="lrow"><b>Just Chatting</b><input id="u-chat" readonly aria-label="Just Chatting link"><button class="btn" data-copy="u-chat">Copy</button></div>
+      <div class="lrow"><b>Waiting</b><input id="u-wait" readonly aria-label="Waiting link"><button class="btn" data-copy="u-wait">Copy</button></div>
+    </div>
+    <ol class="steps" style="margin-top:16px">
+      <li>In each scene, press <strong>+</strong> under Sources and pick <strong>Browser</strong>. Paste that scene's link and set the size to <strong>1920 × 1080</strong>.</li>
+      <li>Put the browser source <strong>at the top</strong> of the scene's Sources list.</li>
+      <li>Put your camera (and game capture) <strong>below</strong> it, then drag and size them so they show through the windows. Holding <strong>Alt</strong> while dragging an edge crops a source in OBS.</li>
+      <li>For chat, add <a href="../chat/">Combined Chat</a> (or any chat overlay) <strong>above</strong> the browser source and fit it inside the chat panel.</li>
+    </ol>
+    <p>Window positions, all on a 1920 × 1080 canvas, so you can type them into OBS's <strong>Edit Transform</strong> (Ctrl+E):</p>
+    <div class="tw"><table id="posTable"></table></div>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>My camera is hidden</td><td>The camera goes <strong>below</strong> the browser source in the Sources list; the window in the scene is see-through.</td></tr>
+      <tr><td>My chat is hidden</td><td>The chat overlay goes <strong>above</strong> the browser source, sitting on the chat panel.</td></tr>
+      <tr><td>No latest follower or sub</td><td>They appear after your first follow and sub with Streamer.bot running (step 4). They're remembered between streams.</td></tr>
+      <tr><td>The info bar covers my game's HUD</td><td>Move it to the top or bottom, or turn it off, in step 3.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Platform logos from Simple Icons (CC0); each belongs to its owner.</div></footer>
+</div>
+
+<script>
+var PLAT={"twitch":{"n":"Twitch","v":"Follow on Twitch","l":"twitch.tv/{h}","a":"@{h}","c":"9146FF","p":"M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"},"kick":{"n":"Kick","v":"Follow on Kick","l":"kick.com/{h}","a":"@{h}","c":"53FC18","p":"M1.333 0h8v5.333H12V2.667h2.667V0h8v8H20v2.667h-2.667v2.666H20V16h2.667v8h-8v-2.667H12v-2.666H9.333V24h-8Z"},"youtube":{"n":"YouTube","v":"Subscribe on YouTube","l":"youtube.com/@{h}","a":"@{h}","c":"FF0000","p":"M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"},"tiktok":{"n":"TikTok","v":"Follow on TikTok","l":"tiktok.com/@{h}","a":"@{h}","c":"FE2C55","p":"M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"},"x":{"n":"X","v":"Follow on X","l":"x.com/{h}","a":"@{h}","c":"FFFFFF","p":"M14.234 10.162 22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299-.929-1.329L3.076 1.56h3.182l5.965 8.532.929 1.329 7.754 11.09h-3.182z"},"instagram":{"n":"Instagram","v":"Follow on Instagram","l":"instagram.com/{h}","a":"@{h}","c":"FF0069","p":"M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"},"discord":{"n":"Discord","v":"Join the Discord","l":"discord.gg/{h}","a":"discord.gg/{h}","c":"5865F2","p":"M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"},"facebook":{"n":"Facebook","v":"Follow on Facebook","l":"facebook.com/{h}","a":"@{h}","c":"0866FF","p":"M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"},"threads":{"n":"Threads","v":"Follow on Threads","l":"threads.net/@{h}","a":"@{h}","c":"FFFFFF","p":"M18.263 11.097c-.03-3.486-1.92-5.586-5.111-5.586-2.13 0-3.922.963-4.863 2.499l2.062 1.438c.535-.843 1.272-1.543 2.628-1.543 1.528 0 2.318.85 2.544 2.431a15 15 0 0 0-2.236-.173c-4.125 0-6.068 1.867-6.068 4.336s1.943 3.99 4.804 3.99c3.139 0 5.013-2.115 5.781-4.735.798.361 1.348 1.204 1.348 2.47 0 3.387-3.907 5.232-7.22 5.232-4.885 0-8.077-3.207-8.077-8.424 0-6.392 4.223-10.487 9.9-10.487 3.808 0 5.69 1.671 6.97 3.914l2.108-1.475C21.44 2.078 18.331 0 13.663 0 6.227 0 1.168 5.277 1.168 12.934c0 7 4.953 11.066 10.856 11.066 4.878 0 9.809-2.846 9.809-7.716 0-2.545-1.46-4.231-3.569-5.187m-6.33 4.855c-1.077 0-2.026-.512-2.026-1.453 0-1.483 1.822-1.934 3.606-1.934.678 0 1.34.045 1.927.173-.422 1.927-1.671 3.215-3.508 3.214Z"},"bluesky":{"n":"Bluesky","v":"Follow on Bluesky","l":"bsky.app/profile/{h}","a":"@{h}","c":"1185FE","p":"M5.202 2.857C7.954 4.922 10.913 9.11 12 11.358c1.087-2.247 4.046-6.436 6.798-8.501C20.783 1.366 24 .213 24 3.883c0 .732-.42 6.156-.667 7.037-.856 3.061-3.978 3.842-6.755 3.37 4.854.826 6.089 3.562 3.422 6.299-5.065 5.196-7.28-1.304-7.847-2.97-.104-.305-.152-.448-.153-.327 0-.121-.05.022-.153.327-.568 1.666-2.782 8.166-7.847 2.97-2.667-2.737-1.432-5.473 3.422-6.3-2.777.473-5.899-.308-6.755-3.369C.42 10.04 0 4.615 0 3.883c0-3.67 3.217-2.517 5.202-1.026"},"snapchat":{"n":"Snapchat","v":"Add on Snapchat","l":"snapchat.com/add/{h}","a":"@{h}","c":"FFFC00","p":"M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.569-1.273.988-3.146 1.271-.059.091-.12.375-.164.57-.029.179-.074.36-.134.553-.076.271-.27.405-.555.405h-.03c-.135 0-.313-.031-.538-.074-.36-.075-.765-.135-1.273-.135-.3 0-.599.015-.913.074-.6.104-1.123.464-1.723.884-.853.599-1.826 1.288-3.294 1.288-.06 0-.119-.015-.18-.015h-.149c-1.468 0-2.427-.675-3.279-1.288-.599-.42-1.107-.779-1.707-.884-.314-.045-.629-.074-.928-.074-.54 0-.958.089-1.272.149-.211.043-.391.074-.54.074-.374 0-.523-.224-.583-.42-.061-.192-.09-.389-.135-.567-.046-.181-.105-.494-.166-.57-1.918-.222-2.95-.642-3.189-1.226-.031-.063-.052-.15-.055-.225-.015-.243.165-.465.42-.509 3.264-.54 4.73-3.879 4.791-4.02l.016-.029c.18-.345.224-.645.119-.869-.195-.434-.884-.658-1.332-.809-.121-.029-.24-.074-.346-.119-1.107-.435-1.257-.93-1.197-1.273.09-.479.674-.793 1.168-.793.146 0 .27.029.383.074.42.194.789.3 1.104.3.234 0 .384-.06.465-.105l-.046-.569c-.098-1.626-.225-3.651.307-4.837C7.392 1.077 10.739.807 11.727.807l.419-.015h.06z"},"patreon":{"n":"Patreon","v":"Support on Patreon","l":"patreon.com/{h}","a":"patreon.com/{h}","c":"FF424D","p":"M22.957 7.21c-.004-3.064-2.391-5.576-5.191-6.482-3.478-1.125-8.064-.962-11.384.604C2.357 3.231 1.093 7.391 1.046 11.54c-.039 3.411.302 12.396 5.369 12.46 3.765.047 4.326-4.804 6.068-7.141 1.24-1.662 2.836-2.132 4.801-2.618 3.376-.836 5.678-3.501 5.673-7.031Z"},"kofi":{"n":"Ko-fi","v":"Support on Ko-fi","l":"ko-fi.com/{h}","a":"ko-fi.com/{h}","c":"FF6433","p":"M11.351 2.715c-2.7 0-4.986.025-6.83.26C2.078 3.285 0 5.154 0 8.61c0 3.506.182 6.13 1.585 8.493 1.584 2.701 4.233 4.182 7.662 4.182h.83c4.209 0 6.494-2.234 7.637-4a9.5 9.5 0 0 0 1.091-2.338C21.792 14.688 24 12.22 24 9.208v-.415c0-3.247-2.13-5.507-5.792-5.87-1.558-.156-2.65-.208-6.857-.208m0 1.947c4.208 0 5.09.052 6.571.182 2.624.311 4.13 1.584 4.13 4v.39c0 2.156-1.792 3.844-3.87 3.844h-.935l-.156.649c-.208 1.013-.597 1.818-1.039 2.546-.909 1.428-2.545 3.064-5.922 3.064h-.805c-2.571 0-4.831-.883-6.078-3.195-1.09-2-1.298-4.155-1.298-7.506 0-2.181.857-3.402 3.012-3.714 1.533-.233 3.559-.26 6.39-.26m6.547 2.287c-.416 0-.65.234-.65.546v2.935c0 .311.234.545.65.545 1.324 0 2.051-.754 2.051-2s-.727-2.026-2.052-2.026m-10.39.182c-1.818 0-3.013 1.48-3.013 3.142 0 1.533.858 2.857 1.949 3.897.727.701 1.87 1.429 2.649 1.896a1.47 1.47 0 0 0 1.507 0c.78-.467 1.922-1.195 2.623-1.896 1.117-1.039 1.974-2.364 1.974-3.897 0-1.662-1.247-3.142-3.039-3.142-1.065 0-1.792.545-2.338 1.298-.493-.753-1.246-1.298-2.312-1.298"},"web":{"n":"Website","v":"Visit the website","l":"{h}","a":"{h}","c":"4DA3FF","p":"M12 2a10 10 0 100 20 10 10 0 000-20zm6.93 6h-2.95a15.6 15.6 0 00-1.38-3.56A8.03 8.03 0 0118.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14a8.2 8.2 0 010-4h3.38a16.5 16.5 0 000 4H4.26zm.81 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.99 7.99 0 015.07 16zm2.95-8H5.07a7.99 7.99 0 014.33-3.56A15.6 15.6 0 008.02 8zM12 19.96A14.1 14.1 0 0110.09 16h3.82A14.1 14.1 0 0112 19.96zM14.34 14H9.66a14.7 14.7 0 010-4h4.68a14.7 14.7 0 010 4zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14a16.5 16.5 0 000-4h3.38a8.2 8.2 0 010 4h-3.38z"}};
+(function(){
+"use strict";
+var ORDER=["twitch","kick","youtube","tiktok","x","instagram","discord","facebook","threads","bluesky","snapchat","patreon","kofi","web"];
+var GLOWS=[["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+var BASE=location.origin+location.pathname;
+var DEF={game:{cp:"br",cs:"m",ib:"bottom",nt:1},chat:{tp:"Just chatting: ask me anything",side:"right"},
+  wait:{k:"Respawning",t:"Back in a moment",ln:["Grab a drink, I'll be right back","Keep chat warm for me"],up:1}};
+var CAM={s:[400,225],m:[512,288],l:[640,360]};
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function lum(h){var c=[0,2,4].map(function(i){var v=parseInt(h.slice(i,i+2),16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+function clean(h,p){h=String(h||"").trim().replace(/^https?:\/\//i,"").replace(/^www\./i,"");if(p!=="web"){h=h.split(/[?#]/)[0];if(h.indexOf("/")>=0){var seg=h.split("/").filter(Boolean);h=seg.length?seg[seg.length-1]:""}h=h.replace(/^@/,"")}return h.slice(0,60)}
+function showH(p,h,fmt){var P=PLAT[p];return (fmt==="at"?P.a:P.l).replace("{h}",h)}
+function enc(list){return list.map(function(x){return x.p+":"+encodeURIComponent(x.h)}).join(",")}
+function dec(s){return (s||"").split(",").map(function(x){var i=x.indexOf(":");return i<1?null:{p:x.slice(0,i),h:decodeURIComponent(x.slice(i+1))}}).filter(function(x){return x&&PLAT[x.p]&&x.h})}
+
+// Where each window sits on the 1920 x 1080 canvas: [x, y, width, height]
+function layout(c){
+  var L={cam:null,chat:null};
+  if(c.k==="game"){
+    if(c.cs!=="off"){var w=CAM[c.cs][0],h=CAM[c.cs][1],m=32,bar=c.ib==="off"?0:60;
+      var top=c.cp.charAt(0)==="t",left=c.cp.charAt(1)==="l";
+      var y=top?m+(c.ib==="top"?bar:0):1080-m-h-(c.ib==="bottom"?bar:0)-(c.nt&&!top?0:0);
+      L.cam=[left?m:1920-m-w,y,w,h]}
+  }else if(c.k==="chat"){
+    var cx=c.side==="left"?580:60;L.cam=[cx,60,1280,720];L.chat=[c.side==="left"?60:1380,60,480,860];
+  }else{L.cam=[1180,80,640,360];L.chat=[1180,500,640,420]}
+  return L;
+}
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+function overlay(){
+  var $=function(i){return document.getElementById(i)},sn=$("sn"),ovr=$("ovr");
+  var cfg,ws=null,live=false,seen={},kickHold={},kickMute={},rot=null,srot=null,tick=null,t0=Date.now();
+  function fit(){ovr.style.transform="scale("+Math.min(innerWidth/1920,innerHeight/1080)+")"}
+  addEventListener("resize",fit);
+  function el(t,c,txt){var e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e}
+  function read(){
+    var p=new URLSearchParams(location.hash.slice(1));
+    var g=p.get("g")||"4DA3FF";if(!/^[0-9a-fA-F]{6}$/.test(g))g="4DA3FF";
+    var k=DEF[p.get("sc")]?p.get("sc"):"game";
+    cfg={k:k,g:g.toUpperCase(),bg:p.get("bg")==="clear"?"clear":"anim",sq:p.get("cr")==="sq",n:p.get("n")||"",s:dec(p.get("s")),f:p.get("f")==="at"?"at":"link",
+      lv:p.get("lv")!=="0",cp:["tl","tr","bl","br"].indexOf(p.get("cp"))>=0?p.get("cp"):DEF.game.cp,cs:["s","m","l","off"].indexOf(p.get("cs"))>=0?p.get("cs"):DEF.game.cs,
+      ib:["top","bottom","off"].indexOf(p.get("ib"))>=0?p.get("ib"):DEF.game.ib,nt:p.get("nt")!=="0",
+      tp:p.has("tp")?p.get("tp"):DEF.chat.tp,side:p.get("side")==="left"?"left":"right",
+      wk:p.has("wk")?p.get("wk"):DEF.wait.k,wt:p.has("wt")?p.get("wt"):DEF.wait.t,ln:p.has("ln")?p.getAll("ln").filter(Boolean):DEF.wait.ln,up:p.get("up")!=="0",
+      h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1"};
+    build();fit();
+  }
+  // the background gets see-through holes where the camera goes
+  function holes(L){
+    var r=cfg.sq?0:22,d="M0 0H1920V1080H0Z";
+    [L.cam].forEach(function(b){if(!b)return;var x=b[0],y=b[1],w=b[2],h=b[3];
+      d+=r?"M"+(x+r)+" "+y+"H"+(x+w-r)+"A"+r+" "+r+" 0 0 1 "+(x+w)+" "+(y+r)+"V"+(y+h-r)+"A"+r+" "+r+" 0 0 1 "+(x+w-r)+" "+(y+h)+"H"+(x+r)+"A"+r+" "+r+" 0 0 1 "+x+" "+(y+h-r)+"V"+(y+r)+"A"+r+" "+r+" 0 0 1 "+(x+r)+" "+y+"Z"
+           :"M"+x+" "+y+"H"+(x+w)+"V"+(y+h)+"H"+x+"Z"});
+    var svg='<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"><path fill="#000" fill-rule="evenodd" d="'+d+'"/></svg>';
+    return 'url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
+  }
+  function box(b,cls){var e=el("div",cls);e.style.left=b[0]+"px";e.style.top=b[1]+"px";e.style.width=b[2]+"px";e.style.height=b[3]+"px";return e}
+  function pillFor(x){var P=PLAT[x.p];var d=el("div","pill");d.style.setProperty("--pc","#"+P.c);d.style.setProperty("--pr",hx2rgb(P.c));
+    d.innerHTML='<i><svg viewBox="0 0 24 24" aria-hidden="true"><path></path></svg></i><span></span>';d.querySelector("path").setAttribute("d",P.p);d.querySelector("span").textContent=showH(x.p,x.h,cfg.f);return d}
+  function socials(all){var so=el("div","soc");(all?cfg.s:[]).forEach(function(x){so.appendChild(pillFor(x))});return so}
+  function infoRow(){var r=el("div","info");r.id="info";return r}
+  var CAM_SVG='<svg viewBox="0 0 100 80" aria-hidden="true"><circle cx="50" cy="28" r="17"/><path d="M12 80c2-22 18-32 38-32s36 10 38 32z"/></svg>';
+  function build(){
+    clearInterval(rot);clearInterval(srot);clearInterval(tick);
+    sn.className="sn "+cfg.k+(cfg.bg==="clear"?" clear":"")+(cfg.sq?" sq":"");
+    sn.style.setProperty("--g","#"+cfg.g);sn.style.setProperty("--gr",hx2rgb(cfg.g));sn.style.setProperty("--ink",lum(cfg.g)>.35?"#000":"#fff");
+    sn.innerHTML="";var L=layout(cfg);
+    // stand-ins for the preview only, drawn underneath everything
+    if(cfg.demo){
+      if(cfg.k==="game")sn.appendChild(el("div","demo game"));
+      if(L.cam){var dc=box(L.cam,"demo cam");dc.innerHTML=CAM_SVG;sn.appendChild(dc)}
+    }
+    var bg=el("div","bgx");bg.innerHTML='<div class="blob"></div><div class="blob b2"></div><div class="grid"></div>';
+    var m=holes(L);bg.style.webkitMaskImage=m;bg.style.maskImage=m;sn.appendChild(bg);
+    if(L.chat){var pn=box(L.chat,"panel");pn.appendChild(el("div","ph","Chat"));sn.appendChild(pn);
+      if(cfg.demo){var dch=box(L.chat,"demo chat");[["NightOwlTV","#B57BFF","that was a clean round"],["Kezza_Plays","#53FC18","gg"],["pixelpete","#4DA3FF","how long you been streaming?"],["Morag","#FF6FB5","hello from Glasgow"]].forEach(function(x){var d=el("div");var b=el("b",null,x[0]+": ");b.style.color=x[1];d.appendChild(b);d.appendChild(document.createTextNode(x[2]));dch.appendChild(d)});sn.appendChild(dch)}}
+    if(L.cam){var fr=box(L.cam,"fr");if((cfg.k!=="game"||cfg.nt)&&cfg.n)fr.appendChild(el("div","tag",cfg.n));sn.appendChild(fr)}
+    if(cfg.k==="game"){
+      if(cfg.ib!=="off"){
+        var bar=el("div","ibar "+cfg.ib);bar.appendChild(el("div","nm",cfg.n));bar.appendChild(infoRow());
+        var s1=el("div","soc1");bar.appendChild(s1);sn.appendChild(bar);
+        // one social at a time in the bar
+        var si=0;function showS(){s1.innerHTML="";if(cfg.s.length)s1.appendChild(pillFor(cfg.s[si%cfg.s.length]))}
+        showS();if(cfg.s.length>1)srot=setInterval(function(){var pl=s1.firstChild;if(pl)pl.classList.add("out");setTimeout(function(){si++;showS()},450)},5000);
+      }
+    }else if(cfg.k==="chat"){
+      var lx=cfg.side==="left"?580:60;
+      var lt=el("div");lt.style.cssText="position:absolute;left:"+lx+"px;top:828px;width:1280px";
+      lt.appendChild(el("div","topic",cfg.tp));sn.appendChild(lt);
+      // one tidy row along the bottom: socials on the left, latest follower and sub on the right
+      var so2=socials(true);so2.classList.add("one");so2.style.cssText="position:absolute;left:"+lx+"px;width:1280px;bottom:40px";sn.appendChild(so2);
+      // latest follower and sub sit under the chat panel
+      var ir=infoRow();ir.classList.add("under");ir.style.left=(cfg.side==="left"?60:1380)+"px";sn.appendChild(ir);
+    }else{
+      var col=el("div");col.style.cssText="position:absolute;left:100px;top:150px;width:980px;display:flex;flex-direction:column;gap:22px";
+      col.appendChild(el("div","kick",cfg.wk));col.appendChild(el("div","big",cfg.wt));
+      var ln=el("div","ln",cfg.ln[0]||"");col.appendChild(ln);
+      if(cfg.up){var aw=el("div","away");aw.id="away";col.appendChild(aw)}
+      col.appendChild(infoRow());sn.appendChild(col);
+      var so=socials(true);so.style.cssText="position:absolute;left:100px;bottom:70px;max-width:1000px";sn.appendChild(so);
+      var li=0;if(cfg.ln.length>1)rot=setInterval(function(){ln.classList.add("out");setTimeout(function(){li=(li+1)%cfg.ln.length;ln.textContent=cfg.ln[li];ln.classList.remove("out")},500)},6000);
+      t0=Date.now();if(cfg.up){tick=setInterval(away,500);away()}
+    }
+    drawInfo(false);
+  }
+  function away(){var e=$("away");if(!e)return;var s=Math.floor((Date.now()-t0)/1000),m=Math.floor(s/60);e.innerHTML="";e.appendChild(el("small",null,"Away for"));e.appendChild(document.createTextNode(m+":"+String(s%60).padStart(2,"0")))}
+
+  /* ---- latest follower / sub: kept in the OBS browser so all three scenes share them ---- */
+  var LAST={};
+  function loadLast(){try{LAST=JSON.parse(localStorage.getItem("sn_last")||"{}")||{}}catch(e){LAST={}}}
+  function drawInfo(flash){
+    var r=$("info");if(!r)return;r.innerHTML="";if(!cfg.lv)return;
+    [["follow","Latest follower"],["sub","Latest sub"]].forEach(function(x){var v=LAST[x[0]];if(!v||!v.name)return;
+      var c=el("div","chipx"+(flash===x[0]?" flash":""));var dot=el("i","dot");dot.style.setProperty("--pc",v.src==="kick"?"#53FC18":"#9146FF");
+      c.appendChild(dot);c.appendChild(el("b",null,x[1]));c.appendChild(el("span",null,v.name));r.appendChild(c)});
+  }
+  function push(a){
+    if(!a||!a.name)return;
+    var k=a.type==="follow"?"follow":(a.type==="sub"||a.type==="resub"||a.type==="gift"||a.type==="bomb")?"sub":null;if(!k)return;
+    LAST[k]={name:String(a.name).slice(0,30),src:a.src};if(!cfg.demo)try{localStorage.setItem("sn_last",JSON.stringify(LAST))}catch(e){}
+    drawInfo(k);
+  }
+  addEventListener("storage",function(e){if(e.key==="sn_last"){loadLast();drawInfo(false)}});
+
+  /* ---- reading Streamer.bot's events ---- */
+  function nm(o){if(!o||typeof o!=="object")return "";return String(o.name||o.displayName||o.display_name||o.userName||o.login||o.username||o.slug||"")}
+  function who(d){return nm(d.user)||d.user_name||d.userName||d.displayName||d.display_name||d.username||nm(d.targetUser)||nm(d.follower)||""}
+  function num(){for(var i=0;i<arguments.length;i++){var v=parseInt(arguments[i],10);if(!isNaN(v)&&v>0)return v}return 0}
+  function txt(d){var m=d.message&&typeof d.message==="object"?d.message:null;var t=typeof d.text==="string"?d.text:typeof d.message==="string"?d.message:m&&typeof m.message==="string"?m.message:"";return t.slice(0,240)}
+  function anon(d){return !!(d.isAnonymous||d.anonymous||d.gifterIsAnonymous)}
+  function tier(d){if(d.isPrime||d.is_prime)return "Prime";var s=String(d.subTier||d.sub_tier||d.tier||"");return /3/.test(s)?"Tier 3":/2/.test(s)?"Tier 2":""}
+  function stripCheer(t,d){
+    var names=(d.cheerEmotes||[]).map(function(c){return String(c.Name||c.name||"").replace(/[^A-Za-z]/g,"")}).filter(Boolean);
+    var re=names.length?new RegExp("(^|\\s)("+names.join("|")+")\\d+(?=\\s|$)","gi"):/(^|\s)cheer\d+(?=\s|$)/gi;
+    return t.replace(re,"$1").replace(/\s{2,}/g," ").trim();
+  }
+  function onceOnly(d){var id=d.messageId||d.id||"";if(!id)return true;id=String(id);if(seen[id])return false;seen[id]=Date.now();
+    var ks=Object.keys(seen);if(ks.length>300)ks.slice(0,100).forEach(function(k){delete seen[k]});return true}
+  function twitch(type,d){
+    switch(type){
+      case "Follow":return {type:"follow",name:who(d)};
+      case "Sub":return {type:"sub",name:who(d),tier:tier(d)};
+      case "ReSub":return {type:"resub",name:who(d),months:num(d.cumulativeMonths,d.cumulative,d.durationMonths,d.monthsSubscribed),tier:tier(d),msg:txt(d)};
+      case "GiftSub":
+        if(d.fromCommunitySubGift||d.from_community_sub_gift)return null; // part of a gift bomb, shown once by GiftBomb
+        return {type:"gift",name:anon(d)?"Anonymous":who(d),to:nm(d.recipient)||d.recipientDisplayName||d.recipientUser||"",tier:tier(d)};
+      case "GiftBomb":return {type:"bomb",name:anon(d)?"Anonymous":who(d),amount:num(d.total,d.gifts,d.count,(d.recipients||[]).length),tier:tier(d)};
+      case "Cheer":{var bits=num(d.bits,d.message&&d.message.bits);return {type:"cheer",name:anon(d)?"Anonymous":who(d),amount:bits,msg:stripCheer(txt(d),d)}}
+      case "Raid":return {type:"raid",name:nm(d.raider)||d.from_broadcaster_user_name||d.fromBroadcasterUserName||who(d),amount:num(d.viewers,d.viewerCount)};
+    }
+    return null;
+  }
+  function kick(type,d){
+    switch(type){
+      case "Follow":return {type:"follow",name:who(d)};
+      case "Subscription":return {type:"sub",name:who(d)};
+      case "Resubscription":return {type:"resub",name:who(d),months:num(d.duration,d.months,d.cumulativeMonths),msg:txt(d)};
+      case "GiftSubscription":{
+        var g=anon(d)?"Anonymous":who(d),key=g.toLowerCase(),r=d.recipient||(d.recipients&&d.recipients[0]);
+        var mu=kickMute[key];if(mu&&mu.left>0&&mu.until>Date.now()){mu.left--;return null}  // already shown as part of a mass gift
+        var a={src:"kick",type:"gift",name:g,to:nm(r)};
+        // hold it a moment, in case it turns out to be part of a mass gift
+        var h=kickHold[key]||(kickHold[key]={list:[],t:0});h.list.push(a);clearTimeout(h.t);
+        h.t=setTimeout(function(){delete kickHold[key];if(h.list.length===1)push(h.list[0]);else push({src:"kick",type:"bomb",name:g,amount:h.list.length})},1500);
+        return "held";
+      }
+      case "MassGiftSubscription":{
+        var gg=anon(d)?"Anonymous":who(d),k2=gg.toLowerCase(),n=num((d.recipients||[]).length,d.quantity,d.total,d.count,d.amount);
+        if(kickHold[k2]){clearTimeout(kickHold[k2].t);n=Math.max(n,kickHold[k2].list.length);delete kickHold[k2]}
+        kickMute[k2]={until:Date.now()+20000,left:n};
+        return {type:"bomb",name:gg,amount:n};
+      }
+      case "KicksGifted":{
+        var gift=d.gift&&typeof d.gift==="object"?d.gift:{};
+        return {type:"kicks",name:anon(d)?"Anonymous":(who(d)||nm(d.sender)),amount:num(d.amount,d.kicks,d.quantity,d.total,gift.amount,gift.kicks,gift.value),msg:txt(d)};
+      }
+    }
+    return null;
+  }
+  function handle(src,type,d){
+    if(!onceOnly(d))return;
+    var a=src==="kick"?kick(type,d):twitch(type,d);
+    if(!a||a==="held")return;a.src=src;push(a);
+  }
+  async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
+  function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+  var EVENTS=[["Twitch","Follow"],["Twitch","Sub"],["Twitch","ReSub"],["Twitch","GiftSub"],["Twitch","GiftBomb"],["Kick","Follow"],["Kick","Subscription"],["Kick","Resubscription"],["Kick","GiftSubscription"],["Kick","MassGiftSubscription"]];
+  function subscribe(){if(live)return;live=true;EVENTS.forEach(function(e,i){var ev={};ev[e[0]]=[e[1]];send({request:"Subscribe",id:"sn-"+i,events:ev})})}
+  function connect(){
+    live=false;
+    try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.port+"/")}catch(e){setTimeout(connect,10000);return}
+    var helloT=setTimeout(subscribe,1500);
+    ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.request==="Hello"){clearTimeout(helloT);if(m.authentication&&cfg.pw){var a=m.authentication;var s=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"sn-auth",authentication:await sha(s+a.challenge)})}else subscribe();return}
+      if(m.id==="sn-auth"){subscribe();return}
+      if(!m.event||!m.data)return;
+      var src=String(m.event.source||"").toLowerCase();
+      if(src==="twitch"||src==="kick")handle(src,String(m.event.type||""),m.data);
+    };
+    ws.onclose=function(){clearTimeout(helloT);live=false;setTimeout(connect,5000)};
+    ws.onerror=function(){try{ws.close()}catch(x){}};
+  }
+  read();
+  if(cfg.demo){
+    LAST={follow:{name:"NightOwlTV",src:"twitch"},sub:{name:"Kezza_Plays",src:"kick"}};drawInfo(false);
+    window.addEventListener("message",function(e){var d=e.data;if(d&&typeof d.snHash==="string"){try{history.replaceState(null,"","#"+d.snHash)}catch(x){}read()}});
+    return;
+  }
+  loadLast();drawInfo(false);
+  addEventListener("hashchange",read);
+  if(cfg.lv)connect();
+}
+
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={n:"",list:[{p:"twitch",h:""},{p:"kick",h:""},{p:"tiktok",h:""}],f:"link",g:"4DA3FF",bg:"anim",cr:"rd",lv:1,h:"127.0.0.1",p:"8080",tab:"game",scr:JSON.parse(JSON.stringify(DEF))};
+  try{var sv=JSON.parse(ls("sn_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  // first visit: borrow the name and socials from Screens if they're set up on this browser
+  if(!ls("sn_cfg")){try{var sc=JSON.parse(ls("sc_cfg")||"null");if(sc){if(sc.n)S.n=sc.n;if(Array.isArray(sc.list)&&sc.list.length)S.list=sc.list;if(sc.f)S.f=sc.f;if(sc.g)S.g=sc.g;if(sc.bg)S.bg=sc.bg}}catch(e){}}
+  ["game","chat","wait"].forEach(function(k){S.scr[k]=Object.assign({},DEF[k],S.scr[k]||{})});
+  $("chName").value=S.n;$("chName").addEventListener("input",function(){S.n=this.value;sync()});
+  var box=$("items");
+  function draw(){
+    box.innerHTML="";
+    S.list.forEach(function(it,k){
+      var P=PLAT[it.p];
+      var row=document.createElement("div");row.className="item";row.style.setProperty("--pc","#"+P.c);row.style.setProperty("--pr",hx2rgb(P.c));
+      var ic=document.createElement("div");ic.className="ico";ic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path></path></svg>';ic.querySelector("path").setAttribute("d",P.p);
+      var sel=document.createElement("select");sel.setAttribute("aria-label","Platform");
+      ORDER.forEach(function(p){var o=document.createElement("option");o.value=p;o.textContent=PLAT[p].n;if(p===it.p)o.selected=true;sel.appendChild(o)});
+      sel.addEventListener("change",function(){it.p=sel.value;draw();sync()});
+      var inp=document.createElement("input");inp.value=it.h;inp.setAttribute("aria-label",P.n+" username");inp.spellcheck=false;inp.autocomplete="off";
+      inp.placeholder=it.p==="discord"?"invite code":it.p==="web"?"yoursite.com":"username";
+      inp.addEventListener("input",function(){it.h=clean(inp.value,it.p);sync()});
+      var acts=document.createElement("div");acts.className="acts";
+      [["↑","Move up",-1],["↓","Move down",1]].forEach(function(a){var b=document.createElement("button");b.className="ib";b.type="button";b.textContent=a[0];b.title=a[1];b.setAttribute("aria-label",a[1]);
+        var j=k+a[2];b.disabled=j<0||j>=S.list.length;b.addEventListener("click",function(){var t=S.list[j];S.list[j]=S.list[k];S.list[k]=t;draw();sync()});acts.appendChild(b)});
+      var del=document.createElement("button");del.className="ib del";del.type="button";del.textContent="✕";del.title="Remove";del.setAttribute("aria-label","Remove "+P.n);
+      del.addEventListener("click",function(){S.list.splice(k,1);draw();sync()});acts.appendChild(del);
+      row.appendChild(ic);row.appendChild(sel);row.appendChild(inp);row.appendChild(acts);box.appendChild(row);
+    });
+  }
+  $("addBtn").addEventListener("click",function(){var used=S.list.map(function(x){return x.p});var p=ORDER.find(function(x){return used.indexOf(x)<0})||"web";S.list.push({p:p,h:""});draw();sync();box.lastChild.querySelector("input").focus()});
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
+  var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  function segv(id,get,set){$(id).addEventListener("click",function(e){var b=e.target.closest("button");if(b){set(b.dataset.v);sync()}})}
+  segv("bgSeg",0,function(v){S.bg=v});segv("fmtSeg",0,function(v){S.f=v});segv("crSeg",0,function(v){S.cr=v});
+  segv("cpSeg",0,function(v){S.scr.game.cp=v});segv("csSeg",0,function(v){S.scr.game.cs=v});segv("ibSeg",0,function(v){S.scr.game.ib=v});segv("chSeg",0,function(v){S.scr.chat.side=v});
+  $("optNt").addEventListener("change",function(){S.scr.game.nt=this.checked?1:0;sync()});
+  $("optUp").addEventListener("change",function(){S.scr.wait.up=this.checked?1:0;sync()});
+  $("optLv").addEventListener("change",function(){S.lv=this.checked?1:0;sync()});
+  $("tpIn").addEventListener("input",function(){S.scr.chat.tp=this.value;sync()});
+  $("wkIn").addEventListener("input",function(){S.scr.wait.k=this.value;sync()});
+  $("wtIn").addEventListener("input",function(){S.scr.wait.t=this.value;sync()});
+  $("wlIn").addEventListener("input",function(){S.scr.wait.ln=this.value.split("\n").map(function(s){return s.trim()}).filter(Boolean).slice(0,10);sync()});
+  [["host","h"],["port","p"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value.trim();sync()})});
+  $("pw").addEventListener("input",sync);
+  $("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.tab=b.dataset.k;fillTab();sync()}});
+  function fillTab(){
+    $("tabs").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-selected",b.dataset.k===S.tab)});
+    document.querySelectorAll("[data-for]").forEach(function(e){e.hidden=e.dataset.for!==S.tab});
+    $("tpIn").value=S.scr.chat.tp;$("wkIn").value=S.scr.wait.k;$("wtIn").value=S.scr.wait.t;$("wlIn").value=S.scr.wait.ln.join("\n");
+  }
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){
+    var el=$(b.dataset.copy),o=b.textContent,done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select();
+  })});
+  function hash(k,extra){extra=extra||{};var c=S.scr[k],p=new URLSearchParams();p.set("ov","1");p.set("sc",k);p.set("g",S.g);
+    if(S.bg!=="anim")p.set("bg",S.bg);if(S.cr==="sq")p.set("cr","sq");if(S.n.trim())p.set("n",S.n.trim());
+    var real=S.list.filter(function(x){return x.h});if(real.length)p.set("s",enc(real));if(S.f!=="link")p.set("f",S.f);
+    if(k==="game"){p.set("cp",c.cp);p.set("cs",c.cs);p.set("ib",c.ib);if(!c.nt)p.set("nt","0")}
+    else if(k==="chat"){p.set("tp",c.tp);if(c.side==="left")p.set("side","left")}
+    else{p.set("wk",c.k);p.set("wt",c.t);c.ln.forEach(function(l){p.append("ln",l)});if(!c.up)p.set("up","0")}
+    if(!S.lv)p.set("lv","0");
+    if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw);
+    for(var x in extra)p.set(x,extra[x]);return p.toString()}
+  function seg(id,v){$(id).querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===v)})}
+  function posTable(){
+    var t=$("posTable");t.innerHTML="<tr><th>Scene</th><th>Window</th><th>Position (x, y)</th><th>Size</th></tr>";
+    [["game","Gameplay"],["chat","Just Chatting"],["wait","Waiting"]].forEach(function(s){var c=Object.assign({k:s[0]},S.scr[s[0]]);if(s[0]==="game"){}
+      var L=layout({k:s[0],cp:c.cp,cs:c.cs,ib:c.ib,nt:c.nt,side:c.side});
+      [["cam","Camera"],["chat","Chat panel"]].forEach(function(w){var b=L[w[0]];if(!b)return;var r=document.createElement("tr");
+        [s[1],w[1],b[0]+", "+b[1],b[2]+" × "+b[3]].forEach(function(v){var td=document.createElement("td");td.textContent=v;r.appendChild(td)});t.appendChild(r)})});
+  }
+  function sync(){
+    ls("sn_cfg",JSON.stringify(S));
+    sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    seg("bgSeg",S.bg);seg("fmtSeg",S.f);seg("crSeg",S.cr);seg("cpSeg",S.scr.game.cp);seg("csSeg",S.scr.game.cs);seg("ibSeg",S.scr.game.ib);seg("chSeg",S.scr.chat.side);
+    $("cpSeg").parentNode.style.opacity=S.scr.game.cs==="off"?.45:1;
+    $("optNt").checked=!!S.scr.game.nt;$("optUp").checked=!!S.scr.wait.up;$("optLv").checked=!!S.lv;
+    ["game","chat","wait"].forEach(function(k){$("u-"+k).value=BASE+"#"+hash(k)});
+    posTable();
+    var pf=$("prevFrame"),h=hash(S.tab,{demo:"1"});
+    if(pf.dataset.on&&pf.contentWindow)pf.contentWindow.postMessage({snHash:h},"*");else{pf.src=BASE+"#"+h;pf.dataset.on=1}
+  }
+  $("heroFrame").src=BASE+"#ov=1&demo=1&sc=chat&g=4DA3FF&n=Your%20channel&tp=Just%20chatting%3A%20ask%20me%20anything&s="+enc([{p:"twitch",h:"yourname"},{p:"kick",h:"yourname"},{p:"tiktok",h:"yourname"}]);
+  $("host").value=S.h;$("port").value=S.p;
+  draw();fillTab();sync();
+}
+})();
+</script>
+</body>
+</html>
