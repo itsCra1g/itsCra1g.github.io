@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Multistream Guide: Twitch, Kick, YouTube and TikTok at once</title>
+<meta name="description" content="Free multistreaming guide by itsCRA1G: stream to Twitch, Kick, YouTube and TikTok at the same time from OBS, with an upload speed planner, each platform's rules, setup steps and fixes.">
+<meta property="og:title" content="Multistream Guide: Twitch, Kick, YouTube and TikTok">
+<meta property="og:description" content="Go live everywhere from OBS: upload planner, platform rules, setup and fixes. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --warn:#FFB020; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.65 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:2px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 9px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:12px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:980px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 30px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:15em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:46em}li{margin:4px 0}
+strong{color:var(--fg)}
+code,.k{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.path{font-weight:600;color:var(--fg)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;margin:16px 0;max-width:48em}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* quick start */
+.qs{list-style:none;padding:0;counter-reset:q;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;max-width:none}
+.qs li{counter-increment:q;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 16px 16px 58px;position:relative;margin:0}
+.qs li::before{content:counter(q);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:8px;background:var(--acc-soft);color:var(--acc);font:700 14px/28px var(--display);text-align:center}
+.qs b{display:block;color:var(--fg);font-weight:700;margin-bottom:2px}
+.qs span{font-size:14px}
+/* mic picker */
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:10px 14px;cursor:pointer;text-align:left}
+.seg button small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.mictips{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin-bottom:18px;max-width:none}
+.mictips p{margin:0 0 8px}.mictips ul{margin:0}
+.chain{display:flex;flex-direction:column;gap:10px}
+.flt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.flt.off{opacity:.55}
+.flt .n{width:44px;height:44px;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font:700 16px var(--display)}
+.flt.off .n{background:var(--tile2);color:var(--mute)}
+.flt h4{margin:0;font:700 17px var(--display);color:var(--fg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:700 11px var(--text);letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--acc-soft);color:var(--acc)}
+.tag.opt{background:rgba(255,176,32,.14);color:var(--warn)}.tag.skip{background:var(--tile2);color:var(--mute)}
+.flt p{margin:6px 0 0;font-size:15px}
+.vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vals span{font:13px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:8px;padding:4px 8px}
+.vals span i{font-style:normal;color:var(--mute)}
+/* gate helper */
+.helper{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin:16px 0;max-width:none}
+.helper label{font-weight:600;color:var(--fg);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.helper input{font:600 16px var(--mono);width:90px;color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px}
+.helper output{font:600 15px var(--text);color:var(--fg)}
+/* meter */
+.meter{max-width:760px;margin:10px 0 18px}
+.mrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;margin:8px 0}
+.mrow b{font-size:14px;color:var(--fg)}
+.mtrack{position:relative;height:22px;border-radius:6px;background:linear-gradient(90deg,#14301f 0 66.6%,#3a3412 66.6% 85%,#3a1717 85%)}
+.mfill{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+.mscale{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;font:12px var(--mono);color:var(--mute)}
+.mscale div{position:relative;height:16px}
+.mscale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0 14px;min-width:560px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td:first-child{color:var(--fg);font-weight:600;width:30%}
+.checks{list-style:none;padding:0}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks input{width:18px;height:18px;margin-top:4px;accent-color:var(--acc);flex:0 0 auto}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+
+<style>
+:root{--tw:#A970FF;--kk:#53FC18;--yt:#FF4E45;--tt:#25F4EE}
+.pick{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+.pick label{display:flex;align-items:center;gap:9px;font:600 15px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:10px 14px;cursor:pointer}
+.pick input{width:18px;height:18px;accent-color:var(--acc)}
+.pick label:has(input:checked){border-color:var(--acc);background:var(--acc-soft)}
+.dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+.planner{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;background:var(--tile);border:1px solid var(--edge);border-radius:18px;padding:18px;max-width:none}
+.planner .lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.planner select,.planner input[type=number]{font:600 15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:10px;padding:9px 10px;width:100%;max-width:280px}
+.plan{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--tile2);border:1px solid var(--edge);border-radius:12px;padding:10px 14px;font-size:15px}
+.prow b{color:var(--fg)}.prow small{display:block;color:var(--mute);font-size:13px}
+.prow .kb{font:600 14px var(--mono);color:var(--fg);white-space:nowrap}
+.verdict{border-radius:14px;padding:14px 16px;font-size:15px;border:1px solid}
+.verdict b{display:block;font:700 18px var(--display);margin-bottom:2px}
+.verdict.ok{border-color:rgba(61,220,151,.4);background:rgba(61,220,151,.08)}.verdict.ok b{color:var(--ok)}
+.verdict.tight{border-color:rgba(255,176,32,.4);background:rgba(255,176,32,.08)}.verdict.tight b{color:var(--warn)}
+.verdict.no{border-color:rgba(255,107,107,.45);background:rgba(255,107,107,.08)}.verdict.no b{color:var(--bad)}
+.pcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.pc{background:var(--tile);border:1px solid var(--edge);border-top:3px solid var(--c,var(--acc));border-radius:16px;padding:16px 18px;min-width:0}
+.pc h3{margin:0 0 6px;display:flex;align-items:center;gap:8px}
+.pc ol,.pc ul{padding-left:20px;margin:6px 0 0;font-size:15px}
+.pc p{font-size:15px;margin:8px 0 0}
+.rule{display:grid;grid-template-columns:110px minmax(0,1fr);gap:14px;padding:14px 0;border-bottom:1px solid var(--edge)}
+.rule:last-child{border:0}
+.rule .who{font:700 15px var(--display);color:var(--fg);display:flex;gap:8px;align-items:center}
+.rule ul{margin:0}
+@media (max-width:560px){.rule{grid-template-columns:1fr;gap:4px}}
+.hidden-pf{display:none!important}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Multistream Guide</a>
+  <nav><a href="#how">Which way</a><a href="#plan">Upload planner</a><a href="#rules">Rules</a><a href="#setup">Setup</a><a href="#vertical">TikTok</a><a href="#fixes">Fixes</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free guide · by itsCRA1G</div>
+  <h1>Go live on Twitch, Kick, YouTube and TikTok at once.</h1>
+  <p class="lead">Multistreaming puts you in front of more people from one stream. This guide covers the ways to do it from OBS, whether your internet can handle it, each platform's rules (some of which cost money if you get them wrong), the setup for each one, and fixes when it goes wrong.</p>
+  <div class="chips"><span class="chip">OBS Studio</span><span class="chip">Upload speed planner</span><span class="chip">Platform rules, checked Nov 2026</span><span class="chip">Vertical for TikTok</span></div>
+  <p style="margin-top:22px;margin-bottom:6px"><strong>Where do you want to go live?</strong> The rest of the page follows what you tick.</p>
+  <div class="pick" id="pfPick">
+    <label><input type="checkbox" value="tw" checked><span class="dot" style="background:var(--tw)"></span>Twitch</label>
+    <label><input type="checkbox" value="kk" checked><span class="dot" style="background:var(--kk)"></span>Kick</label>
+    <label><input type="checkbox" value="yt" checked><span class="dot" style="background:var(--yt)"></span>YouTube</label>
+    <label><input type="checkbox" value="tt" checked><span class="dot" style="background:var(--tt)"></span>TikTok</label>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <section id="how">
+    <div class="sec-head"><span class="num">1</span><h2>Three ways to do it</h2></div>
+    <div class="tw"><table>
+      <tr><th>Way</th><th>How it works</th><th>Good</th><th>Watch out for</th></tr>
+      <tr><td>OBS plugin</td><td>OBS sends a separate copy of your stream to each platform. Free plugins: <strong>Aitum Multistream</strong> or <strong>Multiple RTMP outputs</strong>.</td><td>Free, no extra delay, no branding, full control of each output.</td><td>Every platform adds a full stream to your upload. Needs decent internet.</td></tr>
+      <tr><td>Relay service</td><td>OBS sends one stream to a service like Restream, which copies it to every platform.</td><td>Only one stream leaves your house, so it suits slower internet.</td><td>Free plans are limited and branded; more platforms cost a monthly fee. Adds a little delay.</td></tr>
+      <tr><td>Streamlabs Dual Output</td><td>Streamlabs Desktop sends one landscape and one vertical stream.</td><td>Easy landscape + vertical in one app.</td><td>Only if you use Streamlabs instead of OBS; more platforms need its paid plan.</td></tr>
+    </table></div>
+    <div class="note"><p><strong>The usual setup:</strong> keep Twitch as OBS's main stream (Twitch's Enhanced Broadcasting and Dual Format only work on that main connection), then add the other platforms as plugin outputs. If your upload can't take it, switch to a relay.</p></div>
+  </section>
+
+  <section id="plan">
+    <div class="sec-head"><span class="num">2</span><h2>Can your internet take it?</h2></div>
+    <p>Run a speed test (search "speed test", use the <strong>upload</strong> number) on the PC you stream from, with a cable rather than Wi-Fi if you can. Then fill this in.</p>
+    <div class="planner">
+      <div><div class="lbl">Way</div><select id="way"><option value="plugin">OBS plugin</option><option value="relay">Relay service</option></select></div>
+      <div><div class="lbl">Landscape quality</div><select id="qual">
+        <option value="6000">1080p 60fps · 6,000 kbps</option><option value="6001">936p 60fps · 6,000 kbps</option><option value="4500">720p 60fps · 4,500 kbps</option><option value="3000">720p 30fps · 3,000 kbps</option><option value="7500">1080p 60fps · 7,500 kbps</option></select></div>
+      <div><div class="lbl">Vertical (TikTok) quality</div><select id="vq"><option value="4500">1080×1920 · 4,500 kbps</option><option value="3000">720×1280 · 3,000 kbps</option></select></div>
+      <div><div class="lbl">My upload speed</div><div style="display:flex;align-items:center;gap:8px"><input type="number" id="up" min="1" step="1" value="20" inputmode="decimal" style="max-width:120px"><span class="hint" style="margin:0">Mbps</span></div></div>
+    </div>
+    <div class="plan" id="planOut"></div>
+    <p class="hint" style="margin-top:12px">Rule of thumb: keep everything you send under about two-thirds of your upload, so the rest of the house and a busy moment don't drop frames.</p>
+  </section>
+
+  <section id="rules">
+    <div class="sec-head"><span class="num">3</span><h2>Each platform's rules</h2></div>
+    <div class="note warn"><p><strong>Checked 17 November 2026, and they do change.</strong> Have a quick look at each platform's own rules before you start, especially if you're a Twitch Partner, a Kick Partner, or have any kind of contract.</p></div>
+    <div id="ruleList">
+      <div class="rule" data-pf="tw"><div class="who"><span class="dot" style="background:var(--tw)"></span>Twitch</div><ul>
+        <li>Multistreaming is allowed for everyone.</li>
+        <li><strong>Twitch must look at least as good as anywhere else.</strong> Don't send YouTube or Kick a higher quality than Twitch. Sharing one encoder for every landscape output keeps this simple.</li>
+        <li><strong>Don't send Twitch viewers away to your other live streams:</strong> no "come watch on Kick/YouTube" links, banners, chat commands or QR codes while you're live. Saying you also stream elsewhere is fine. A socials rotation that shows your Kick or YouTube while you're live there is a grey area, so consider leaving those out.</li>
+        <li><strong>Combined chat on stream:</strong> Twitch's written rules still say not to show merged chat from other platforms on the Twitch stream. Twitch said early in 2026 it would stop enforcing that, but the rule hasn't been removed. Showing it is your call; Twitch-only chat on screen is the zero-risk option.</li>
+      </ul></div>
+      <div class="rule" data-pf="kk"><div class="who"><span class="dot" style="background:var(--kk)"></span>Kick</div><ul>
+        <li><strong>Kick Partners must switch on the Multistreaming toggle</strong> whenever they're also live on a landscape platform like Twitch or YouTube. It's in your dashboard while you're live, or type <code>/multi on</code> in chat. Not doing it can get your account actioned.</li>
+        <li>With the toggle on, Kick Partner Program earnings for that time are <strong>halved</strong>. Subscriptions aren't affected.</li>
+        <li>Vertical platforms such as TikTok don't count, so Kick + TikTok needs no toggle.</li>
+        <li>Changing category while live can reset the toggle, so check it after switching.</li>
+        <li>Not a Kick Partner? The toggle is described for partners only; check Kick's current rules for your account.</li>
+      </ul></div>
+      <div class="rule" data-pf="yt"><div class="who"><span class="dot" style="background:var(--yt)"></span>YouTube</div><ul>
+        <li>Multistreaming is allowed.</li>
+        <li>You need a verified channel with live streaming switched on. The first time, it can take up to 24 hours to be enabled, so do it well before your first stream.</li>
+        <li>Music: YouTube's Content ID is strict, and copyrighted music can block or mute the stream or VOD.</li>
+      </ul></div>
+      <div class="rule" data-pf="tt"><div class="who"><span class="dot" style="background:var(--tt)"></span>TikTok</div><ul>
+        <li><strong>Not everyone can stream to TikTok from OBS.</strong> A stream key generally needs 1,000+ followers, being 18 or over, a clean account and a region that has it. Some report TikTok also wanting mostly gaming content for key access.</li>
+        <li>The stream key changes: get a fresh one before every stream.</li>
+        <li>TikTok is vertical, so it needs its own 9:16 layout (section 5).</li>
+        <li>Only one TikTok LIVE at a time: going live from your phone ends the OBS stream.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="setup">
+    <div class="sec-head"><span class="num">4</span><h2>Setting it up in OBS</h2></div>
+    <h3>1. Install a plugin</h3>
+    <p>Close OBS first. Get <strong>Aitum Multistream</strong> (from Aitum's site, needs OBS 30 or later) or <strong>Multiple RTMP outputs</strong> (from the OBS forum's Resources section), run the installer, then open OBS. A new dock appears: if you can't see it, look under <span class="path">Docks</span>.</p>
+    <p>Only download plugins from their official pages, and keep them up to date: older versions of Multiple RTMP outputs could crash OBS when streaming started twice in quick succession.</p>
+    <h3>2. Set the main stream</h3>
+    <p><span class="path">Settings → Stream</span>: choose your main platform (normally Twitch) and connect your account or paste its key. This is what OBS's normal Start Streaming button sends.</p>
+    <h3>3. Add an output for each other platform</h3>
+    <p>In the plugin's dock, add a target for each platform, paste its server URL and stream key (below), and:</p>
+    <ul>
+      <li><strong>Share the encoder with the main stream</strong> where the plugin offers it. It saves a lot of GPU and CPU, and keeps every landscape platform at the same quality (which keeps Twitch's rule happy).</li>
+      <li><strong>Tick "start/stop with OBS streaming"</strong> (wording varies), so one press starts everything.</li>
+      <li>Pick the <strong>audio track</strong>: Track 1 is usually everything. If you use a Twitch VOD track to keep music off Twitch VODs, think about whether other platforms' VODs need the same.</li>
+    </ul>
+    <div class="pcards" id="pcards">
+      <div class="pc" data-pf="tw" style="--c:var(--tw)"><h3><span class="dot" style="background:var(--tw)"></span>Twitch</h3>
+        <ol><li>OBS <span class="path">Settings → Stream</span>, Service: Twitch.</li><li><span class="path">Connect Account</span> (easiest), or paste the key from Creator Dashboard <span class="path">Settings → Stream</span>.</li></ol>
+        <p>Keep Twitch as the main stream. Enhanced Broadcasting (and the vertical Dual Format for Twitch mobile viewers) only works there.</p></div>
+      <div class="pc" data-pf="kk" style="--c:var(--kk)"><h3><span class="dot" style="background:var(--kk)"></span>Kick</h3>
+        <ol><li>Kick Creator Dashboard → <span class="path">Settings → Stream URL &amp; Key</span>.</li><li>Copy the <strong>Stream URL</strong> (it starts <code>rtmps://</code>) into the server box and the <strong>Stream Key</strong> into the key box.</li></ol>
+        <p>Partners: switch on the Multistreaming toggle each time you're also live on Twitch or YouTube.</p></div>
+      <div class="pc" data-pf="yt" style="--c:var(--yt)"><h3><span class="dot" style="background:var(--yt)"></span>YouTube</h3>
+        <ol><li>YouTube Studio → <span class="path">Create → Go live</span> → <span class="path">Stream</span>.</li><li>Copy the <strong>Stream URL</strong> (<code>rtmp://a.rtmp.youtube.com/live2</code>) and <strong>Stream key</strong>.</li><li>Turn on <span class="path">Auto-start</span> and <span class="path">Auto-stop</span> so it goes live and ends with OBS.</li></ol>
+        <p>Set the title and thumbnail in Studio before going live, or use a tool that updates every platform's title at once.</p></div>
+      <div class="pc" data-pf="tt" style="--c:var(--tt)"><h3><span class="dot" style="background:var(--tt)"></span>TikTok</h3>
+        <ol><li>On a computer, open TikTok's LIVE Producer (<code>livecenter.tiktok.com/producer</code>, or <span class="path">Go LIVE</span> on tiktok.com).</li><li>Set the title and category, then copy the <strong>Server URL</strong> and <strong>Stream Key</strong>.</li><li>Paste them into your <strong>vertical</strong> output (section 5). Do this every stream: the key changes.</li></ol>
+        <p>No key yet? TikTok LIVE Studio works without one, but it's separate software, so it doesn't fit neatly alongside OBS.</p></div>
+    </div>
+    <h3>4. Going live</h3>
+    <ol>
+      <li>Kick Partners: be ready to switch on the Multistreaming toggle (or <code>/multi on</code>) as soon as you're live.</li>
+      <li>TikTok: paste the new key.</li>
+      <li>Press Start Streaming <strong>once</strong>, and give every output a few seconds to connect. Don't press it again, and don't have a Stream Deck key or Streamer.bot action send a second "start" at the same moment.</li>
+      <li>Check each platform is actually live (open each one on your phone).</li>
+    </ol>
+  </section>
+
+  <section id="vertical" data-pf="tt">
+    <div class="sec-head"><span class="num">5</span><h2>A vertical layout for TikTok</h2></div>
+    <p>TikTok is watched on phones held upright, so your landscape stream would be tiny with black bars. Give it its own 9:16 layout:</p>
+    <ol>
+      <li>Install <strong>Aitum Vertical</strong> (free, from Aitum). It adds a second, upright canvas inside OBS with its own scenes.</li>
+      <li>Set the vertical canvas to 1080×1920 (or 720×1280 if your PC or upload struggles).</li>
+      <li>Build vertical scenes: camera at the top, gameplay cropped to the action in the middle, chat or alerts at the bottom. You can reuse the same sources.</li>
+      <li>Send the vertical canvas to TikTok, using Aitum Vertical's own stream settings or as a vertical target in Aitum Multistream.</li>
+    </ol>
+    <div class="note"><p><strong>Extra load:</strong> the vertical layout is a second encode, so it adds GPU work and upload on top of your landscape outputs. The planner above includes it.</p></div>
+  </section>
+
+  <section id="together">
+    <div class="sec-head"><span class="num">6</span><h2>Chat, alerts and titles everywhere</h2></div>
+    <ul>
+      <li><strong>Read every chat in one place:</strong> Streamer.bot connects to Twitch, Kick and YouTube. This hub's <a href="../chat/">Combined Chat</a> shows Twitch and Kick together. TikTok chat needs a TikTok-specific tool. Mind Twitch's merged-chat rule if you put it on screen.</li>
+      <li><strong>Alerts from more than one platform:</strong> <a href="../alerts/">Alerts</a>, <a href="../activity/">Activity Feed</a>, <a href="../sub-goal/">Sub Goal</a> and <a href="../goals/">Goal Bars</a> here handle Twitch and Kick together.</li>
+      <li><strong>Talk to every chat:</strong> bots usually send to one platform at a time, so check yours replies on all of them. In Streamer.bot, Twitch and Kick need separate "send message" steps.</li>
+      <li><strong>Titles:</strong> set them everywhere before you go live. Some Streamer.bot add-ons update Twitch, Kick and YouTube titles in one go.</li>
+      <li><strong>Raids and shoutouts</strong> are per platform: a Twitch raid only moves Twitch viewers.</li>
+    </ul>
+  </section>
+
+  <section id="fixes">
+    <div class="sec-head"><span class="num">7</span><h2>When it goes wrong</h2></div>
+    <div class="tw"><table>
+      <tr><th>Problem</th><th>Usual cause and fix</th></tr>
+      <tr><td>One platform never goes live</td><td>Wrong or old stream key (TikTok's changes every stream), a typo in the server URL, or the output isn't set to start with OBS. Re-copy the key and URL; start that output by hand to test.</td></tr>
+      <tr><td>OBS crashes, or outputs drop, the moment you go live</td><td>Something told OBS to start streaming twice: a Stream Deck key plus a Streamer.bot action, or two presses. Keep one thing in charge of starting, and update the multistream plugin.</td></tr>
+      <tr><td>Dropped frames (network) on every platform</td><td>You're sending more than your upload can carry. Lower the bitrate, drop an output, use a cable instead of Wi-Fi, or switch to a relay.</td></tr>
+      <tr><td>Dropped frames on one platform only</td><td>The route to that platform's server is struggling. Try another server for it, or a lower bitrate just for that output.</td></tr>
+      <tr><td>"Encoding overloaded" or the stream stutters</td><td>Too many encodes. Share the main encoder with landscape outputs, use your graphics card's encoder (NVENC, AMF or QuickSync), and drop the vertical to 720×1280.</td></tr>
+      <tr><td>YouTube shows "waiting for stream"</td><td>Auto-start is off, or the key is from a different scheduled stream. Turn Auto-start on, or press Go Live in Studio.</td></tr>
+      <tr><td>Kick earnings lower than expected</td><td>The Multistreaming toggle halves Partner Program earnings while it's on. That's expected when you're also on Twitch or YouTube.</td></tr>
+      <tr><td>TikTok shows the landscape stream squashed or with black bars</td><td>The TikTok output is sending the main canvas. Point it at the vertical canvas instead.</td></tr>
+      <tr><td>Twitch looks worse than the others</td><td>Its output has a lower bitrate or resolution. Match them, ideally by sharing one encoder, since Twitch requires it to be at least as good.</td></tr>
+    </table></div>
+  </section>
+
+  <section id="check">
+    <div class="sec-head"><span class="num">8</span><h2>Before you go live</h2></div>
+    <p>Ticks are remembered on this device.</p>
+    <ul class="checks" id="checks">
+      <li><input type="checkbox" id="m1"><label for="m1">Upload speed checked against the planner</label></li>
+      <li><input type="checkbox" id="m2"><label for="m2">Twitch is the main OBS stream, at least as good quality as the rest</label></li>
+      <li data-pf="kk"><input type="checkbox" id="m3"><label for="m3">Kick: ready to switch on the Multistreaming toggle (if I'm a Partner and also on Twitch or YouTube)</label></li>
+      <li data-pf="yt"><input type="checkbox" id="m4"><label for="m4">YouTube: live streaming enabled, Auto-start on, title set</label></li>
+      <li data-pf="tt"><input type="checkbox" id="m5"><label for="m5">TikTok: fresh stream key pasted into the vertical output</label></li>
+      <li><input type="checkbox" id="m6"><label for="m6">Every output set to start with OBS, and only one thing presses "start"</label></li>
+      <li><input type="checkbox" id="m7"><label for="m7">Nothing on the Twitch stream tells viewers to go and watch elsewhere</label></li>
+      <li><input type="checkbox" id="m8"><label for="m8">Checked each platform is live on my phone</label></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Platform rules checked 17 November 2026; always check each platform's current rules. Not affiliated with OBS, Aitum, Restream, Streamlabs, Twitch, Kick, YouTube or TikTok.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var NAMES={tw:"Twitch",kk:"Kick",yt:"YouTube",tt:"TikTok"},COL={tw:"var(--tw)",kk:"var(--kk)",yt:"var(--yt)",tt:"var(--tt)"};
+var S={pf:["tw","kk","yt","tt"],way:"plugin",qual:"6000",vq:"4500",up:20,done:{}};
+try{var sv=JSON.parse(localStorage.getItem("ms_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+function save(){try{localStorage.setItem("ms_cfg",JSON.stringify(S))}catch(e){}}
+var AUDIO=160;
+function fmt(n){return n.toLocaleString("en-GB")}
+function render(){
+  document.querySelectorAll("#pfPick input").forEach(function(cb){cb.checked=S.pf.indexOf(cb.value)>=0});
+  document.querySelectorAll("[data-pf]").forEach(function(el){el.classList.toggle("hidden-pf",S.pf.indexOf(el.dataset.pf)<0)});
+  $("way").value=S.way;$("qual").value=S.qual;$("vq").value=S.vq;$("up").value=S.up;
+  var land=S.pf.filter(function(p){return p!=="tt"}),tt=S.pf.indexOf("tt")>=0,qb=parseInt(S.qual,10),vb=parseInt(S.vq,10);
+  if(qb===6001)qb=6000;
+  var rows=[],total=0;
+  if(land.length){
+    if(S.way==="relay"){rows.push(["Relay service","Copies it to "+land.map(function(p){return NAMES[p]}).join(", "),qb+AUDIO]);total+=qb+AUDIO}
+    else land.forEach(function(p){rows.push([NAMES[p],"Landscape stream",qb+AUDIO,p]);total+=qb+AUDIO});
+  }
+  if(tt){rows.push(["TikTok","Vertical stream"+(S.way==="relay"?" (sent from OBS unless your relay plan does vertical)":""),vb+AUDIO,"tt"]);total+=vb+AUDIO}
+  var o=$("planOut");o.innerHTML="";
+  if(!rows.length){o.innerHTML='<p class="hint">Tick at least one platform at the top of the page.</p>';return}
+  rows.forEach(function(r){var d=document.createElement("div");d.className="prow";
+    d.innerHTML='<div><b></b><small></small></div><span class="kb"></span>';
+    var b=d.querySelector("b");if(r[3]){var dot=document.createElement("span");dot.className="dot";dot.style.cssText="display:inline-block;margin-right:8px;background:"+COL[r[3]];b.appendChild(dot)}
+    b.appendChild(document.createTextNode(r[0]));d.querySelector("small").textContent=r[1];d.querySelector(".kb").textContent=fmt(r[2])+" kbps";o.appendChild(d)});
+  var mbps=total/1000,up=Math.max(0,parseFloat(S.up)||0),need=mbps*1.5,v=document.createElement("div");
+  var cls=up>=need?"ok":up>=mbps*1.2?"tight":"no";
+  v.className="verdict "+cls;
+  var head=cls==="ok"?"You're fine":cls==="tight"?"Tight: it may drop frames":"Too much for your upload";
+  var msg="You'd send "+mbps.toFixed(1)+" Mbps. With "+up+" Mbps upload, aim to send no more than about "+(up/1.5).toFixed(1)+" Mbps.";
+  if(cls!=="ok"){
+    var tips=[];
+    if(S.way==="plugin"&&land.length>1)tips.push("switch to a relay service (one landscape stream out)");
+    if(qb>4500)tips.push("drop landscape to 720p 60fps");
+    if(tt&&vb>3000)tips.push("drop the vertical to 720×1280");
+    if(S.pf.length>2)tips.push("leave a platform out");
+    if(tips.length)msg+=" Try: "+tips.join(", or ")+".";
+  }
+  v.innerHTML="<b></b><span></span>";v.querySelector("b").textContent=head;v.querySelector("span").textContent=msg;o.appendChild(v);
+  var enc=(land.length?1:0)+(tt?1:0);
+  if(enc>1){var n=document.createElement("p");n.className="hint";n.style.margin="4px 0 0";n.textContent="Your PC will be encoding twice (landscape and vertical). Use your graphics card's encoder and share it with every landscape output.";o.appendChild(n)}
+}
+document.querySelectorAll("#pfPick input").forEach(function(cb){cb.addEventListener("change",function(){
+  S.pf=Array.from(document.querySelectorAll("#pfPick input")).filter(function(x){return x.checked}).map(function(x){return x.value});save();render()})});
+$("way").addEventListener("change",function(){S.way=this.value;save();render()});
+$("qual").addEventListener("change",function(){S.qual=this.value;save();render()});
+$("vq").addEventListener("change",function(){S.vq=this.value;save();render()});
+$("up").addEventListener("input",function(){S.up=this.value;save();render()});
+document.querySelectorAll("#checks input").forEach(function(cb){cb.checked=!!S.done[cb.id];cb.addEventListener("change",function(){S.done[cb.id]=cb.checked;save()})});
+render();
+})();
+</script>
+</body>
+</html>
