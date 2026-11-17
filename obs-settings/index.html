@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OBS Settings Helper: the right stream settings for your PC and internet</title>
+<meta name="description" content="Free OBS settings helper by itsCRA1G: answer a few questions about your PC, internet and platform and get the encoder, bitrate, resolution and frame rate to use, with where to put each one in OBS.">
+<meta property="og:title" content="OBS Settings Helper">
+<meta property="og:description" content="Answer a few questions, get your OBS stream settings. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --warn:#FFB020; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.65 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:2px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 9px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:12px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:980px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 30px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:15em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:46em}li{margin:4px 0}
+strong{color:var(--fg)}
+code,.k{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.path{font-weight:600;color:var(--fg)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;margin:16px 0;max-width:48em}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* quick start */
+.qs{list-style:none;padding:0;counter-reset:q;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;max-width:none}
+.qs li{counter-increment:q;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 16px 16px 58px;position:relative;margin:0}
+.qs li::before{content:counter(q);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:8px;background:var(--acc-soft);color:var(--acc);font:700 14px/28px var(--display);text-align:center}
+.qs b{display:block;color:var(--fg);font-weight:700;margin-bottom:2px}
+.qs span{font-size:14px}
+/* mic picker */
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:10px 14px;cursor:pointer;text-align:left}
+.seg button small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.mictips{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin-bottom:18px;max-width:none}
+.mictips p{margin:0 0 8px}.mictips ul{margin:0}
+.chain{display:flex;flex-direction:column;gap:10px}
+.flt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.flt.off{opacity:.55}
+.flt .n{width:44px;height:44px;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font:700 16px var(--display)}
+.flt.off .n{background:var(--tile2);color:var(--mute)}
+.flt h4{margin:0;font:700 17px var(--display);color:var(--fg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:700 11px var(--text);letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--acc-soft);color:var(--acc)}
+.tag.opt{background:rgba(255,176,32,.14);color:var(--warn)}.tag.skip{background:var(--tile2);color:var(--mute)}
+.flt p{margin:6px 0 0;font-size:15px}
+.vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vals span{font:13px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:8px;padding:4px 8px}
+.vals span i{font-style:normal;color:var(--mute)}
+/* gate helper */
+.helper{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin:16px 0;max-width:none}
+.helper label{font-weight:600;color:var(--fg);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.helper input{font:600 16px var(--mono);width:90px;color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px}
+.helper output{font:600 15px var(--text);color:var(--fg)}
+/* meter */
+.meter{max-width:760px;margin:10px 0 18px}
+.mrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;margin:8px 0}
+.mrow b{font-size:14px;color:var(--fg)}
+.mtrack{position:relative;height:22px;border-radius:6px;background:linear-gradient(90deg,#14301f 0 66.6%,#3a3412 66.6% 85%,#3a1717 85%)}
+.mfill{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+.mscale{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;font:12px var(--mono);color:var(--mute)}
+.mscale div{position:relative;height:16px}
+.mscale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0 14px;min-width:560px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td:first-child{color:var(--fg);font-weight:600;width:30%}
+.checks{list-style:none;padding:0}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks input{width:18px;height:18px;margin-top:4px;accent-color:var(--acc);flex:0 0 auto}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+
+<style>
+.qs2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.q{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;min-width:0}
+.q .lbl{font:700 15px var(--display);color:var(--fg);margin-bottom:4px}
+.q .hint{font-size:13px;color:var(--mute);margin:0 0 10px}
+.q select,.q input[type=number]{font:600 15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:10px;padding:9px 10px;width:100%}
+.q .seg{margin:0}
+.q .seg button{padding:8px 12px}
+.res{display:flex;flex-direction:column;gap:14px;margin-top:6px}
+.hl{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.big{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:14px 16px}
+.big small{display:block;font:700 11px var(--text);letter-spacing:1.4px;text-transform:uppercase;color:var(--mute)}
+.big b{display:block;font:700 24px/1.2 var(--display);color:var(--fg);margin-top:4px}
+.big span{font-size:13px;color:var(--mute)}
+.screen{background:var(--tile);border:1px solid var(--edge);border-radius:16px;overflow:hidden}
+.screen h3{margin:0;padding:12px 16px;font:700 15px var(--display);background:var(--tile2);border-bottom:1px solid var(--edge);color:var(--fg)}
+.screen h3 span{font:500 13px var(--text);color:var(--mute);margin-left:8px}
+.kv{display:grid;grid-template-columns:minmax(140px,34%) minmax(0,1fr);border-bottom:1px solid var(--edge)}
+.kv:last-child{border:0}
+.kv div{padding:10px 16px;font-size:15px}
+.kv div:first-child{color:var(--mute)}
+.kv div:last-child{color:var(--fg);font-weight:600}
+.kv div:last-child small{display:block;font-weight:400;color:var(--mute);font-size:13px;margin-top:2px}
+@media (max-width:560px){.kv{grid-template-columns:1fr}.kv div:first-child{padding-bottom:0}.kv div:last-child{padding-top:2px}}
+.warns{display:flex;flex-direction:column;gap:8px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer}
+.btn:hover{background:#8CC4FF}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">OBS Settings Helper</a>
+  <nav><a href="#ask">Your setup</a><a href="#result">Your settings</a><a href="#why">What they mean</a><a href="#test">Test it</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free tool · by itsCRA1G</div>
+  <h1>The right OBS settings for your PC and internet.</h1>
+  <p class="lead">Answer a few questions and get the encoder, bitrate, resolution and frame rate to use, laid out the way OBS's settings screens are, so you can copy them straight in. Change an answer and the settings update.</p>
+  <div class="chips"><span class="chip">OBS Studio 30+</span><span class="chip">Twitch · Kick · YouTube · TikTok</span><span class="chip">NVIDIA · AMD · Intel · CPU</span><span class="chip">Limits checked Nov 2026</span></div>
+</div></div>
+
+<main class="wrap">
+  <section id="ask">
+    <div class="sec-head"><span class="num">1</span><h2>Your setup</h2></div>
+    <div class="qs2">
+      <div class="q"><div class="lbl">Where do you stream?</div><p class="hint">Your main platform: the one OBS's Start Streaming button sends to.</p>
+        <select id="pf"><option value="tw">Twitch</option><option value="kk">Kick</option><option value="yt">YouTube</option><option value="tt">TikTok (vertical)</option></select></div>
+      <div class="q" id="qEb"><div class="lbl">Twitch Enhanced Broadcasting?</div><p class="hint">A tick box in OBS <span class="path">Settings → Stream</span> when Twitch is chosen. Not sure? Pick Off.</p>
+        <div class="seg" id="eb"><button data-v="0">Off</button><button data-v="1">On</button></div></div>
+      <div class="q"><div class="lbl">How many platforms at once from this PC?</div><p class="hint">Count each one OBS sends a separate stream to. Using a relay service like Restream? Pick 1.</p>
+        <select id="n"><option value="1">Just 1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+      <div class="q"><div class="lbl">Your upload speed</div><p class="hint">Run a speed test on the streaming PC and use the <strong>upload</strong> number.</p>
+        <div style="display:flex;gap:8px;align-items:center"><input type="number" id="up" min="1" step="1" value="20" inputmode="decimal" style="max-width:120px"><span class="hint" style="margin:0">Mbps</span></div></div>
+      <div class="q"><div class="lbl">Connection</div><p class="hint">A cable is far steadier than Wi-Fi for streaming.</p>
+        <div class="seg" id="wifi"><button data-v="0">Cable</button><button data-v="1">Wi-Fi</button></div></div>
+      <div class="q"><div class="lbl">Graphics card</div><p class="hint">Not sure? On Windows, open Task Manager → Performance and look under GPU.</p>
+        <select id="gpu">
+          <option value="nv40">NVIDIA RTX 40 or 50 series</option>
+          <option value="nv20">NVIDIA RTX 20 or 30 series, or GTX 16 series</option>
+          <option value="nv10">NVIDIA GTX 10 series or older</option>
+          <option value="amd7">AMD Radeon RX 7000 or 9000 series</option>
+          <option value="amdold">AMD Radeon RX 6000 or older</option>
+          <option value="arc">Intel Arc</option>
+          <option value="igpu">Built-in graphics only (Intel or AMD)</option>
+          <option value="none">Don't know / none of these</option>
+        </select></div>
+      <div class="q"><div class="lbl">One PC or two?</div><p class="hint">Two means a separate streaming PC with a capture card.</p>
+        <div class="seg" id="pcs"><button data-v="1">One PC</button><button data-v="2">Two PCs</button></div></div>
+      <div class="q"><div class="lbl">What do you mostly stream?</div><p class="hint">Fast games need more frames and more bitrate to look clean.</p>
+        <div class="seg" id="mo"><button data-v="fast">Fast games</button><button data-v="mix">A mix</button><button data-v="slow">Slow games / chatting</button></div></div>
+      <div class="q"><div class="lbl">Your monitor</div><p class="hint">The resolution of the screen you game on.</p>
+        <select id="mon"><option value="1080">1920×1080 (1080p)</option><option value="1440">2560×1440 (1440p)</option><option value="2160">3840×2160 (4K)</option><option value="uw">3440×1440 (ultrawide)</option></select></div>
+    </div>
+  </section>
+
+  <section id="result">
+    <div class="sec-head"><span class="num">2</span><h2>Your settings</h2></div>
+    <div class="res" id="out"></div>
+  </section>
+
+  <section id="why">
+    <div class="sec-head"><span class="num">3</span><h2>What the settings mean</h2></div>
+    <div class="tw"><table>
+      <tr><th>Setting</th><th>What it does</th></tr>
+      <tr><td>Bitrate</td><td>How much data per second your stream uses. More looks better in busy scenes, but it has to fit your upload and the platform's limit. Constant bitrate (CBR) keeps it steady, which platforms want.</td></tr>
+      <tr><td>Resolution</td><td>How many pixels. More pixels need more bitrate to stay sharp, so at a fixed bitrate a slightly lower resolution often looks cleaner in fast games.</td></tr>
+      <tr><td>Frame rate (FPS)</td><td>Frames per second. 60 looks smooth for fast games; 30 halves the work and suits slow games and chatting.</td></tr>
+      <tr><td>Encoder</td><td>What squashes the video. Graphics card encoders (NVIDIA NVENC, AMD, Intel QuickSync) barely touch your game's performance. The CPU (x264) can look great but is heavy on one PC.</td></tr>
+      <tr><td>Preset</td><td>Quality versus effort. Slower presets look better but work the encoder harder. If OBS says "encoding overloaded", step one notch faster.</td></tr>
+      <tr><td>Keyframe interval</td><td>How often a full picture is sent. Platforms want every 2 seconds.</td></tr>
+      <tr><td>Base and output resolution</td><td>Base (canvas) is what you build your scenes on. Output is what's sent. OBS shrinks one to the other with the downscale filter.</td></tr>
+    </table></div>
+  </section>
+
+  <section id="test">
+    <div class="sec-head"><span class="num">4</span><h2>Test it before you go live</h2></div>
+    <ol>
+      <li>Put the settings in, then do a private test: Twitch's bandwidth test mode, an unlisted YouTube stream, or a short recording.</li>
+      <li>While it runs, watch the bottom-right of OBS. The square should stay green and "dropped frames" near 0%.</li>
+      <li>Check <span class="path">View → Stats</span> (or the Stats dock):
+        <ul><li><strong>Dropped frames (network):</strong> your internet can't keep up. Lower the bitrate.</li>
+        <li><strong>Skipped frames (encoding lag):</strong> the encoder can't keep up. Use a faster preset, or turn off Multipass.</li>
+        <li><strong>Missed frames (rendering lag):</strong> the graphics card is maxed out. Cap your game's frame rate, or lower the game's settings.</li></ul></li>
+      <li>Play your busiest game moment and watch it back. Blocky in fast action? Drop resolution a step before dropping frame rate.</li>
+    </ol>
+    <div class="note"><p><strong>Next steps:</strong> get your sound right with the <a href="../audio/">Mic &amp; Audio Guide</a>, and if you stream to more than one platform, the <a href="../multistream/">Multistream Guide</a> covers the rules and the setup.</p></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Platform limits checked November 2026; menu names are from OBS Studio 30 to 32 and can move between versions. Not affiliated with OBS, NVIDIA, AMD, Intel, Twitch, Kick, YouTube or TikTok.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var S={pf:"tw",eb:"0",n:"1",up:20,wifi:"0",gpu:"nv20",pcs:"1",mo:"fast",mon:"1080"};
+try{var sv=JSON.parse(localStorage.getItem("ob_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+function save(){try{localStorage.setItem("ob_cfg",JSON.stringify(S))}catch(e){}}
+var CAP={tw:6000,kk:8000,yt:12000,tt:6000},PNAME={tw:"Twitch",kk:"Kick",yt:"YouTube",tt:"TikTok"};
+function n(x){return Number(x).toLocaleString("en-GB")}
+function calc(){
+  var r={rows:{},warn:[],hl:[]},pf=S.pf,eb=pf==="tw"&&S.eb==="1",N=parseInt(S.n,10)||1,up=Math.max(0,parseFloat(S.up)||0),wifi=S.wifi==="1",two=S.pcs==="2",mo=S.mo,g=S.gpu;
+  var cap=eb?7500:CAP[pf];
+  var share=up*1000*(wifi?0.6:0.75)/N-160;
+  var br=Math.floor(Math.min(cap,share)/500)*500;
+  // resolution and fps
+  var vert=pf==="tt",res,fps;
+  if(vert){
+    if(br>=4500){res=[1080,1920]}else{res=[720,1280]}
+    fps=(mo==="slow"||br<3500)?30:60;
+  }else if(br>=6000){
+    fps=mo==="slow"?(br>=6000?60:30):60;
+    if(pf==="tw"&&!eb&&mo==="fast")res=[1664,936];else res=[1920,1080];
+    if(mo==="slow")fps=30;
+  }else if(br>=4500){
+    if(mo==="slow"){res=[1920,1080];fps=30}else{res=[1280,720];fps=60}
+  }else if(br>=3500){res=[1280,720];fps=mo==="slow"?30:60}
+  else if(br>=2500){res=[1280,720];fps=30}
+  else {res=[852,480];fps=30}
+  if(mo==="slow"&&br>=6000&&!vert){res=[1920,1080];fps=30}
+  if(br<2500)r.warn.push(["bad","Your upload is very low for streaming ("+up+" Mbps"+(N>1?" shared between "+N+" platforms":"")+"). This gives about "+n(Math.max(br,0))+" kbps. Expect a soft, low-resolution stream; streaming to fewer platforms, using a cable, or a better connection will help most."]);
+  if(br<1000)br=1000;
+  if(wifi)r.warn.push(["warn","Wi-Fi can drop out for a moment and cost you frames. The bitrate here is set lower to leave room; a cable lets you go higher."]);
+  // canvas
+  var base=S.mon==="1440"?[2560,1440]:S.mon==="2160"?[1920,1080]:S.mon==="uw"?[2560,1440]:[1920,1080];
+  if(vert)base=[1080,1920];
+  var baseNote=S.mon==="2160"?"Your monitor is 4K, but a 1080p canvas is far lighter on the graphics card. Fit your game capture to the screen (right-click → Transform → Fit to screen).":S.mon==="uw"?"Ultrawide games don't fit a normal 16:9 stream; a 2560×1440 canvas with the game cropped or fitted works best.":vert?"An upright canvas. If your main stream is landscape, use Aitum Vertical for this instead (see the Multistream Guide).":"The same as your monitor, so your game fills the canvas.";
+  var scale=!(base[0]===res[0]&&base[1]===res[1]);
+  // encoder
+  var enc={},strong=["nv40","nv20","amd7","arc"].indexOf(g)>=0;
+  if(g==="nv40"||g==="nv20"||g==="nv10"){
+    var preset=two?"P7: Slowest (Best Quality)":g==="nv40"?"P6: Slower (Better Quality)":g==="nv20"?"P5: Slow (Good Quality)":"P4: Medium (Default)";
+    enc={Encoder:["NVIDIA NVENC H.264",pf==="yt"&&g==="nv40"?"YouTube also takes NVIDIA NVENC AV1, which looks better at the same bitrate. H.264 is the safe choice.":"Twitch (without Enhanced Broadcasting) and Kick only take H.264."],
+      "Rate Control":["CBR"],Bitrate:[n(br)+" Kbps"],"Keyframe Interval":["2 s"],Preset:[preset,"If OBS says \"encoding overloaded\", go one step faster (lower P number)."],
+      Tuning:["High Quality"],Multipass:[g==="nv10"?"Disabled":"Two Passes (Quarter Resolution)"],Profile:["high"],"Look-ahead":["Off"],"Adaptive Quantization":["On","Called Psycho Visual Tuning in older OBS versions."],"B-Frames":["2"]};
+  }else if(g==="amd7"||g==="amdold"){
+    enc={Encoder:["AMD HW H.264 (AVC)",pf==="yt"&&g==="amd7"?"YouTube also takes AMD AV1 on RX 7000 and newer. H.264 is the safe choice.":""],"Rate Control":["CBR"],Bitrate:[n(br)+" Kbps"],"Keyframe Interval":["2 s"],
+      Preset:[two?"Quality":g==="amd7"?"Quality":"Balanced","If OBS says \"encoding overloaded\", switch to Balanced, then Speed."],Profile:["High"],"B-Frames":[g==="amd7"?"2":"0",g==="amd7"?"":"Older AMD cards can't do B-frames in H.264."]};
+  }else if(g==="arc"||g==="igpu"){
+    enc={Encoder:["QuickSync H.264",g==="igpu"?"Uses the graphics built into your processor. Fine for streaming, but keep resolution modest.":""],"Rate Control":["CBR"],Bitrate:[n(br)+" Kbps"],"Keyframe Interval":["2 s"],
+      "Target Usage":[g==="arc"?"TU3":"TU5","Lower TU numbers are better quality but more work. Go up a number if it struggles."],Profile:["high"],"B-Frames":[g==="arc"?"3":"2"]};
+    if(g==="igpu"&&!vert&&res[1]>720){res=[1280,720];r.warn.push(["warn","With built-in graphics, 720p is the safe limit while gaming on the same PC."])}
+    if(g==="igpu")scale=!(base[0]===res[0]&&base[1]===res[1]);
+  }else{
+    enc={Encoder:["x264","Uses your processor, not your graphics card. Check Task Manager → Performance → GPU: if you have one listed above, choose it instead."],"Rate Control":["CBR"],Bitrate:[n(br)+" Kbps"],"Keyframe Interval":["2 s"],
+      "CPU Usage Preset":[two?"medium":"veryfast",two?"On a dedicated streaming PC with a strong processor, try \"slow\".":"On one PC, faster presets leave room for your game."],Profile:["high"],Tune:["(None)"]};
+    if(!two&&!vert&&res[1]>720&&fps===60){res=[1280,720];r.warn.push(["warn","Encoding on the processor while gaming on the same PC is heavy, so this stays at 720p."]);scale=!(base[0]===res[0]&&base[1]===res[1])}
+  }
+  if(eb){
+    r.warn.push(["info","Enhanced Broadcasting is on, so OBS and Twitch choose the encoder settings themselves and the Output settings below are mostly greyed out. The video and audio settings still apply. Extra outputs from a multistream plugin may need their own encoder rather than sharing one."]);
+  }
+  r.hl=[["Resolution",res[0]+"×"+res[1],vert?"vertical":(res[1]+"p")],["Frame rate",fps+" fps",fps===60?"smooth for fast games":"lighter, fine for slow content"],["Bitrate",n(br)+" kbps",(eb?"Enhanced Broadcasting":PNAME[pf])+" limit "+n(cap)],["Encoder",enc.Encoder[0].replace(" (AVC)",""),strong||g==="igpu"?"graphics card":g==="nv10"||g==="amdold"?"older graphics card":"processor"]];
+  r.screens=[
+    ["Settings → Output","set Output Mode to Advanced, then the Streaming tab",enc],
+    ["Settings → Output → Audio","",{"Track 1 Audio Bitrate":["160"]}],
+    ["Settings → Video","",Object.assign({"Base (Canvas) Resolution":[base[0]+"×"+base[1],baseNote],"Output (Scaled) Resolution":[res[0]+"×"+res[1],res[0]===1664?"1664×936 isn't in the list: type it in. At Twitch's 6,000 kbps it stays clearer than 1080p in fast games.":""]},
+      scale?{"Downscale Filter":[strong?"Lanczos (Sharpened scaling, 36 samples)":"Bicubic (Sharpened scaling, 16 samples)",strong?"":"Lighter on older or built-in graphics."]}:{},
+      {"Common FPS Values":[String(fps)]})],
+    ["Settings → Audio","",{"Sample Rate":["48 kHz","Match it in Windows sound settings too. More in the Mic & Audio Guide."]}],
+    ["Settings → Advanced","",{"Color Format":["NV12 (8-bit, 4:2:0)"],"Color Space":["Rec. 709"],"Color Range":["Limited"],"Automatically Reconnect":["On","Retry Delay 2 s, Maximum Retries 25"],"Dynamically change bitrate to manage congestion":[wifi||up<10?"On":"Off","Drops the bitrate for a moment instead of dropping frames when the connection struggles."]}]
+  ];
+  if(N>1)r.warn.push(["info","Streaming to "+N+" platforms from this PC: each gets the bitrate above, and they all share your upload. Use the same encoder for every landscape output where your multistream plugin allows it."]);
+  if(pf==="tw"&&!eb&&mo==="fast"&&res[0]===1664)r.warn.push(["info","For fast games on Twitch, 1664×936 at 60 fps usually looks cleaner than 1080p at the same 6,000 kbps, because each pixel gets more of the bitrate. Prefer 1080p? It works too; just expect a little more blur in busy moments."]);
+  if(pf==="yt"&&br<9000&&share>=9000)r.warn.push(["info","YouTube can take more than this; it's limited by your upload."]);
+  if(pf==="kk")r.warn.push(["info","Kick only takes H.264, so stick with the H.264 encoder even if AV1 or HEVC is offered."]);
+  return r;
+}
+function render(){
+  ["pf","n","gpu","mon"].forEach(function(id){$(id).value=S[id]});$("up").value=S.up;
+  ["eb","wifi","pcs","mo"].forEach(function(id){$(id).querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S[id])})});
+  $("qEb").hidden=S.pf!=="tw";
+  var r=calc(),o=$("out");o.innerHTML="";
+  var hl=document.createElement("div");hl.className="hl";
+  r.hl.forEach(function(h){var d=document.createElement("div");d.className="big";d.innerHTML="<small></small><b></b><span></span>";d.children[0].textContent=h[0];d.children[1].textContent=h[1];d.children[2].textContent=h[2];hl.appendChild(d)});
+  o.appendChild(hl);
+  if(r.warn.length){var w=document.createElement("div");w.className="warns";r.warn.forEach(function(x){var d=document.createElement("div");d.className="note"+(x[0]==="info"?"":" warn");d.innerHTML="<p></p>";d.firstChild.textContent=x[1];if(x[0]==="bad")d.style.borderLeftColor="var(--bad)";w.appendChild(d)});o.appendChild(w)}
+  var txt=["OBS settings ("+PNAME[S.pf]+") from itscra1g.github.io/obs-settings",""];
+  r.screens.forEach(function(s){
+    var keys=Object.keys(s[2]).filter(function(k){return s[2][k]&&s[2][k][0]});if(!keys.length)return;
+    var box=document.createElement("div");box.className="screen";var h=document.createElement("h3");h.textContent=s[0];if(s[1]){var sp=document.createElement("span");sp.textContent=s[1];h.appendChild(sp)}box.appendChild(h);
+    txt.push(s[0]+(s[1]?" ("+s[1]+")":""));
+    keys.forEach(function(k){var v=s[2][k],row=document.createElement("div");row.className="kv";row.innerHTML="<div></div><div></div>";row.children[0].textContent=k;row.children[1].textContent=v[0];
+      if(v[1]){var sm=document.createElement("small");sm.textContent=v[1];row.children[1].appendChild(sm)}box.appendChild(row);txt.push("  "+k+": "+v[0])});
+    txt.push("");o.appendChild(box)});
+  var act=document.createElement("div");act.className="actions";var bt=document.createElement("button");bt.className="btn";bt.textContent="Copy these settings";
+  var msg=document.createElement("span");msg.className="hint";msg.style.margin="0";
+  bt.addEventListener("click",function(){var t=txt.join("\n");
+    function fallback(){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");msg.textContent="Copied."}catch(e){msg.textContent="Select and copy the settings above."}ta.remove()}
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){msg.textContent="Copied."},fallback);else fallback()});
+  act.appendChild(bt);act.appendChild(msg);o.appendChild(act);
+}
+["pf","n","gpu","mon"].forEach(function(id){$(id).addEventListener("change",function(){S[id]=this.value;save();render()})});
+$("up").addEventListener("input",function(){S.up=this.value;save();render()});
+["eb","wifi","pcs","mo"].forEach(function(id){$(id).addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S[id]=b.dataset.v;save();render()})});
+render();
+})();
+</script>
+</body>
+</html>
