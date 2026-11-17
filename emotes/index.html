@@ -76,6 +76,7 @@ code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px so
 .ihead .src{font-size:13px;color:var(--mute)}
 .ihead .rm{margin-left:auto}
 .warn{font-size:13px;color:#FFB020;width:100%}
+.busy{margin:0 0 10px;color:var(--acc)}
 .outs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
 .out{background:var(--tile2);border:1px solid var(--edge);border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;min-width:0}
 .out .pv{width:120px;height:120px;display:grid;place-items:center;border-radius:8px;background:repeating-conic-gradient(#1b1f27 0 25%,#13161c 0 50%) 0 0/16px 16px}
@@ -116,14 +117,14 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
 <div class="wrap"><div class="hero">
   <div class="eyebrow">Free tool · by itsCRA1G</div>
   <h1>Every emote and badge size, from one image.</h1>
-  <p class="lead">Drop in your artwork and get the exact sizes Twitch, Kick and Discord ask for, squared up, named and ready to upload. It all happens in your browser, so your images never leave your computer.</p>
-  <div class="chips"><span class="chip">Twitch emotes and badges</span><span class="chip">Kick emotes and badges</span><span class="chip">Discord emoji</span><span class="chip">Several at once</span><span class="chip">Download as a zip</span></div>
+  <p class="lead">Drop in your artwork, still or animated, and get the exact sizes Twitch, Kick and Discord ask for, squared up, named and ready to upload. It all happens in your browser, so your images never leave your computer.</p>
+  <div class="chips"><span class="chip">Twitch emotes and badges</span><span class="chip">Kick emotes and badges</span><span class="chip">Discord emoji</span><span class="chip">Animated GIFs</span><span class="chip">Several at once</span><span class="chip">Download as a zip</span></div>
 </div></div>
 
 <main class="wrap">
   <section id="resize">
     <div class="sec-head"><span class="num">1</span><h2>Drop in your images</h2></div>
-    <label class="drop" id="drop"><b>Drop images here, or click to choose</b><span>PNG, JPG, WebP or GIF · several at once is fine · a big, square, transparent PNG works best</span><input type="file" id="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple></label>
+    <label class="drop" id="drop"><b>Drop images here, or click to choose</b><span>PNG, JPG, WebP or GIF (animated GIFs stay animated) · several at once is fine · a big, square, see-through image works best</span><input type="file" id="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple></label>
     <div class="opts">
       <div><div class="lbl">Make for</div>
         <div class="tog" id="targets">
@@ -150,11 +151,11 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
     <div class="sec-head"><span class="num">2</span><h2>What each platform wants</h2></div>
     <div class="tw"><table>
       <tr><th>What</th><th>Sizes (pixels, square)</th><th>File</th><th>Notes</th></tr>
-      <tr><td><strong>Twitch emote</strong></td><td>112, 56 and 28</td><td>PNG, 1 MB max</td><td>Upload all three in Creator Dashboard → Viewer Rewards → Emotes. The 112 one also works for a channel points reward icon.</td></tr>
-      <tr><td><strong>Twitch sub / bits badge</strong></td><td>72, 36 and 18</td><td>PNG</td><td>Viewer Rewards → Badges. Keep them bold and simple: 18 pixels is tiny.</td></tr>
-      <tr><td><strong>Kick emote</strong></td><td>500</td><td>PNG (or GIF), under 1 MB</td><td>One square file; Kick makes the smaller sizes itself.</td></tr>
+      <tr><td><strong>Twitch emote</strong></td><td>112, 56 and 28</td><td>PNG, or GIF if animated (60 frames max); 1 MB max</td><td>Upload all three in Creator Dashboard → Viewer Rewards → Emotes. The 112 one also works for a channel points reward icon.</td></tr>
+      <tr><td><strong>Twitch sub / bits badge</strong></td><td>72, 36 and 18</td><td>PNG (badges can't be animated)</td><td>Viewer Rewards → Badges. Keep them bold and simple: 18 pixels is tiny.</td></tr>
+      <tr><td><strong>Kick emote</strong></td><td>500</td><td>PNG, or GIF if animated; under 1 MB</td><td>One square file; Kick makes the smaller sizes itself.</td></tr>
       <tr><td><strong>Kick sub badge</strong></td><td>72</td><td>PNG with a see-through background</td><td>Kick doesn't publish a badge size, so this makes a sharp square one; if the upload page asks for something else, go with that.</td></tr>
-      <tr><td><strong>Discord emoji</strong></td><td>128</td><td>PNG, 256 KB max</td><td>Server Settings → Emoji.</td></tr>
+      <tr><td><strong>Discord emoji</strong></td><td>128</td><td>PNG, or GIF if animated; 256 KB max</td><td>Server Settings → Emoji.</td></tr>
     </table></div>
     <p class="hint">Sizes checked November 2026. Platforms change things now and then, so if an upload page says something different, follow it.</p>
   </section>
@@ -164,7 +165,7 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
     <p><strong>Start big.</strong> Draw or export at 500 pixels or more and let this shrink it. Making a small image bigger always looks blurry.</p>
     <p><strong>Think 28 pixels.</strong> That's how big an emote is in chat. Thick outlines, one clear expression or object and few small details survive; fine text and thin lines don't.</p>
     <p><strong>Use a see-through background.</strong> Emotes sit on dark and light chat themes, so check both previews above.</p>
-    <p><strong>Animated GIFs:</strong> this tool uses the first frame, so it's best for static emotes and badges. For animated ones, resize the GIF in your editor and keep it under 1 MB.</p>
+    <p><strong>Animated GIFs</strong> come out animated for emotes and as a still first frame for badges. If a size goes over its limit, the tool cuts colours first, then frames, until it fits; Twitch also gets cut to 60 frames. GIFs have no soft edges, so outlines on see-through backgrounds look best kept bold. Short loops with fewer colours give the cleanest results.</p>
   </section>
 </main>
 
@@ -179,22 +180,31 @@ var TARGETS={twe:["Twitch emote","twitch-emote",[112,56,28],1048576],twb:["Twitc
   kke:["Kick emote","kick-emote",[500],1048576],kkb:["Kick badge","kick-badge",[72],1048576],dce:["Discord emoji","discord-emoji",[128],262144]};
 var S={fit:"fit",trim:true,sharp:true,on:["twe","kke"]};
 try{var sv=JSON.parse(localStorage.getItem("em_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
-var items=[];   // {id,name,img,el,outs:{key:[{size,blob,url}]}}
+var items=[];   // {id,name,src,el,gen,outs:{key:[{size,blob,url}]}}
 var nid=0;
 
 /* ---------- image work ---------- */
-function loadImg(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),i=new Image();i.onload=function(){res(i)};i.onerror=function(){URL.revokeObjectURL(u);rej(new Error("Couldn't read that image"))};i.src=u})}
+var ANIM={twe:1,kke:1,dce:1};   // these can be animated; badges stay still
 function canvasOf(w,h){var c=document.createElement("canvas");c.width=w;c.height=h;return c}
-// the box around anything that isn't see-through
+function loadImg(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),i=new Image();i.onload=function(){res(i)};i.onerror=function(){URL.revokeObjectURL(u);rej(new Error("Couldn't read that image"))};i.src=u})}
+async function loadFile(f){
+  if(f.type==="image/gif"){var g=null;try{g=parseGif(await f.arrayBuffer())}catch(e){g=null}if(g&&g.frames.length>1)return g}
+  var img=await loadImg(f),c=canvasOf(img.naturalWidth,img.naturalHeight);c.getContext("2d").drawImage(img,0,0);
+  return {w:c.width,h:c.height,frames:[c],delays:[0]};
+}
 function trimBox(c){
   var w=c.width,h=c.height,d=c.getContext("2d").getImageData(0,0,w,h).data,x0=w,y0=h,x1=-1,y1=-1;
   for(var y=0;y<h;y++)for(var x=0;x<w;x++)if(d[(y*w+x)*4+3]>8){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
   return x1<0?null:{x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};
 }
-function square(img){
-  var c=canvasOf(img.naturalWidth,img.naturalHeight);c.getContext("2d").drawImage(img,0,0);
-  var b={x:0,y:0,w:c.width,h:c.height};
-  if(S.trim){var t=trimBox(c);if(t)b=t}
+// one box for every frame, so an animation doesn't jump about
+function unionBox(cs){
+  var W=cs[0].width,H=cs[0].height,full={x:0,y:0,w:W,h:H};if(!S.trim)return full;
+  var x0=W,y0=H,x1=-1,y1=-1;
+  cs.forEach(function(c){var t=trimBox(c);if(t){x0=Math.min(x0,t.x);y0=Math.min(y0,t.y);x1=Math.max(x1,t.x+t.w-1);y1=Math.max(y1,t.y+t.h-1)}});
+  return x1<0?full:{x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};
+}
+function square(c,b){
   var side=S.fit==="fit"?Math.max(b.w,b.h):Math.min(b.w,b.h);
   var sq=canvasOf(side,side),x=sq.getContext("2d");
   if(S.fit==="fit")x.drawImage(c,b.x,b.y,b.w,b.h,Math.round((side-b.w)/2),Math.round((side-b.h)/2),b.w,b.h);
@@ -216,34 +226,173 @@ function sharpen(c,amt){
   im.data.set(o);x.putImageData(im,0,0);
 }
 function toBlob(c){return new Promise(function(r){c.toBlob(function(b){r(b)},"image/png")})}
+function tick(){return new Promise(function(r){setTimeout(r,0)})}
 function kb(n){return n<1024?n+" B":n<1048576?(n/1024).toFixed(n<10240?1:0)+" KB":(n/1048576).toFixed(2)+" MB"}
 function slug(n){return String(n||"emote").replace(/\.[a-z0-9]+$/i,"").replace(/[^A-Za-z0-9_-]+/g,"_").replace(/^_+|_+$/g,"").slice(0,40)||"emote"}
 
+/* ---------- reading animated GIFs ---------- */
+function parseGif(buf){
+  var b=new Uint8Array(buf),p=0;
+  if(b[0]!==71||b[1]!==73||b[2]!==70)throw new Error("not a GIF");
+  function u8(){return b[p++]}function u16(){var v=b[p]|(b[p+1]<<8);p+=2;return v}
+  p=6;var W=u16(),H=u16(),f=u8();p+=2;
+  var gct=null;if(f&128){var n=1<<((f&7)+1);gct=b.subarray(p,p+n*3);p+=n*3}
+  var cur=new Uint8ClampedArray(W*H*4),frames=[],delays=[],gce={d:0,disp:0,ti:-1},cut=false;
+  while(p<b.length){
+    var c=u8();
+    if(c===0x21){var l=u8();
+      if(l===0xF9){u8();var pf=u8(),d=u16(),ti=u8();u8();gce={d:d,disp:(pf>>2)&7,ti:(pf&1)?ti:-1}}
+      else{for(var s;(s=u8());)p+=s}
+    }else if(c===0x2C){
+      var fx=u16(),fy=u16(),fw=u16(),fh=u16(),ff=u8(),ct=gct;
+      if(ff&128){var ln=1<<((ff&7)+1);ct=b.subarray(p,p+ln*3);p+=ln*3}
+      var mcs=u8(),parts=[],tot=0;for(var s2;(s2=u8());){parts.push(b.subarray(p,p+s2));tot+=s2;p+=s2}
+      var data=new Uint8Array(tot),o=0;parts.forEach(function(x){data.set(x,o);o+=x.length});
+      var idx=lzwDec(mcs,data,fw*fh),rows=[];
+      if(ff&64){[[0,8],[4,8],[2,4],[1,2]].forEach(function(q){for(var r=q[0];r<fh;r+=q[1])rows.push(r)})}else for(var r=0;r<fh;r++)rows.push(r);
+      var save=gce.disp===3?cur.slice():null;
+      if(ct)for(var i=0;i<fh;i++){var yy=fy+rows[i];if(yy>=H)continue;
+        for(var j=0;j<fw;j++){var xx=fx+j;if(xx>=W)continue;var k=idx[i*fw+j];if(k===gce.ti||k*3>=ct.length)continue;
+          var q2=(yy*W+xx)*4;cur[q2]=ct[k*3];cur[q2+1]=ct[k*3+1];cur[q2+2]=ct[k*3+2];cur[q2+3]=255}}
+      var cv=canvasOf(W,H);cv.getContext("2d").putImageData(new ImageData(cur.slice(),W,H),0,0);
+      frames.push(cv);delays.push(gce.d<=1?100:gce.d*10);
+      if(gce.disp===2){for(var y2=fy;y2<Math.min(H,fy+fh);y2++)cur.fill(0,(y2*W+fx)*4,(y2*W+Math.min(W,fx+fw))*4)}
+      else if(save)cur=save;
+      gce={d:0,disp:0,ti:-1};
+      if(frames.length>=300||(frames.length+1)*W*H*4>400e6){cut=true;break}
+    }else break;
+  }
+  return {w:W,h:H,frames:frames,delays:delays,cut:cut};
+}
+function lzwDec(min,data,n){
+  var out=new Uint8Array(n),clear=1<<min,eoi=clear+1,size=min+1,mask=(1<<size)-1,next=eoi+1,old=-1,first=0;
+  var prefix=new Int16Array(4096),suffix=new Uint8Array(4096),stack=new Uint8Array(4097);
+  for(var i=0;i<clear;i++){prefix[i]=-1;suffix[i]=i}
+  var bits=0,datum=0,pi=0,op=0;
+  while(op<n){
+    while(bits<size){if(pi>=data.length)return out;datum|=data[pi++]<<bits;bits+=8}
+    var code=datum&mask;datum>>>=size;bits-=size;
+    if(code===clear){size=min+1;mask=(1<<size)-1;next=eoi+1;old=-1;continue}
+    if(code===eoi)break;
+    if(old<0){out[op++]=suffix[code];old=first=code;continue}
+    var inCode=code,sp=0;
+    if(code>=next){stack[sp++]=first;code=old}
+    while(code>=clear){stack[sp++]=suffix[code];code=prefix[code]}
+    first=suffix[code];stack[sp++]=first;
+    while(sp&&op<n)out[op++]=stack[--sp];
+    if(next<4096){prefix[next]=old;suffix[next]=first;next++;if((next&mask)===0&&next<4096){size++;mask+=next}}
+    old=inCode;
+  }
+  return out;
+}
+
+/* ---------- writing animated GIFs ---------- */
+function palette(px,k){
+  var total=0;px.forEach(function(d){total+=d.length/4});
+  var step=Math.max(1,Math.floor(total/120000)),s=[],cnt=0;
+  px.forEach(function(d){for(var i=0;i<d.length;i+=4){if((cnt++)%step)continue;if(d[i+3]<128)continue;s.push((d[i]<<16)|(d[i+1]<<8)|d[i+2])}});
+  if(!s.length)return [[0,0,0]];
+  function rng(b){var lo=[255,255,255],hi=[0,0,0];for(var i=0;i<b.length;i++){var v=b[i],c=[v>>16&255,v>>8&255,v&255];for(var j=0;j<3;j++){if(c[j]<lo[j])lo[j]=c[j];if(c[j]>hi[j])hi[j]=c[j]}}
+    var r=[hi[0]-lo[0],hi[1]-lo[1],hi[2]-lo[2]],ch=r[0]>=r[1]&&r[0]>=r[2]?0:r[1]>=r[2]?1:2;return {r:r[ch],ch:ch}}
+  var boxes=[{b:s,m:rng(s)}];
+  while(boxes.length<k){
+    var bi=-1,best=0;
+    boxes.forEach(function(x,i){var sc=x.m.r*x.b.length;if(x.b.length>1&&sc>best){best=sc;bi=i}});
+    if(bi<0)break;
+    var bx=boxes[bi],sh=16-8*bx.m.ch;bx.b.sort(function(a,c){return ((a>>sh)&255)-((c>>sh)&255)});
+    var mid=bx.b.length>>1,a=bx.b.slice(0,mid),c2=bx.b.slice(mid);
+    boxes.splice(bi,1,{b:a,m:rng(a)},{b:c2,m:rng(c2)});
+  }
+  return boxes.map(function(x){var r=0,g=0,bb=0;x.b.forEach(function(v){r+=v>>16&255;g+=v>>8&255;bb+=v&255});var n=x.b.length;return [Math.round(r/n),Math.round(g/n),Math.round(bb/n)]});
+}
+function lzwEnc(idx,min,out){
+  var clear=1<<min,eoi=clear+1,size=min+1,next=eoi+1,dict=new Map(),cur=0,bits=0,block=[];
+  function flushBlock(){if(block.length){out.push(block.length);for(var i=0;i<block.length;i++)out.push(block[i]);block=[]}}
+  function emit(code){cur|=code<<bits;bits+=size;while(bits>=8){block.push(cur&255);cur>>>=8;bits-=8;if(block.length===255)flushBlock()}}
+  emit(clear);var prefix=idx[0];
+  for(var i=1;i<idx.length;i++){
+    var k=idx[i],key=(prefix<<8)|k,v=dict.get(key);
+    if(v!==undefined){prefix=v;continue}
+    emit(prefix);
+    if(next===4096){emit(clear);dict.clear();next=eoi+1;size=min+1}
+    else{if(next>=(1<<size))size++;dict.set(key,next++)}
+    prefix=k;
+  }
+  emit(prefix);emit(eoi);if(bits>0)block.push(cur&255);flushBlock();out.push(0);
+}
+function encodeGif(px,size,delays,nc){
+  var pal=palette(px,nc-1),bz=1;while((1<<bz)<pal.length+1)bz++;
+  var o=[];function u16(v){o.push(v&255,(v>>8)&255)}function str(t){for(var i=0;i<t.length;i++)o.push(t.charCodeAt(i))}
+  str("GIF89a");u16(size);u16(size);o.push(0xF0|(bz-1),0,0);
+  o.push(0,0,0);for(var i=0;i<(1<<bz)-1;i++){var c=pal[i]||[0,0,0];o.push(c[0],c[1],c[2])}
+  o.push(0x21,0xFF,0x0B);str("NETSCAPE2.0");o.push(3,1,0,0,0);
+  var cache=new Int16Array(262144).fill(-1),mcs=Math.max(2,bz);
+  for(var f=0;f<px.length;f++){
+    var d=px[f],idx=new Uint8Array(size*size);
+    for(var p=0;p<idx.length;p++){var q=p*4;if(d[q+3]<128)continue;
+      var key=((d[q]>>2)<<12)|((d[q+1]>>2)<<6)|(d[q+2]>>2),v=cache[key];
+      if(v<0){var bd=1e9;for(var j=0;j<pal.length;j++){var dr=pal[j][0]-d[q],dg=pal[j][1]-d[q+1],db=pal[j][2]-d[q+2],dd=dr*dr+dg*dg+db*db;if(dd<bd){bd=dd;v=j+1}}cache[key]=v}
+      idx[p]=v}
+    o.push(0x21,0xF9,4,(2<<2)|1);u16(Math.max(2,Math.round(delays[f]/10)));o.push(0,0);
+    o.push(0x2C);u16(0);u16(0);u16(size);u16(size);o.push(0,mcs);lzwEnc(idx,mcs,o);
+  }
+  o.push(0x3B);return new Blob([new Uint8Array(o)],{type:"image/gif"});
+}
+function decimate(f,d,max){var step=Math.ceil(f.length/max),nf=[],nd=[];for(var i=0;i<f.length;i+=step){nf.push(f[i]);var s=0;for(var j=i;j<Math.min(i+step,f.length);j++)s+=d[j];nd.push(s)}return {f:nf,d:nd}}
+// make one animated size, cutting colours then frames until it fits the limit
+async function makeGif(sq,delays,size,limit,maxFrames,stale){
+  var px=[];for(var i=0;i<sq.length;i++){px.push(shrink(sq[i],size).getContext("2d").getImageData(0,0,size,size).data);if(i%6===5){await tick();if(stale())throw "stale"}}
+  var dl=delays.slice(),notes=[],start=px.length;
+  if(maxFrames&&px.length>maxFrames){var m=decimate(px,dl,maxFrames);px=m.f;dl=m.d}
+  var blob,cols=256;
+  for(;;){
+    for(var t=0;t<3;t++){cols=[256,128,64][t];blob=encodeGif(px,size,dl,cols);await tick();if(stale())throw "stale";if(blob.size<=limit)break}
+    if(blob.size<=limit||px.length<=2)break;
+    var h=decimate(px,dl,Math.ceil(px.length/2));px=h.f;dl=h.d;
+  }
+  if(px.length<start)notes.push("cut from "+start+" to "+px.length+" frames");
+  if(cols<256)notes.push(cols+" colours");
+  return {blob:blob,frames:px.length,notes:notes};
+}
+
 /* ---------- building each image's results ---------- */
+function revoke(it){Object.keys(it.outs).forEach(function(k){it.outs[k].forEach(function(o){URL.revokeObjectURL(o.url)})});it.outs={}}
 async function build(it){
-  Object.keys(it.outs).forEach(function(k){it.outs[k].forEach(function(o){URL.revokeObjectURL(o.url)})});
-  it.outs={};
-  var sq=square(it.img),box=it.el.querySelector(".body");box.innerHTML="";
-  var warn=it.el.querySelector(".warn");
-  var small=Math.min(it.img.naturalWidth,it.img.naturalHeight);
-  warn.textContent=sq.width<112?"This image is small ("+sq.width+" pixels once squared). The bigger sizes will look soft: start from 500 pixels or more if you can.":
-    (S.on.indexOf("kke")>=0&&sq.width<500?"Kick wants 500 pixels; this image is "+sq.width+" once squared, so the Kick emote is stretched up and may look soft.":"");
-  warn.hidden=!warn.textContent;
+  var g=++it.gen,stale=function(){return g!==it.gen};
+  revoke(it);
+  var src=it.src,anim=src.frames.length>1,b=unionBox(src.frames),sq=src.frames.map(function(c){return square(c,b)}),side=sq[0].width;
+  var box=it.el.querySelector(".body");box.innerHTML="";
+  var warn=it.el.querySelector(".warn"),msgs=[];
+  if(side<112)msgs.push("This image is small ("+side+" pixels once squared). The bigger sizes will look soft: start from 500 pixels or more if you can.");
+  else if(S.on.indexOf("kke")>=0&&side<500)msgs.push("Kick wants 500 pixels; this image is "+side+" once squared, so the Kick emote is stretched up and may look soft.");
+  if(src.cut)msgs.push("This GIF is very long, so only the first "+src.frames.length+" frames were used.");
+  warn.textContent=msgs.join(" ");warn.hidden=!msgs.length;
+  var busy=null;
+  if(anim&&S.on.some(function(k){return ANIM[k]})){busy=document.createElement("div");busy.className="hint busy";busy.textContent="Making the animated versions… big GIFs can take a few seconds.";box.appendChild(busy)}
+  try{
   for(var t=0;t<S.on.length;t++){
-    var key=S.on[t],T=TARGETS[key];
-    box.appendChild(Object.assign(document.createElement("div"),{className:"grp",textContent:T[0]}));
+    var key=S.on[t],T=TARGETS[key],moving=anim&&ANIM[key];
+    var gl=document.createElement("div");gl.className="grp";gl.textContent=T[0]+(anim?(moving?" · animated GIF":" · still PNG (badges can't move)"):"");box.appendChild(gl);
     var row=document.createElement("div");row.className="outs";box.appendChild(row);it.outs[key]=[];
     for(var s=0;s<T[2].length;s++){
-      var size=T[2][s],c=shrink(sq,size),b=await toBlob(c),url=URL.createObjectURL(b),file=it.name+"_"+T[1]+"_"+size+".png";
-      it.outs[key].push({size:size,blob:b,url:url,file:file});
+      var size=T[2][s],bl,extra="";
+      if(moving){var r=await makeGif(sq,src.delays,size,T[3],key==="twe"?60:0,stale);bl=r.blob;extra=r.frames+" frames"+(r.notes.length?" · "+r.notes.join(", "):"")}
+      else{bl=await toBlob(shrink(sq[0],size))}
+      if(stale())return;
+      var url=URL.createObjectURL(bl),file=it.name+"_"+T[1]+"_"+size+(moving?".gif":".png");
+      it.outs[key].push({size:size,blob:bl,url:url,file:file,moving:moving});
       var cell=document.createElement("div");cell.className="out";
       var pv=document.createElement("div");pv.className="pv"+(size>112?" big":"");var im=document.createElement("img");im.src=url;im.alt=T[0]+" "+size;if(size<=112){im.width=size;im.height=size}pv.appendChild(im);
       var nm=document.createElement("b");nm.textContent=size+" × "+size;
-      var sz=document.createElement("small");var okSize=b.size<=T[3];sz.className=okSize?"ok":"bad";sz.textContent=kb(b.size)+(okSize?" · fits":" · too big for "+kb(T[3]));
+      var sz=document.createElement("small");var okSize=bl.size<=T[3];sz.className=okSize?"ok":"bad";sz.textContent=kb(bl.size)+(okSize?" · fits":" · too big for "+kb(T[3]));
       var a=document.createElement("a");a.href=url;a.download=file;a.textContent="Download";
-      cell.appendChild(pv);cell.appendChild(nm);cell.appendChild(sz);cell.appendChild(a);row.appendChild(cell);
+      cell.appendChild(pv);cell.appendChild(nm);cell.appendChild(sz);
+      if(extra){var ex=document.createElement("small");ex.textContent=extra;cell.appendChild(ex)}
+      cell.appendChild(a);row.appendChild(cell);
     }
   }
+  }catch(e){if(e==="stale")return;throw e}
+  if(busy)busy.remove();
   previews(it);
 }
 function previews(it){
@@ -261,26 +410,26 @@ function previews(it){
     c.appendChild(line);p.appendChild(c);
   });
 }
-function addItem(img,fname){
-  var it={id:++nid,name:slug(fname),img:img,outs:{}};
+function addItem(src,fname){
+  var it={id:++nid,name:slug(fname),src:src,outs:{},gen:0};
   var el=document.createElement("div");el.className="item";
   el.innerHTML='<div class="ihead"><input aria-label="Emote name" spellcheck="false" maxlength="40"><span class="src"></span><button class="btn ghost rm" type="button">Remove</button><div class="warn" hidden></div></div><div class="body"></div><div class="chats"></div>';
   var nm=el.querySelector("input");nm.value=it.name;
   nm.addEventListener("change",function(){it.name=slug(nm.value);nm.value=it.name;build(it)});
-  el.querySelector(".src").textContent=fname+" · "+img.naturalWidth+" × "+img.naturalHeight;
-  el.querySelector(".rm").addEventListener("click",function(){items=items.filter(function(x){return x!==it});el.remove();Object.keys(it.outs).forEach(function(k){it.outs[k].forEach(function(o){URL.revokeObjectURL(o.url)})});status()});
-  it.el=el;$("items").appendChild(el);items.push(it);
+  el.querySelector(".src").textContent=fname+" · "+src.w+" × "+src.h+(src.frames.length>1?" · animated, "+src.frames.length+" frames":"");
+  el.querySelector(".rm").addEventListener("click",function(){it.gen++;items=items.filter(function(x){return x!==it});el.remove();revoke(it);status()});
+  it.el=el;$("items").appendChild(el);items.push(it);status();
   return build(it).then(status);
 }
 async function addFiles(list){
   for(var i=0;i<list.length;i++){var f=list[i];if(!/^image\//.test(f.type))continue;
-    try{await addItem(await loadImg(f),f.name)}catch(e){alertBox(f.name+": "+e.message)}}
+    try{await addItem(await loadFile(f),f.name)}catch(e){alertBox(f.name+": "+(e&&e.message||"couldn't read that image"))}}
 }
 function alertBox(msg){var d=document.createElement("div");d.className="item warn";d.textContent=msg;$("items").prepend(d);setTimeout(function(){d.remove()},6000)}
 function status(){var n=items.length;$("zipAll").disabled=!n||!S.on.length;$("clear").hidden=!n;$("count").textContent=n?(n===1?"1 image":n+" images"):""}
 async function rebuildAll(){for(var i=0;i<items.length;i++)await build(items[i]);status()}
 
-/* ---------- a small zip maker (no compression; PNGs are already compressed) ---------- */
+/* ---------- a small zip maker (no compression; PNGs and GIFs are already compressed) ---------- */
 var CRC=(function(){var t=new Uint32Array(256);for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
 function crc32(b){var c=0xFFFFFFFF;for(var i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
 async function zip(files){
@@ -302,7 +451,7 @@ $("zipAll").addEventListener("click",async function(){
   if(!files.length)return;var b=await zip(files),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=(items.length===1?items[0].name:"emotes")+".zip";document.body.appendChild(a);a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000);
 });
-$("clear").addEventListener("click",function(){items.forEach(function(it){Object.keys(it.outs).forEach(function(k){it.outs[k].forEach(function(o){URL.revokeObjectURL(o.url)})})});items=[];$("items").innerHTML="";status()});
+$("clear").addEventListener("click",function(){items.forEach(function(it){it.gen++;revoke(it)});items=[];$("items").innerHTML="";status()});
 
 /* ---------- controls ---------- */
 function save(){try{localStorage.setItem("em_cfg",JSON.stringify(S))}catch(e){}}
