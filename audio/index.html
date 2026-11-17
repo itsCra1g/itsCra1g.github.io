@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mic and Audio Guide for streamers: OBS filters, levels and fixes</title>
+<meta name="description" content="Free mic and audio guide for Twitch and Kick streamers by itsCRA1G: OBS filter settings for your kind of mic, levels that sound right, keeping music off VODs, and fixes for common problems.">
+<meta property="og:title" content="Mic and Audio Guide for streamers">
+<meta property="og:description" content="OBS filter settings for your mic, levels, VOD tracks and fixes. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --warn:#FFB020; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.65 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:2px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 9px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:12px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:980px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 30px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:15em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:46em}li{margin:4px 0}
+strong{color:var(--fg)}
+code,.k{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.path{font-weight:600;color:var(--fg)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;margin:16px 0;max-width:48em}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* quick start */
+.qs{list-style:none;padding:0;counter-reset:q;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;max-width:none}
+.qs li{counter-increment:q;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 16px 16px 58px;position:relative;margin:0}
+.qs li::before{content:counter(q);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:8px;background:var(--acc-soft);color:var(--acc);font:700 14px/28px var(--display);text-align:center}
+.qs b{display:block;color:var(--fg);font-weight:700;margin-bottom:2px}
+.qs span{font-size:14px}
+/* mic picker */
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:10px 14px;cursor:pointer;text-align:left}
+.seg button small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.mictips{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin-bottom:18px;max-width:none}
+.mictips p{margin:0 0 8px}.mictips ul{margin:0}
+.chain{display:flex;flex-direction:column;gap:10px}
+.flt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.flt.off{opacity:.55}
+.flt .n{width:44px;height:44px;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font:700 16px var(--display)}
+.flt.off .n{background:var(--tile2);color:var(--mute)}
+.flt h4{margin:0;font:700 17px var(--display);color:var(--fg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:700 11px var(--text);letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--acc-soft);color:var(--acc)}
+.tag.opt{background:rgba(255,176,32,.14);color:var(--warn)}.tag.skip{background:var(--tile2);color:var(--mute)}
+.flt p{margin:6px 0 0;font-size:15px}
+.vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vals span{font:13px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:8px;padding:4px 8px}
+.vals span i{font-style:normal;color:var(--mute)}
+/* gate helper */
+.helper{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin:16px 0;max-width:none}
+.helper label{font-weight:600;color:var(--fg);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.helper input{font:600 16px var(--mono);width:90px;color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px}
+.helper output{font:600 15px var(--text);color:var(--fg)}
+/* meter */
+.meter{max-width:760px;margin:10px 0 18px}
+.mrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;margin:8px 0}
+.mrow b{font-size:14px;color:var(--fg)}
+.mtrack{position:relative;height:22px;border-radius:6px;background:linear-gradient(90deg,#14301f 0 66.6%,#3a3412 66.6% 85%,#3a1717 85%)}
+.mfill{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+.mscale{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;font:12px var(--mono);color:var(--mute)}
+.mscale div{position:relative;height:16px}
+.mscale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0 14px;min-width:560px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td:first-child{color:var(--fg);font-weight:600;width:30%}
+.checks{list-style:none;padding:0}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks input{width:18px;height:18px;margin-top:4px;accent-color:var(--acc);flex:0 0 auto}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Mic &amp; Audio Guide</a>
+  <nav><a href="#quick">Quick start</a><a href="#mic">Your mic</a><a href="#filters">Filters</a><a href="#levels">Levels</a><a href="#music">Music &amp; VODs</a><a href="#fixes">Fixes</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free guide · by itsCRA1G</div>
+  <h1>Sound good on stream, whatever mic you've got.</h1>
+  <p class="lead">Viewers will put up with a soft camera, but not bad audio. This guide gets your mic sounding clear and steady in OBS, sets your game, music and alerts at the right levels, and fixes the common problems. Pick your kind of mic below and the settings change to suit it.</p>
+  <div class="chips"><span class="chip">OBS Studio</span><span class="chip">Settings for your mic</span><span class="chip">Twitch and Kick</span><span class="chip">Music off your VODs</span><span class="chip">Fixes</span></div>
+</div></div>
+
+<main class="wrap">
+  <section id="quick">
+    <div class="sec-head"><span class="num">1</span><h2>The 10-minute version</h2></div>
+    <p>If you only do this, you'll already sound better than most new streams.</p>
+    <ol class="qs">
+      <li><b>Get the mic close</b><span>A hand's width from your mouth (about 10 to 15 cm), slightly off to the side so you don't blast it with air.</span></li>
+      <li><b>Set the level at the source</b><span>Use the mic's own gain (knob, app or interface) so talking loudly peaks in the yellow in OBS, never the red.</span></li>
+      <li><b>Use 48 kHz everywhere</b><span>OBS <span class="path">Settings → Audio → Sample Rate</span> 48 kHz, and the same for your mic and headphones in Windows sound settings.</span></li>
+      <li><b>Add the core filters</b><span>Noise Suppression, then Compressor, then Limiter. Add a Gain filter first only if you can't turn the mic up any other way. Settings for your mic are below.</span></li>
+      <li><b>Keep the game under your voice</b><span>Your voice should be clearly louder than game sound, which should be clearly louder than music.</span></li>
+      <li><b>Record yourself and listen</b><span>Do a 30-second test recording with game audio on, then listen back on headphones. It's the only test that counts.</span></li>
+    </ol>
+  </section>
+
+  <section id="mic">
+    <div class="sec-head"><span class="num">2</span><h2>What mic have you got?</h2></div>
+    <p>Pick the closest match. The tips here and the filter settings in section 3 change to suit it.</p>
+    <div class="seg" id="micSeg" role="group" aria-label="Your mic setup">
+      <button data-v="usbdyn">USB dynamic<small>Sturdy talk-radio style, plugs in by USB</small></button>
+      <button data-v="usbcon">USB condenser<small>Sensitive "podcast" style, plugs in by USB</small></button>
+      <button data-v="xlr">XLR mic + interface<small>Mic cable into a small audio box</small></button>
+      <button data-v="mixer">Mixer or mic app<small>GoXLR, Wave Link, RØDECaster and similar</small></button>
+      <button data-v="headset">Headset mic<small>Gaming headset or earbuds</small></button>
+    </div>
+    <div class="mictips" id="micTips"></div>
+
+    <h3>Where to put it</h3>
+    <ul>
+      <li><strong>Close beats loud.</strong> A mic 10 cm away needs much less gain than one 50 cm away, so it picks up far less keyboard, fan and room.</li>
+      <li><strong>Point it at your mouth and away from noise.</strong> Most streaming mics hear best from the front (or the end, for "end-address" mics) and least from the back. Aim the back at your keyboard or PC.</li>
+      <li><strong>Off to the side a little</strong> stops "p" and "b" sounds popping. A foam cover or pop filter helps too.</li>
+      <li><strong>Use a boom arm or stand that isn't on your desk</strong> if you can, so typing and bumps don't thud through.</li>
+      <li><strong>Soft things help a hard room.</strong> Curtains, a rug, a sofa or even a duvet behind you cut echo far better than foam squares on one wall.</li>
+    </ul>
+  </section>
+
+  <section id="filters">
+    <div class="sec-head"><span class="num">3</span><h2>OBS filters, in order</h2></div>
+    <p>In OBS's Audio Mixer, open your mic's menu (the <span class="k">⋮</span> button, or right-click it) and choose <span class="path">Filters</span>. Add them with the <span class="k">+</span> button in the order below: order matters, because each one works on what the one above hands it. Settings shown are for: <strong id="micName"></strong>.</p>
+    <div class="chain" id="chain"></div>
+    <div class="note"><p><strong>These are starting points, not rules.</strong> Every voice and room is different. Change one thing at a time and do a test recording after each change.</p></div>
+
+    <h3 id="gate">Setting a noise gate for your room</h3>
+    <p>A gate mutes the mic when you're not talking. Set it too high and it chops the start of your words; too low and it does nothing. To find your number: sit quietly with your PC and game running, and watch your mic's meter in OBS. Type the number it hovers around below.</p>
+    <div class="helper">
+      <label>My mic sits at about <input id="floor" type="number" inputmode="numeric" value="-50" min="-90" max="-10" step="1"> dB when I'm quiet</label>
+      <output id="gateOut"></output>
+    </div>
+    <p>If the gate cuts off quiet words, lower both numbers by 3. If you can still hear the keyboard between sentences, raise them by 3.</p>
+
+    <h3>Mic settings outside the filters</h3>
+    <ul>
+      <li><strong>Mono:</strong> most mics are mono but show up in one ear only. Open <span class="path">Edit → Advanced Audio Properties</span> and tick <span class="path">Mono</span> for your mic.</li>
+      <li><strong>Don't hear yourself twice:</strong> in the same window, leave your mic's <span class="path">Audio Monitoring</span> on <span class="path">Monitor Off</span>.</li>
+      <li><strong>Turn off unused devices:</strong> in <span class="path">Settings → Audio</span>, set any global mic or desktop devices you don't use to <span class="path">Disabled</span>, so nothing sneaks in twice.</li>
+      <li><strong>Audio bitrate:</strong> <span class="path">Settings → Output</span>, audio bitrate 160 is a good default for Twitch and Kick.</li>
+    </ul>
+  </section>
+
+  <section id="levels">
+    <div class="sec-head"><span class="num">4</span><h2>Levels that sound right</h2></div>
+    <p>OBS's meters go from green (quiet) through yellow to red (too loud). Aim for roughly these peaks when everything is playing at once:</p>
+    <div class="meter" aria-hidden="true">
+      <div class="mrow"><b>Your voice</b><div class="mtrack"><div class="mfill" style="left:75.0%;width:11.7%"></div></div></div>
+      <div class="mrow"><b>Alerts and sounds</b><div class="mtrack"><div class="mfill" style="left:70.0%;width:10.0%"></div></div></div>
+      <div class="mrow"><b>Discord friends</b><div class="mtrack"><div class="mfill" style="left:63.3%;width:11.7%"></div></div></div>
+      <div class="mrow"><b>Game</b><div class="mtrack"><div class="mfill" style="left:58.3%;width:11.7%"></div></div></div>
+      <div class="mrow"><b>Music</b><div class="mtrack"><div class="mfill" style="left:46.7%;width:11.7%"></div></div></div>
+      <div class="mscale"><i></i><div><span style="left:0">−60</span><span style="left:33.3%">−40</span><span style="left:66.6%">−20</span><span style="left:83.3%">−10</span><span style="left:100%;transform:translateX(-100%)">0 dB</span></div></div>
+    </div>
+    <div class="tw"><table>
+      <tr><th>Source</th><th>Peaks around</th><th>Why</th></tr>
+      <tr><td>Your voice</td><td>−15 to −8 dB (yellow)</td><td>The main thing people tune in for. The limiter catches the shouts.</td></tr>
+      <tr><td>Alerts and sound effects</td><td>−18 to −12 dB</td><td>Noticeable without making people jump. Turn loud ones down in the file or the overlay.</td></tr>
+      <tr><td>Discord friends</td><td>−22 to −15 dB</td><td>Clear, but a step below you, since it's your stream.</td></tr>
+      <tr><td>Game</td><td>−25 to −18 dB</td><td>Atmosphere, never louder than talking. Gunfire and explosions are what push it up, so judge it in a busy moment.</td></tr>
+      <tr><td>Music</td><td>−32 to −25 dB</td><td>Background. If chat can sing along over you, it's too loud.</td></tr>
+    </table></div>
+    <div class="note"><p><strong>Turn sources down in OBS, not your headphones.</strong> What you hear isn't what viewers hear. Use the OBS fader for each source, then set your own headphones however you like.</p></div>
+
+    <h3>Separate the game from everything else</h3>
+    <p><span class="path">Desktop Audio</span> grabs everything your PC plays: game, Discord, music, browser and every notification. To control each one on its own, add an <span class="path">Application Audio Capture</span> source for each app (Windows 10 version 2004 or later, and Windows 11), then set Desktop Audio to Disabled in <span class="path">Settings → Audio</span> so nothing plays twice. Now the game, Discord and music each get their own fader.</p>
+  </section>
+
+  <section id="music">
+    <div class="sec-head"><span class="num">5</span><h2>Music, VODs and multistreaming</h2></div>
+    <div class="note warn"><p><strong>Copyrighted music can get your VODs muted or your channel a strike.</strong> Stick to music you have the rights to stream: royalty-free libraries, stream-safe playlists, or your own music. Soundtrack by Twitch closed in 2023, so remove its source if it's still in OBS.</p></div>
+    <h3>Keep music out of your Twitch VODs</h3>
+    <p>OBS can send Twitch a second audio track just for the VOD, with your music left out. Live viewers hear the music; the VOD doesn't.</p>
+    <ol>
+      <li><span class="path">Settings → Stream</span>: choose Twitch as the service.</li>
+      <li><span class="path">Settings → Output</span>: tick <span class="path">Twitch VOD Track</span> and pick Track 2. (In Simple mode, tick <span class="path">Enable Advanced Encoder Settings</span> first if you don't see it.)</li>
+      <li><span class="path">Edit → Advanced Audio Properties</span>: tick Tracks 1 and 2 for your mic, game, Discord and alerts. Tick only Track 1 for music.</li>
+      <li>Do a short test stream with music on, then check the VOD has no music.</li>
+    </ol>
+    <h3>Streaming to Twitch and Kick at once</h3>
+    <p>If you multistream with a plugin such as Multiple RTMP outputs, each extra output has its own audio track setting. Point it at Track 1 (everything) for live viewers. If that platform keeps VODs, think about whether music should be in them too.</p>
+  </section>
+
+  <section id="fixes">
+    <div class="sec-head"><span class="num">6</span><h2>Fixes for common problems</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you hear</th><th>Usual cause and fix</th></tr>
+      <tr><td>Robotic, crackly or "underwater" voice</td><td>A sample rate mismatch. Set OBS and every audio device in Windows sound settings to 48 kHz (48000 Hz), then restart OBS.</td></tr>
+      <tr><td>Viewers hear an echo or everything twice</td><td>The same sound captured twice: Desktop Audio plus an app capture, a mic set to monitor, or speakers picked up by your mic. Disable the duplicate, set monitoring off, wear headphones.</td></tr>
+      <tr><td>Viewers hear your game or Discord through your mic</td><td>Sound leaking from headphones or speakers. Turn your headphones down, use closed-back ones, or move the mic closer and lower its gain.</td></tr>
+      <tr><td>Voice too quiet, even at full</td><td>Gain too low at the source. Raise it in the mic app or interface first; use a Gain filter only as a last resort. Quiet dynamic mics on interfaces may need an inline preamp.</td></tr>
+      <tr><td>Voice sounds squashed, or breathing gets loud</td><td>Too much compression. Raise the compressor's threshold a few dB or lower its ratio.</td></tr>
+      <tr><td>Words chopped at the start or end</td><td>Gate too high, or its release too short. Lower the gate numbers by 3 dB, or lengthen the release.</td></tr>
+      <tr><td>Keyboard clacks come through</td><td>Mic too far away or pointing at the keyboard. Move it closer and aim its back at the keys; Noise Suppression (RNNoise or NVIDIA) helps.</td></tr>
+      <tr><td>Your lips and your voice don't line up</td><td>Camera delay. In Advanced Audio Properties, add a Sync Offset to your mic (start around 100 to 200 ms) until they match in a recording.</td></tr>
+      <tr><td>Mic cuts out or vanishes</td><td>USB power saving or a changed device. Use a rear USB port, turn off USB selective suspend in Windows power options, and re-pick the device in the mic's properties.</td></tr>
+      <tr><td>Game suddenly very loud on stream</td><td>Windows or the game changed volume, or Desktop Audio caught it twice. Use Application Audio Capture for the game and set its level in OBS.</td></tr>
+    </table></div>
+  </section>
+
+  <section id="test">
+    <div class="sec-head"><span class="num">7</span><h2>Before you go live: a quick check</h2></div>
+    <p>Tick these off. They're remembered on this device so you can come back to them.</p>
+    <ul class="checks" id="checks">
+      <li><input type="checkbox" id="c1"><label for="c1">48 kHz in OBS and in Windows for every audio device</label></li>
+      <li><input type="checkbox" id="c2"><label for="c2">Mic close, pointing at me, back towards the keyboard</label></li>
+      <li><input type="checkbox" id="c3"><label for="c3">Filters added in order and checked with a recording</label></li>
+      <li><input type="checkbox" id="c4"><label for="c4">Mic set to Mono and Monitor Off</label></li>
+      <li><input type="checkbox" id="c5"><label for="c5">Game, Discord, music and alerts each on their own fader</label></li>
+      <li><input type="checkbox" id="c6"><label for="c6">Voice clearly louder than game, game louder than music</label></li>
+      <li><input type="checkbox" id="c7"><label for="c7">Music is safe to stream, and kept off the Twitch VOD track</label></li>
+      <li><input type="checkbox" id="c8"><label for="c8">Listened back to a recording on headphones, with the game busy</label></li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Written for OBS Studio 32; menu names can move between versions. Not affiliated with OBS, Twitch, Kick or any hardware brand.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var MIC={
+  usbdyn:{name:"USB dynamic mic",tips:["Dynamic mics only hear what's close, which is great for noisy rooms. The catch: they're quiet, so get right up to them.","Turn the gain up in the mic itself or its app first. If it's still too quiet at full, that's when the Gain filter comes in.","You can usually skip the noise gate: the mic does a lot of that job by itself."],
+    gain:["opt","Only if the mic is still too quiet at full gain.",["Gain","+4 to +10 dB"]],
+    ns:["use","RNNoise cleans fans and hum well. On an NVIDIA RTX card, NVIDIA Noise Removal is even better.",["Method","RNNoise"]],
+    gate:["skip","Usually not needed with a dynamic mic close up. Add one only if the keyboard still comes through.",null],
+    comp:["use","Evens out quiet and loud talking.",["Ratio","4:1"],["Threshold","−20 dB"],["Attack","6 ms"],["Release","60 ms"],["Output gain","+3 to +6 dB"]]},
+  usbcon:{name:"USB condenser mic",tips:["Condensers hear everything: your room, your keyboard, your PC fans. Set them to the cardioid (single heart-shaped) pattern if there's a switch, and get close.","Keep the mic's own gain lower than you'd think, and let the filters do the rest.","The noise gate earns its place here. Use the helper below to set it for your room."],
+    gain:["skip","Not usually needed: condensers are loud. Lower the mic's own gain instead if you hit red.",null],
+    ns:["use","Important for condensers. RNNoise, or NVIDIA Noise Removal on an RTX card.",["Method","RNNoise"]],
+    gate:["use","Mutes the room between sentences. Set it with the helper below.",["Close","from helper"],["Open","from helper"],["Attack","25 ms"],["Hold","200 ms"],["Release","150 ms"]],
+    comp:["use","Evens out quiet and loud talking.",["Ratio","4:1"],["Threshold","−18 dB"],["Attack","6 ms"],["Release","60 ms"],["Output gain","+2 to +4 dB"]]},
+  xlr:{name:"XLR mic and interface",tips:["Set the interface's gain knob so your loudest talking peaks around −10 dB in OBS. That's the most important setting you've got.","Turn off any \"direct monitor\" or software monitoring you don't need, so you don't hear yourself twice.","Quiet dynamic mics (the broadcast-style ones) often need more gain than small interfaces have. An inline preamp fixes that properly, without the hiss of turning everything to full."],
+    gain:["skip","Use the interface's gain knob instead.",null],
+    ns:["use","RNNoise, or NVIDIA Noise Removal on an RTX card. For a dynamic mic in a quiet room you can try it off.",["Method","RNNoise"]],
+    gate:["opt","Use it for a condenser or a noisy room; skip it for a dynamic mic up close.",["Close","from helper"],["Open","from helper"],["Attack","25 ms"],["Hold","200 ms"],["Release","150 ms"]],
+    comp:["use","Evens out quiet and loud talking.",["Ratio","4:1"],["Threshold","−20 dB"],["Attack","6 ms"],["Release","60 ms"],["Output gain","+2 to +6 dB"]]},
+  mixer:{name:"mixer or mic app",tips:["Mixers and mic apps (GoXLR, Elgato Wave Link, RØDECaster and the like) often have a gate, compressor and EQ built in. Do the processing there, once.","Doubling up, for example a gate in the mixer and another in OBS, causes chopped words and squashed sound.","Many mixers send separate channels to Windows (mic, game, chat, music). Add each as its own source in OBS so they get their own fader and VOD-track settings."],
+    gain:["skip","Set gain in the mixer.",null],
+    ns:["opt","Only if your mixer has no noise reduction of its own.",["Method","RNNoise"]],
+    gate:["skip","Use the mixer's gate instead.",null],
+    comp:["skip","Use the mixer's compressor instead.",null]},
+  headset:{name:"headset mic",tips:["Headset mics sit close, which helps, but they're small and pick up breathing. Bend the boom so it's just off the corner of your mouth, not in front of it.","Turn off any Windows or headset-app \"enhancements\" and noise cancelling, then use OBS's instead: the two together often sound robotic.","It's the cheapest part of a setup to upgrade later. A basic USB dynamic mic is a big step up."],
+    gain:["opt","Only if it's still quiet after turning up the mic level in Windows.",["Gain","+3 to +8 dB"]],
+    ns:["use","Headset mics are noisy; this matters most. NVIDIA Noise Removal on an RTX card if you have one.",["Method","RNNoise"]],
+    gate:["opt","Helps hide breathing between sentences. Set it with the helper below.",["Close","from helper"],["Open","from helper"],["Attack","25 ms"],["Hold","200 ms"],["Release","150 ms"]],
+    comp:["use","A gentler setting, since headsets are already close.",["Ratio","3:1"],["Threshold","−20 dB"],["Attack","6 ms"],["Release","80 ms"],["Output gain","+3 to +5 dB"]]}
+};
+var LIM=["use","The safety net: stops shouts and laughs from clipping. Always last.",["Threshold","−3 dB"],["Release","60 ms"]];
+var S={mic:"usbdyn",floor:-50,done:{}};
+try{var sv=JSON.parse(localStorage.getItem("au_cfg")||"null");if(sv){if(MIC[sv.mic])S.mic=sv.mic;if(typeof sv.floor==="number")S.floor=sv.floor;if(sv.done)S.done=sv.done}}catch(e){}
+function save(){try{localStorage.setItem("au_cfg",JSON.stringify(S))}catch(e){}}
+function gateVals(){var f=Math.max(-90,Math.min(-10,Math.round(Number(S.floor)||-50)));return {close:f+4,open:f+10}}
+function dB(n){return (n<0?"−"+Math.abs(n):"+"+n)+" dB"}
+function card(n,title,d){
+  var el=document.createElement("div");el.className="flt"+(d[0]==="skip"?" off":"");
+  var tag=d[0]==="use"?'<span class="tag">Use</span>':d[0]==="opt"?'<span class="tag opt">Optional</span>':'<span class="tag skip">Skip</span>';
+  el.innerHTML='<div class="n">'+n+'</div><div><h4></h4><p></p><div class="vals"></div></div>';
+  el.querySelector("h4").innerHTML=title+" "+tag;el.querySelector("p").textContent=d[1];
+  var g=gateVals(),v=el.querySelector(".vals");
+  for(var i=2;i<d.length;i++){if(!d[i])continue;var s=document.createElement("span"),val=d[i][1];
+    if(val==="from helper")val=d[i][0]==="Close"?dB(g.close):dB(g.open);
+    s.innerHTML="<i></i> ";s.querySelector("i").textContent=d[i][0];s.appendChild(document.createTextNode(val));v.appendChild(s)}
+  if(!v.children.length)v.remove();
+  return el;
+}
+function render(){
+  var m=MIC[S.mic];
+  $("micSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.mic)});
+  var t=$("micTips");t.innerHTML="";var ul=document.createElement("ul");m.tips.forEach(function(x){var li=document.createElement("li");li.textContent=x;ul.appendChild(li)});
+  var h=document.createElement("p");h.innerHTML="<strong></strong>";h.firstChild.textContent="For a "+m.name+":";t.appendChild(h);t.appendChild(ul);
+  $("micName").textContent="a "+m.name;
+  var c=$("chain");c.innerHTML="";
+  c.appendChild(card(1,"Gain",m.gain));
+  c.appendChild(card(2,"Noise Suppression",m.ns));
+  c.appendChild(card(3,"Noise Gate",m.gate));
+  c.appendChild(card(4,"Compressor",m.comp));
+  c.appendChild(card(5,"Limiter",LIM));
+  var g=gateVals();$("gateOut").innerHTML="";$("gateOut").textContent="→ Close threshold "+dB(g.close)+", Open threshold "+dB(g.open);
+}
+$("micSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.mic=b.dataset.v;save();render()});
+$("floor").value=S.floor;
+$("floor").addEventListener("input",function(){var v=parseFloat(this.value);if(!isNaN(v)){S.floor=v;save();render()}});
+document.querySelectorAll("#checks input").forEach(function(cb){cb.checked=!!S.done[cb.id];cb.addEventListener("change",function(){S.done[cb.id]=cb.checked;save()})});
+render();
+})();
+</script>
+</body>
+</html>
