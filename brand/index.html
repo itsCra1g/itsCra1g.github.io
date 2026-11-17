@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand Guide: build a look for your stream</title>
+<meta name="description" content="Free stream branding guide and builder by itsCRA1G: pick a vibe, colours and fonts, see them on your channel, download a starter avatar, banner and brand sheet, and send your look to the Panel and Schedule makers.">
+<meta property="og:title" content="Brand Guide for streamers">
+<meta property="og:description" content="Pick a vibe, colours and fonts, see them on your channel and download your brand kit. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&family=Montserrat:wght@500;800&family=Rajdhani:wght@700&family=Bangers&family=Press+Start+2P&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --warn:#FFB020; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.65 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:2px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 9px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:12px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:980px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 30px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:15em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:46em}li{margin:4px 0}
+strong{color:var(--fg)}
+code,.k{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.path{font-weight:600;color:var(--fg)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;margin:16px 0;max-width:48em}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* quick start */
+.qs{list-style:none;padding:0;counter-reset:q;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;max-width:none}
+.qs li{counter-increment:q;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 16px 16px 58px;position:relative;margin:0}
+.qs li::before{content:counter(q);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:8px;background:var(--acc-soft);color:var(--acc);font:700 14px/28px var(--display);text-align:center}
+.qs b{display:block;color:var(--fg);font-weight:700;margin-bottom:2px}
+.qs span{font-size:14px}
+/* mic picker */
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:10px 14px;cursor:pointer;text-align:left}
+.seg button small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.mictips{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin-bottom:18px;max-width:none}
+.mictips p{margin:0 0 8px}.mictips ul{margin:0}
+.chain{display:flex;flex-direction:column;gap:10px}
+.flt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.flt.off{opacity:.55}
+.flt .n{width:44px;height:44px;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font:700 16px var(--display)}
+.flt.off .n{background:var(--tile2);color:var(--mute)}
+.flt h4{margin:0;font:700 17px var(--display);color:var(--fg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:700 11px var(--text);letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--acc-soft);color:var(--acc)}
+.tag.opt{background:rgba(255,176,32,.14);color:var(--warn)}.tag.skip{background:var(--tile2);color:var(--mute)}
+.flt p{margin:6px 0 0;font-size:15px}
+.vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vals span{font:13px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:8px;padding:4px 8px}
+.vals span i{font-style:normal;color:var(--mute)}
+/* gate helper */
+.helper{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin:16px 0;max-width:none}
+.helper label{font-weight:600;color:var(--fg);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.helper input{font:600 16px var(--mono);width:90px;color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px}
+.helper output{font:600 15px var(--text);color:var(--fg)}
+/* meter */
+.meter{max-width:760px;margin:10px 0 18px}
+.mrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;margin:8px 0}
+.mrow b{font-size:14px;color:var(--fg)}
+.mtrack{position:relative;height:22px;border-radius:6px;background:linear-gradient(90deg,#14301f 0 66.6%,#3a3412 66.6% 85%,#3a1717 85%)}
+.mfill{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+.mscale{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;font:12px var(--mono);color:var(--mute)}
+.mscale div{position:relative;height:16px}
+.mscale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0 14px;min-width:560px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td:first-child{color:var(--fg);font-weight:600;width:30%}
+.checks{list-style:none;padding:0}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks input{width:18px;height:18px;margin-top:4px;accent-color:var(--acc);flex:0 0 auto}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+
+<style>
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;background:var(--tile);border:1px solid var(--edge);border-radius:18px;padding:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.fld,.opts select{font:600 15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:10px;padding:9px 10px;width:100%;min-width:0}
+.vibes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.vibe{background:var(--tile);border:1px solid var(--edge2);border-radius:14px;padding:12px;cursor:pointer;text-align:left;color:var(--body);font:14px var(--text)}
+.vibe b{display:block;color:var(--fg);font:700 16px var(--display);margin:8px 0 2px}
+.vibe .dots{display:flex;gap:5px}.vibe .dots i{width:18px;height:18px;border-radius:6px;display:block}
+.vibe[aria-pressed=true]{border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sw button{width:30px;height:30px;border-radius:9px;border:2px solid transparent;cursor:pointer;padding:0}
+.sw button[aria-pressed=true]{border-color:#fff}
+.sw input[type=color]{width:38px;height:32px;border:1px solid var(--edge2);border-radius:9px;background:var(--tile2);padding:2px;cursor:pointer}
+.seg{margin:0}.seg button{padding:8px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+/* preview */
+.pv{--m:#4DA3FF;--s:#9AA3B2;--bg:#0B0C0F;--card:#14171D;--fg:#EEF1F6;--sub:#9AA3B2;--hf:"Space Grotesk";border-radius:20px;padding:20px;background:var(--bg);border:1px solid var(--edge);display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;color:var(--fg)}
+.pv .card2{background:var(--card);border-radius:14px;padding:14px;min-width:0}
+.pv .cap{font:700 11px Inter,sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--sub);margin-bottom:10px}
+.pv canvas{max-width:100%;height:auto;display:block;border-radius:10px}
+.pv .chan{display:flex;gap:12px;align-items:center}
+.pv .chan canvas{width:64px;height:64px;border-radius:50%}
+.pv .chan b{font:700 22px var(--hf),sans-serif;color:var(--fg);display:block}
+.pv .chan small{color:var(--sub);font:500 14px Inter,sans-serif}
+.pv .chat{font:14px/1.7 Inter,sans-serif;color:var(--fg)}
+.pv .chat .n{font-weight:700;color:var(--m)}
+.pv .lt{display:flex;align-items:stretch;border-radius:12px;overflow:hidden;background:rgba(0,0,0,.35)}
+.pv.light .lt{background:#EEF0F3}
+.pv .lt i{width:8px;background:var(--m)}
+.pv .lt div{padding:10px 14px}
+.pv .lt b{font:700 20px var(--hf),sans-serif;display:block;color:var(--fg)}
+.pv .lt span{font:600 13px Inter,sans-serif;color:var(--sub)}
+.pv .pnl{height:72px;border-radius:10px;display:flex;align-items:center;gap:12px;padding:0 16px;background:linear-gradient(#1A1D24,#0B0C0F);border:1px solid rgba(255,255,255,.08);font:700 26px var(--hf),sans-serif;color:var(--m);text-shadow:0 0 14px var(--m)}
+.pv.light .pnl{background:linear-gradient(#fff,#ECEEF2);border-color:#D5D9E0;text-shadow:none}
+.pv .btns{display:flex;gap:8px;flex-wrap:wrap}
+.pv .btns span{font:700 14px Inter,sans-serif;padding:9px 14px;border-radius:10px}
+.contrast{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.contrast div{display:flex;justify-content:space-between;gap:10px}
+.contrast em{font-style:normal;font-weight:700}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.meh{color:var(--warn)}
+.dls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px}
+.codes{width:100%;min-height:150px;font:14px/1.55 var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:12px;padding:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Brand Guide</a>
+  <nav><a href="#build">Builder</a><a href="#name">Name</a><a href="#colour">Colour</a><a href="#type">Fonts</a><a href="#voice">Voice</a><a href="#sizes">Sizes</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free guide and tool · by itsCRA1G</div>
+  <h1>Give your stream a look people remember.</h1>
+  <p class="lead">A brand isn't an expensive logo. It's the same name, colours, fonts and personality everywhere people find you. Build yours below, see it on a mock channel, download a starter avatar, banner and brand sheet, then send it straight into the <a href="../panels/">Panel Maker</a> and <a href="../schedule/">Schedule Maker</a>.</p>
+  <div class="chips"><span class="chip">Pick a vibe</span><span class="chip">Contrast check</span><span class="chip">Starter avatar and banner</span><span class="chip">Brand sheet</span><span class="chip">Every platform's sizes</span></div>
+</div></div>
+
+<main class="wrap">
+  <section id="build">
+    <div class="sec-head"><span class="num">1</span><h2>Build your brand</h2></div>
+    <p><strong>Start with a vibe.</strong> It sets a colour pair and a font to match; change anything after.</p>
+    <div class="vibes" id="vibes"></div>
+    <div class="opts">
+      <div><div class="lbl">Channel name</div><input class="fld" id="name" maxlength="24"></div>
+      <div><div class="lbl">Tagline</div><input class="fld" id="tag" maxlength="48"></div>
+      <div><div class="lbl">Avatar letters</div><input class="fld" id="mono" maxlength="3" placeholder="auto"></div>
+      <div><div class="lbl">Main colour</div><div class="sw" id="swM"></div></div>
+      <div><div class="lbl">Second colour</div><div class="sw" id="swS"></div></div>
+      <div><div class="lbl">Background</div><div class="seg" id="bg"><button data-v="dark">Dark</button><button data-v="light">Light</button></div></div>
+      <div><div class="lbl">Heading font</div><select id="font">
+        <option value="Space Grotesk|700">Space Grotesk</option><option value="Inter|800">Inter</option><option value="Montserrat|800">Montserrat</option>
+        <option value="Bebas Neue|400">Bebas Neue</option><option value="Rajdhani|700">Rajdhani</option><option value="Bangers|400">Bangers</option><option value="Press Start 2P|400">Press Start 2P (pixel)</option></select>
+        <div class="hint" style="margin-top:6px">Body text stays in Inter: clean and readable at any size.</div></div>
+    </div>
+
+    <h3 style="margin-top:26px">How it looks</h3>
+    <div class="pv" id="pv">
+      <div class="card2" style="grid-column:1/-1"><div class="cap">Channel banner (Twitch 1200×480)</div><canvas id="cvB" width="1200" height="480"></canvas></div>
+      <div class="card2"><div class="cap">Channel header</div><div class="chan"><canvas id="cvA" width="800" height="800"></canvas><div><b id="pvName"></b><small id="pvTag"></small></div></div></div>
+      <div class="card2"><div class="cap">Panel</div><div class="pnl" id="pvPanel">ABOUT ME</div></div>
+      <div class="card2"><div class="cap">On-stream name tag</div><div class="lt"><i></i><div><b id="pvLt"></b><span>Now playing · [Game]</span></div></div></div>
+      <div class="card2"><div class="cap">Chat</div><div class="chat"><span class="n" id="pvChat"></span>: welcome in everyone 👋<br><span style="color:var(--s);font-weight:700">viewer</span>: that colour looks great</div></div>
+      <div class="card2"><div class="cap">Buttons and badges</div><div class="btns"><span id="b1">Follow</span><span id="b2">Discord</span><span id="b3">New</span></div></div>
+      <div class="card2"><div class="cap">Contrast check</div><div class="contrast" id="contrast"></div></div>
+    </div>
+    <div class="dls">
+      <button class="btn" id="dlKit">Download brand kit (.zip)</button>
+      <button class="btn ghost" id="dlA">Avatar 800×800</button>
+      <button class="btn ghost" id="dlB">Banner 1200×480</button>
+      <button class="btn ghost" id="dlS">Brand sheet</button>
+      <button class="btn ghost" id="apply">Use in Panel and Schedule Maker</button>
+      <span class="hint" id="msg" style="margin:0"></span>
+    </div>
+    <textarea class="codes" id="codes" readonly aria-label="Brand codes"></textarea>
+    <p class="hint">The avatar and banner are simple starters to get you going. A logo or art made just for you will always stand out more, but even then, keep these colours and fonts so everything matches.</p>
+  </section>
+
+  <section id="name">
+    <div class="sec-head"><span class="num">2</span><h2>Your name</h2></div>
+    <ul>
+      <li><strong>Same handle everywhere:</strong> Twitch, Kick, YouTube, TikTok, X, Discord, Instagram. Check they're all free before you commit, so people can find you anywhere with one search.</li>
+      <li><strong>Easy to say and spell.</strong> If someone hears it on stream, can they type it? Swapping letters for numbers (like the 1 in itsCRA1G) works best when it's part of the joke or the look, not a workaround.</li>
+      <li><strong>Leave room to grow.</strong> A name tied to one game is awkward when you change games.</li>
+      <li><strong>Keep it private.</strong> Don't use your full real name, birth year or town.</li>
+    </ul>
+  </section>
+
+  <section id="colour">
+    <div class="sec-head"><span class="num">3</span><h2>Colour</h2></div>
+    <ul>
+      <li><strong>One main colour does most of the work.</strong> Add a second for highlights, plus a dark or light background. Three colours is plenty.</li>
+      <li><strong>Use the main colour sparingly</strong> (roughly 60% background, 30% neutral, 10% colour). A little colour looks branded; a lot looks loud.</li>
+      <li><strong>Check contrast.</strong> Text in your colour has to be readable on your background. The builder's contrast check tells you whether your colour works for text or only for shapes and glows.</li>
+      <li><strong>Write down the codes</strong> (like #4DA3FF) and use the exact same ones everywhere. "Roughly blue" in five places looks like five different blues.</li>
+    </ul>
+  </section>
+
+  <section id="type">
+    <div class="sec-head"><span class="num">4</span><h2>Fonts</h2></div>
+    <ul>
+      <li><strong>Two fonts at most:</strong> a heading font with personality, and a plain one for everything else.</li>
+      <li><strong>Test it small.</strong> Your name has to read at the size of a chat message and on a phone.</li>
+      <li><strong>Use fonts you're allowed to use.</strong> All the fonts here are from Google Fonts, which are free for any use, including on stream and in merch. Fonts from "free font" sites often aren't free for commercial use.</li>
+      <li><strong>Pixel and comic fonts</strong> are fun for headings but hard to read in long text. Keep them for titles.</li>
+    </ul>
+  </section>
+
+  <section id="logo">
+    <div class="sec-head"><span class="num">5</span><h2>Logo and avatar</h2></div>
+    <ul>
+      <li><strong>Your avatar shows tiny</strong> in chat, follows lists and notifications. A face, a simple mascot or one or two letters reads best; detailed art turns to mush.</li>
+      <li><strong>Make it at 800×800</strong> or bigger and it'll be sharp everywhere.</li>
+      <li><strong>Want a custom logo?</strong> Ask an artist for your colours and font, a version that works on dark and light, and the original files.</li>
+      <li><strong>Don't use other brands' logos, characters or artwork</strong> as your own. It can get your art taken down and causes headaches later.</li>
+    </ul>
+  </section>
+
+  <section id="voice">
+    <div class="sec-head"><span class="num">6</span><h2>Voice and identity</h2></div>
+    <p>The strongest brands aren't just a look; they're a personality viewers can describe in three words.</p>
+    <ul>
+      <li><strong>Pick three words</strong> for how your stream feels (for example: chaotic, friendly, competitive). Check every title, panel and post against them.</li>
+      <li><strong>Name your community.</strong> A name for your viewers, your Discord and your sub tiers gives people something to belong to.</li>
+      <li><strong>Running jokes and catchphrases</strong> become emotes, alert lines, channel point rewards and merch. Write them down when they happen.</li>
+      <li><strong>Use the same tone everywhere:</strong> your alerts, bot messages, Discord posts and socials should all sound like you.</li>
+    </ul>
+  </section>
+
+  <section id="sizes">
+    <div class="sec-head"><span class="num">7</span><h2>Every size you need</h2></div>
+    <div class="tw"><table>
+      <tr><th>Platform</th><th>Avatar</th><th>Banner</th><th>Other</th></tr>
+      <tr><td>Twitch</td><td>800×800 (256 minimum)</td><td>1200×480</td><td>Offline screen 1920×1080 · Panels 320 wide (<a href="../panels/">Panel Maker</a>) · Emotes and badges (<a href="../emotes/">Emote Resizer</a>)</td></tr>
+      <tr><td>Kick</td><td>800×800</td><td>1280×700 minimum</td><td>Offline screen 1920×1080 · Panels 320 wide · Emotes 500</td></tr>
+      <tr><td>YouTube</td><td>800×800</td><td>2560×1440, with words and logos inside the middle 1546×423</td><td>Thumbnails 1280×720</td></tr>
+      <tr><td>TikTok</td><td>Square, 200×200 minimum</td><td>(none)</td><td>Videos and LIVE are 1080×1920 upright</td></tr>
+      <tr><td>X</td><td>400×400</td><td>1500×500</td><td>Posts 1600×900 or 1080×1080 (<a href="../schedule/">Schedule Maker</a>)</td></tr>
+      <tr><td>Discord server</td><td>512×512</td><td>960×540 (boosted servers)</td><td>Emoji 128 (<a href="../emotes/">Emote Resizer</a>)</td></tr>
+    </table></div>
+    <p class="hint">Twitch, Kick and YouTube sizes checked November 2026; keep important text away from banner edges, as phones and desktops crop them differently.</p>
+    <h3>Make the rest match</h3>
+    <p>Use your colours and font in the hub's <a href="../screens/">Screens</a> (Starting Soon, BRB, Ending), <a href="../scenes/">Scene Pack</a>, <a href="../alerts/">Alerts</a> and <a href="../socials/">Socials</a> overlays: they all have a "pick any colour" option.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Fonts from Google Fonts. Not affiliated with Twitch, Kick, YouTube, TikTok, X or Discord.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var VIBES=[
+  ["clean","Clean","Calm, modern, trustworthy","#4DA3FF","#9AA3B2","dark","Inter|800"],
+  ["hype","Hype","Loud, neon, high energy","#FF2E88","#25F4EE","dark","Bebas Neue|400"],
+  ["chill","Chill","Laid back and friendly","#7CC6FE","#B8A1FF","dark","Space Grotesk|700"],
+  ["cosy","Cosy","Warm, soft, welcoming","#B24A2A","#B83B57","light","Montserrat|800"],
+  ["comp","Competitive","Sharp, focused, sweaty","#FF4E45","#E8ECF2","dark","Rajdhani|700"],
+  ["funny","Funny","Bold, silly, chaotic","#FFD23F","#3BCEAC","dark","Bangers|400"],
+  ["retro","Retro","Arcade and pixel art","#53FC18","#FF5FA2","dark","Press Start 2P|400"]
+];
+var SWM=["#4DA3FF","#9146FF","#53FC18","#FF4E45","#FF2E88","#FFB020","#25F4EE","#B24A2A"],SWS=["#9AA3B2","#E8ECF2","#25F4EE","#FF5FA2","#B8A1FF","#3BCEAC","#FFD23F","#E85D75"];
+var S={vibe:"clean",name:"YourName",tag:"Games, chat and good vibes",mono:"",m:"#4DA3FF",s:"#9AA3B2",bg:"dark",font:"Inter|800"};
+try{var sv=JSON.parse(localStorage.getItem("br_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+var saveT;function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem("br_cfg",JSON.stringify(S))}catch(e){}},300)}
+
+function hex(c){var m=/^#?([0-9a-f]{6})$/i.exec(c||"");var n=parseInt(m?m[1]:"4DA3FF",16);return [n>>16&255,n>>8&255,n&255]}
+function lum(c){var r=hex(c).map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*r[0]+.7152*r[1]+.0722*r[2]}
+function ratio(a,b){var x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
+function rgba(c,a){var r=hex(c);return "rgba("+r[0]+","+r[1]+","+r[2]+","+a+")"}
+function on(c){return ratio("#0B0C0F",c)>=ratio("#FFFFFF",c)?"#0B0C0F":"#FFFFFF"}
+function pal(){var d=S.bg==="dark";return {bg:d?"#0B0C0F":"#F4F5F7",card:d?"#14171D":"#FFFFFF",fg:d?"#EEF1F6":"#14161B",sub:d?"#9AA3B2":"#5B6270"}}
+function fnt(){var f=S.font.split("|");return {fam:'"'+f[0]+'",sans-serif',w:f[1],name:f[0],pix:f[0]==="Press Start 2P",tall:f[0]==="Bebas Neue"||f[0]==="Bangers"}}
+function hf(x,size){var F=fnt();x.font=F.w+" "+Math.round(size*(F.pix?.6:F.tall?1.15:1))+"px "+F.fam}
+function monoText(){var m=(S.mono||"").trim();if(m)return m.toUpperCase();var n=(S.name||"?").replace(/[^A-Za-z0-9]/g,"");if(!n)return "?";
+  var caps=n.slice(1).match(/[A-Z]/);return (n[0]+(caps?caps[0]:"")).toUpperCase().slice(0,2)}
+
+/* ---------- canvases ---------- */
+function drawAvatar(cv,size){
+  size=size||800;cv.width=size;cv.height=size;var x=cv.getContext("2d"),P=pal(),m=S.m,s=S.s,u=size/800;
+  var g=x.createLinearGradient(0,0,size,size);g.addColorStop(0,S.bg==="dark"?"#1A1D24":"#FFFFFF");g.addColorStop(1,S.bg==="dark"?"#08090C":"#E6E9EE");x.fillStyle=g;x.fillRect(0,0,size,size);
+  var rg=x.createRadialGradient(size/2,size/2,0,size/2,size/2,size*.6);rg.addColorStop(0,rgba(m,.35));rg.addColorStop(1,rgba(m,0));x.fillStyle=rg;x.fillRect(0,0,size,size);
+  x.lineWidth=34*u;x.strokeStyle=m;x.beginPath();x.arc(size/2,size/2,size*.36,0,Math.PI*2);x.stroke();
+  x.lineWidth=12*u;x.strokeStyle=s;x.beginPath();x.arc(size/2,size/2,size*.36,-Math.PI*.15,Math.PI*.35);x.stroke();
+  var t=monoText(),fs=size*(t.length>2?.26:.34);hf(x,fs);while(x.measureText(t).width>size*.5&&fs>20){fs-=4;hf(x,fs)}
+  x.textAlign="center";x.textBaseline="middle";x.fillStyle=S.bg==="dark"?"#FFFFFF":"#14161B";x.shadowColor=rgba(m,.9);x.shadowBlur=30*u;x.fillText(t,size/2,size/2+(fnt().pix?fs*.06:fs*.04));
+}
+function drawBanner(cv){
+  var W=1200,H=480;cv.width=W;cv.height=H;var x=cv.getContext("2d"),P=pal(),m=S.m,s=S.s;
+  var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,S.bg==="dark"?"#151820":"#FFFFFF");g.addColorStop(1,S.bg==="dark"?"#08090C":"#E8EBEF");x.fillStyle=g;x.fillRect(0,0,W,H);
+  var rg=x.createRadialGradient(W*.25,H*.2,0,W*.25,H*.2,W*.7);rg.addColorStop(0,rgba(m,.28));rg.addColorStop(1,rgba(m,0));x.fillStyle=rg;x.fillRect(0,0,W,H);
+  // stripes
+  x.save();x.translate(W*.72,0);x.rotate(.35);for(var i=0;i<5;i++){x.fillStyle=i%2?rgba(s,.55):rgba(m,.8-.1*i);x.fillRect(i*58,-200,26,H*2)}x.restore();
+  var name=S.name||"YourName",fs=118;hf(x,fs);while(x.measureText(name).width>W*.62&&fs>30){fs-=2;hf(x,fs)}
+  x.textBaseline="alphabetic";x.fillStyle=P.fg;x.shadowColor=rgba(m,.7);x.shadowBlur=26;x.fillText(name,80,H*.56);x.shadowBlur=0;
+  x.fillStyle=m;x.fillRect(82,H*.56+26,120,8);
+  x.font="600 34px Inter,sans-serif";x.fillStyle=P.sub;var tg=S.tag||"";while(tg&&x.measureText(tg).width>W*.62)tg=tg.slice(0,-1);x.fillText(tg,80,H*.56+86);
+}
+function drawSheet(cv){
+  var W=1920,H=1080;cv.width=W;cv.height=H;var x=cv.getContext("2d"),P=pal(),m=S.m,s=S.s,F=fnt();
+  x.fillStyle=P.bg;x.fillRect(0,0,W,H);
+  var rg=x.createRadialGradient(W*.1,0,0,W*.1,0,W*.8);rg.addColorStop(0,rgba(m,.18));rg.addColorStop(1,rgba(m,0));x.fillStyle=rg;x.fillRect(0,0,W,H);
+  x.textBaseline="top";x.font="700 26px Inter,sans-serif";x.fillStyle=m;try{x.letterSpacing="5px"}catch(e){}x.fillText("BRAND SHEET",100,90);try{x.letterSpacing="0px"}catch(e){}
+  hf(x,110);x.fillStyle=P.fg;var nm=S.name||"YourName";var fs=110;while(x.measureText(nm).width>1000&&fs>40){fs-=2;hf(x,fs)}x.fillText(nm,100,135);
+  x.font="500 34px Inter,sans-serif";x.fillStyle=P.sub;x.fillText(S.tag||"",100,135+fs*1.15+10);
+  var av=document.createElement("canvas");drawAvatar(av,360);x.save();x.beginPath();x.arc(W-100-180,90+180,180,0,Math.PI*2);x.clip();x.drawImage(av,W-100-360,90,360,360);x.restore();
+  // swatches
+  var sw=[["Main",m],["Second",s],["Background",P.bg],["Text",P.fg]],y=520;
+  x.font="700 22px Inter,sans-serif";x.fillStyle=P.sub;try{x.letterSpacing="3px"}catch(e){}x.fillText("COLOURS",100,y-50);try{x.letterSpacing="0px"}catch(e){}
+  sw.forEach(function(c,i){var X=100+i*260;x.fillStyle=c[1];x.beginPath();x.roundRect?x.roundRect(X,y,220,170,22):x.rect(X,y,220,170);x.fill();x.lineWidth=2;x.strokeStyle=S.bg==="dark"?"#2A303B":"#D5D9E0";x.stroke();
+    x.fillStyle=P.fg;x.font="700 26px Inter,sans-serif";x.fillText(c[0],X,y+190);x.font="500 24px ui-monospace,Consolas,monospace";x.fillStyle=P.sub;x.fillText(c[1].toUpperCase(),X,y+226)});
+  // fonts
+  var fx=1200;x.font="700 22px Inter,sans-serif";x.fillStyle=P.sub;try{x.letterSpacing="3px"}catch(e){}x.fillText("FONTS",fx,y-50);try{x.letterSpacing="0px"}catch(e){}
+  hf(x,64);x.fillStyle=m;x.fillText(F.name.length>14&&F.pix?"Heading":"Aa "+F.name,fx,y);x.font="500 26px Inter,sans-serif";x.fillStyle=P.sub;x.fillText("Headings · "+F.name,fx,y+90);
+  x.font="600 48px Inter,sans-serif";x.fillStyle=P.fg;x.fillText("Aa Inter",fx,y+150);x.font="500 26px Inter,sans-serif";x.fillStyle=P.sub;x.fillText("Body text · Inter",fx,y+214);
+  x.font="500 24px Inter,sans-serif";x.fillStyle=P.sub;x.fillText("Made with itscra1g.github.io/brand",100,H-80);
+}
+/* ---------- UI ---------- */
+function swatches(id,list,key){var w=$(id);w.innerHTML="";list.forEach(function(c){var b=document.createElement("button");b.style.background=c;b.title=c;b.setAttribute("aria-label","Colour "+c);b.setAttribute("aria-pressed",S[key].toLowerCase()===c.toLowerCase());
+  b.addEventListener("click",function(){S[key]=c;S.vibe="";save();ui()});w.appendChild(b)});
+  var pk=document.createElement("input");pk.type="color";pk.value=S[key];pk.setAttribute("aria-label","Pick any colour");pk.addEventListener("input",function(){S[key]=this.value;S.vibe="";save();render()});pk.addEventListener("change",ui);w.appendChild(pk)}
+function vibes(){var w=$("vibes");w.innerHTML="";VIBES.forEach(function(v){var b=document.createElement("button");b.className="vibe";b.setAttribute("aria-pressed",S.vibe===v[0]);
+  b.innerHTML='<span class="dots"><i></i><i></i><i></i></span><b></b><span></span>';var d=b.querySelectorAll("i");d[0].style.background=v[3];d[1].style.background=v[4];d[2].style.background=v[5]==="dark"?"#0B0C0F":"#F4F5F7";d[2].style.border="1px solid #2A303B";
+  b.querySelector("b").textContent=v[1];b.querySelector("b").style.fontFamily='"'+v[6].split("|")[0]+'",sans-serif';if(v[0]==="retro")b.querySelector("b").style.fontSize="11px";b.lastChild.textContent=v[2];
+  b.addEventListener("click",function(){S.vibe=v[0];S.m=v[3];S.s=v[4];S.bg=v[5];S.font=v[6];save();ui();fontReady().then(render)});w.appendChild(b)})}
+function contrast(){var P=pal(),r1=ratio(S.m,P.bg),r2=ratio(S.s,P.bg),r3=ratio(on(S.m),S.m),w=$("contrast");w.innerHTML="";
+  function row(label,r,ok,meh){var d=document.createElement("div");var a=document.createElement("span");a.textContent=label;var b=document.createElement("em");b.textContent=r.toFixed(1)+":1 · "+(r>=ok?"Good for text":r>=meh?"Big text and shapes only":"Shapes and glows only");b.className=r>=ok?"ok":r>=meh?"meh":"bad";d.appendChild(a);d.appendChild(b);w.appendChild(d)}
+  row("Main colour on background",r1,4.5,3);row("Second colour on background",r2,4.5,3);row("Text on main-colour buttons",r3,4.5,3);
+  var n=document.createElement("div");n.style.color="var(--sub)";n.style.fontSize="13px";n.textContent="4.5:1 or more reads well as normal text; 3:1 is fine for big headings.";w.appendChild(n)}
+function codes(){var P=pal(),F=fnt();return ["Brand: "+(S.name||"")+(S.tag?" — "+S.tag:""),"","Main colour:   "+S.m.toUpperCase(),"Second colour: "+S.s.toUpperCase(),"Background:    "+P.bg,"Text:          "+P.fg,"","Heading font:  "+F.name+" (Google Fonts)","Body font:     Inter (Google Fonts)"].join("\n")}
+function render(){
+  var P=pal(),pv=$("pv"),F=fnt();
+  pv.style.setProperty("--m",S.m);pv.style.setProperty("--s",S.s);pv.style.setProperty("--bg",P.bg);pv.style.setProperty("--card",P.card);pv.style.setProperty("--fg",P.fg);pv.style.setProperty("--sub",P.sub);pv.style.setProperty("--hf",'"'+F.name+'"');
+  pv.classList.toggle("light",S.bg==="light");
+  $("pvName").textContent=S.name||"YourName";$("pvTag").textContent=S.tag;$("pvLt").textContent=S.name||"YourName";$("pvChat").textContent=S.name||"YourName";
+  $("pvPanel").style.fontSize=F.pix?"16px":"26px";$("pvName").style.fontSize=F.pix?"14px":"22px";$("pvLt").style.fontSize=F.pix?"13px":"20px";
+  var b1=$("b1"),b2=$("b2"),b3=$("b3");b1.style.background=S.m;b1.style.color=on(S.m);b2.style.background="transparent";b2.style.border="2px solid "+S.m;b2.style.color=S.bg==="dark"?P.fg:P.fg;b3.style.background=S.s;b3.style.color=on(S.s);
+  drawBanner($("cvB"));drawAvatar($("cvA"));contrast();$("codes").value=codes();
+}
+function ui(){vibes();swatches("swM",SWM,"m");swatches("swS",SWS,"s");$("bg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.bg)});$("font").value=S.font;render()}
+["name","tag","mono"].forEach(function(id){$(id).value=S[id];$(id).addEventListener("input",function(){S[id]=this.value;save();render()})});
+$("bg").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.bg=b.dataset.v;S.vibe="";save();ui()});
+$("font").addEventListener("change",function(){S.font=this.value;S.vibe="";save();ui();fontReady().then(render)});
+function slug(){return String(S.name||"brand").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"brand"}
+function blobOf(cv){return new Promise(function(r){cv.toBlob(r,"image/png")})}
+function dl(blob,name){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},3000)}
+$("dlA").addEventListener("click",function(){var c=document.createElement("canvas");drawAvatar(c,800);blobOf(c).then(function(b){dl(b,slug()+"-avatar.png")})});
+$("dlB").addEventListener("click",function(){var c=document.createElement("canvas");drawBanner(c);blobOf(c).then(function(b){dl(b,slug()+"-banner-1200x480.png")})});
+$("dlS").addEventListener("click",function(){var c=document.createElement("canvas");drawSheet(c);blobOf(c).then(function(b){dl(b,slug()+"-brand-sheet.png")})});
+/* zip */
+var CRC=(function(){var t=new Uint32Array(256);for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(b){var c=0xFFFFFFFF;for(var i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+async function zip(files){var parts=[],central=[],off=0,enc=new TextEncoder();function u16(v){return [v&255,(v>>8)&255]}function u32(v){return [v&255,(v>>8)&255,(v>>16)&255,(v>>>24)&255]}
+  for(var i=0;i<files.length;i++){var name=enc.encode(files[i].path),data=files[i].data instanceof Uint8Array?files[i].data:new Uint8Array(await files[i].data.arrayBuffer()),crc=crc32(data);
+    var head=new Uint8Array([].concat([0x50,0x4b,3,4],u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0)));parts.push(head,name,data);
+    central.push(new Uint8Array([].concat([0x50,0x4b,1,2],u16(20),u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off))),name);off+=head.length+name.length+data.length}
+  var cs=central.reduce(function(a,b){return a+b.length},0);return new Blob(parts.concat(central,[new Uint8Array([].concat([0x50,0x4b,5,6],u16(0),u16(0),u16(files.length),u16(files.length),u32(cs),u32(off),u16(0)))]),{type:"application/zip"})}
+$("dlKit").addEventListener("click",async function(){var a=document.createElement("canvas"),b=document.createElement("canvas"),c=document.createElement("canvas");drawAvatar(a,800);drawBanner(b);drawSheet(c);
+  var f=[{path:"brand/avatar-800.png",data:await blobOf(a)},{path:"brand/banner-1200x480.png",data:await blobOf(b)},{path:"brand/brand-sheet.png",data:await blobOf(c)},{path:"brand/brand-codes.txt",data:new TextEncoder().encode(codes())}];
+  dl(await zip(f),slug()+"-brand-kit.zip")});
+$("apply").addEventListener("click",function(){var n=0;
+  [["pm_cfg"],["sg_cfg"]].forEach(function(k){try{var o=JSON.parse(localStorage.getItem(k[0])||"{}")||{};o.col=S.m;o.font=S.font;if(S.bg==="light"&&k[0]==="sg_cfg")o.bg="light";if(k[0]==="sg_cfg"&&S.name&&!o.name)o.name=S.name;localStorage.setItem(k[0],JSON.stringify(o));n++}catch(e){}});
+  $("msg").innerHTML="";$("msg").textContent=n?"Done. Your colour and font are set in the Panel Maker and Schedule Maker.":"Couldn't save in this browser: copy the codes below instead."});
+function fontReady(){var f=S.font.split("|");if(!document.fonts||!document.fonts.load)return Promise.resolve();return Promise.all([document.fonts.load(f[1]+' 60px "'+f[0]+'"'),document.fonts.load('600 30px "Inter"')]).catch(function(){})}
+ui();fontReady().then(render);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
+})();
+</script>
+</body>
+</html>
