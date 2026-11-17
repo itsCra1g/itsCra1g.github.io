@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emote Resizer: Twitch, Kick and Discord emote and badge sizes</title>
+<meta name="description" content="Free emote and badge resizer by itsCRA1G: drop in an image and get every size Twitch, Kick and Discord need, ready to upload. Runs in your browser; nothing is uploaded.">
+<meta property="og:title" content="Emote Resizer: every Twitch, Kick and Discord size">
+<meta property="og:description" content="Drop in an image, get Twitch, Kick and Discord emote and badge sizes. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 36px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:16em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 18px var(--display);color:var(--fg);margin:0}
+p{margin:0 0 14px;max-width:46em}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}.btn:disabled{opacity:.4;cursor:default}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:200px;border:2px dashed var(--edge2);border-radius:20px;background:var(--tile);text-align:center;padding:28px;cursor:pointer;transition:border-color .2s,background .2s}
+.drop:hover,.drop.over{border-color:var(--acc);background:#0d1118}
+.drop b{font:700 22px var(--display);color:var(--fg)}
+.drop span{font-size:14px;color:var(--mute)}
+.drop input{display:none}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px;margin-top:22px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.tog{display:flex;flex-direction:column;gap:9px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--acc);flex:0 0 auto}
+.tog small{color:var(--mute);font-size:13px;margin-left:4px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 6px}
+.items{display:flex;flex-direction:column;gap:18px}
+.item{background:var(--tile);border:1px solid var(--edge);border-radius:18px;padding:18px}
+.ihead{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:14px}
+.ihead input{font:600 15px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px;min-width:0;width:220px}
+.ihead .src{font-size:13px;color:var(--mute)}
+.ihead .rm{margin-left:auto}
+.warn{font-size:13px;color:#FFB020;width:100%}
+.outs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.out{background:var(--tile2);border:1px solid var(--edge);border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;min-width:0}
+.out .pv{width:120px;height:120px;display:grid;place-items:center;border-radius:8px;background:repeating-conic-gradient(#1b1f27 0 25%,#13161c 0 50%) 0 0/16px 16px}
+.out .pv img{image-rendering:auto;max-width:112px;max-height:112px}
+.out .pv.big img{width:112px;height:112px}
+.out b{font:700 13px var(--text);color:var(--fg)}
+.out small{font-size:12px;color:var(--mute)}
+.out small.ok{color:var(--ok)}.out small.bad{color:var(--bad)}
+.out a{font:700 13px var(--text);color:#000;background:var(--acc);border-radius:8px;padding:6px 10px;text-decoration:none}
+.out a:hover{background:#8CC4FF;color:#000}
+.grp{font:700 12px var(--text);letter-spacing:1.4px;text-transform:uppercase;color:var(--mute);margin:14px 0 8px}
+.grp:first-child{margin-top:0}
+/* chat previews */
+.chats{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:14px}
+.chat{border-radius:10px;padding:10px 12px;font:13px/28px Inter,system-ui,sans-serif;min-width:0}
+.chat .t{font:700 10px var(--text);letter-spacing:1.2px;text-transform:uppercase;opacity:.65;line-height:1.2;margin-bottom:4px}
+.chat img{vertical-align:middle}
+.chat .bdg{width:18px;height:18px;margin-right:3px;vertical-align:-4px}
+.chat .em{width:28px;height:28px;margin:0 2px}
+.chat.kk .em{width:32px;height:32px}
+.chat.tw-d{background:#18181b;color:#efeff1}.chat.tw-l{background:#fff;color:#0e0e10}.chat.kk{background:#0b0e0f;color:#fff}.chat.dc{background:#313338;color:#dbdee1}
+.chat.dc .em{width:22px;height:22px}
+.chat .nm{font-weight:700}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:52em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Emote Resizer</a>
+  <nav><a href="#resize">Resize</a><a href="#sizes">Sizes</a><a href="#tips">Tips</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free tool · by itsCRA1G</div>
+  <h1>Every emote and badge size, from one image.</h1>
+  <p class="lead">Drop in your artwork and get the exact sizes Twitch, Kick and Discord ask for, squared up, named and ready to upload. It all happens in your browser, so your images never leave your computer.</p>
+  <div class="chips"><span class="chip">Twitch emotes and badges</span><span class="chip">Kick emotes and badges</span><span class="chip">Discord emoji</span><span class="chip">Several at once</span><span class="chip">Download as a zip</span></div>
+</div></div>
+
+<main class="wrap">
+  <section id="resize">
+    <div class="sec-head"><span class="num">1</span><h2>Drop in your images</h2></div>
+    <label class="drop" id="drop"><b>Drop images here, or click to choose</b><span>PNG, JPG, WebP or GIF · several at once is fine · a big, square, transparent PNG works best</span><input type="file" id="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple></label>
+    <div class="opts">
+      <div><div class="lbl">Make for</div>
+        <div class="tog" id="targets">
+          <label><input type="checkbox" value="twe" checked>Twitch emote <small>112 · 56 · 28</small></label>
+          <label><input type="checkbox" value="twb">Twitch sub / bits badge <small>72 · 36 · 18</small></label>
+          <label><input type="checkbox" value="kke" checked>Kick emote <small>500</small></label>
+          <label><input type="checkbox" value="kkb">Kick sub badge <small>72</small></label>
+          <label><input type="checkbox" value="dce">Discord emoji <small>128</small></label>
+        </div></div>
+      <div><div class="lbl">Not square?</div><div class="seg" id="fitSeg"><button data-v="fit" aria-pressed="true">Fit (add space)</button><button data-v="fill" aria-pressed="false">Fill (crop)</button></div>
+        <div class="hint">Fit keeps the whole picture and adds see-through space. Fill crops the edges to fill the square.</div></div>
+      <div><div class="lbl">Tidy up</div>
+        <div class="tog">
+          <label><input type="checkbox" id="optTrim" checked>Trim empty see-through edges first</label>
+          <label><input type="checkbox" id="optSharp" checked>Sharpen the small sizes</label>
+        </div>
+        <div class="hint">Trimming makes the emote fill its box, so it looks bigger in chat. Sharpening keeps 28 and 18 pixel versions crisp.</div></div>
+    </div>
+    <div class="actions"><button class="btn" id="zipAll" disabled>Download everything (.zip)</button><button class="btn ghost" id="clear" hidden>Clear all</button><span class="hint" id="count" style="margin:0"></span></div>
+    <div class="items" id="items"></div>
+  </section>
+
+  <section id="sizes">
+    <div class="sec-head"><span class="num">2</span><h2>What each platform wants</h2></div>
+    <div class="tw"><table>
+      <tr><th>What</th><th>Sizes (pixels, square)</th><th>File</th><th>Notes</th></tr>
+      <tr><td><strong>Twitch emote</strong></td><td>112, 56 and 28</td><td>PNG, 1 MB max</td><td>Upload all three in Creator Dashboard → Viewer Rewards → Emotes. The 112 one also works for a channel points reward icon.</td></tr>
+      <tr><td><strong>Twitch sub / bits badge</strong></td><td>72, 36 and 18</td><td>PNG</td><td>Viewer Rewards → Badges. Keep them bold and simple: 18 pixels is tiny.</td></tr>
+      <tr><td><strong>Kick emote</strong></td><td>500</td><td>PNG (or GIF), under 1 MB</td><td>One square file; Kick makes the smaller sizes itself.</td></tr>
+      <tr><td><strong>Kick sub badge</strong></td><td>72</td><td>PNG with a see-through background</td><td>Kick doesn't publish a badge size, so this makes a sharp square one; if the upload page asks for something else, go with that.</td></tr>
+      <tr><td><strong>Discord emoji</strong></td><td>128</td><td>PNG, 256 KB max</td><td>Server Settings → Emoji.</td></tr>
+    </table></div>
+    <p class="hint">Sizes checked November 2026. Platforms change things now and then, so if an upload page says something different, follow it.</p>
+  </section>
+
+  <section id="tips">
+    <div class="sec-head"><span class="num">3</span><h2>Tips for emotes that read well</h2></div>
+    <p><strong>Start big.</strong> Draw or export at 500 pixels or more and let this shrink it. Making a small image bigger always looks blurry.</p>
+    <p><strong>Think 28 pixels.</strong> That's how big an emote is in chat. Thick outlines, one clear expression or object and few small details survive; fine text and thin lines don't.</p>
+    <p><strong>Use a see-through background.</strong> Emotes sit on dark and light chat themes, so check both previews above.</p>
+    <p><strong>Animated GIFs:</strong> this tool uses the first frame, so it's best for static emotes and badges. For animated ones, resize the GIF in your editor and keep it under 1 MB.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Twitch, Kick or Discord.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+// [key, label, folder, sizes, file-size limit in bytes]
+var TARGETS={twe:["Twitch emote","twitch-emote",[112,56,28],1048576],twb:["Twitch badge","twitch-badge",[72,36,18],1048576],
+  kke:["Kick emote","kick-emote",[500],1048576],kkb:["Kick badge","kick-badge",[72],1048576],dce:["Discord emoji","discord-emoji",[128],262144]};
+var S={fit:"fit",trim:true,sharp:true,on:["twe","kke"]};
+try{var sv=JSON.parse(localStorage.getItem("em_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+var items=[];   // {id,name,img,el,outs:{key:[{size,blob,url}]}}
+var nid=0;
+
+/* ---------- image work ---------- */
+function loadImg(file){return new Promise(function(res,rej){var u=URL.createObjectURL(file),i=new Image();i.onload=function(){res(i)};i.onerror=function(){URL.revokeObjectURL(u);rej(new Error("Couldn't read that image"))};i.src=u})}
+function canvasOf(w,h){var c=document.createElement("canvas");c.width=w;c.height=h;return c}
+// the box around anything that isn't see-through
+function trimBox(c){
+  var w=c.width,h=c.height,d=c.getContext("2d").getImageData(0,0,w,h).data,x0=w,y0=h,x1=-1,y1=-1;
+  for(var y=0;y<h;y++)for(var x=0;x<w;x++)if(d[(y*w+x)*4+3]>8){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  return x1<0?null:{x:x0,y:y0,w:x1-x0+1,h:y1-y0+1};
+}
+function square(img){
+  var c=canvasOf(img.naturalWidth,img.naturalHeight);c.getContext("2d").drawImage(img,0,0);
+  var b={x:0,y:0,w:c.width,h:c.height};
+  if(S.trim){var t=trimBox(c);if(t)b=t}
+  var side=S.fit==="fit"?Math.max(b.w,b.h):Math.min(b.w,b.h);
+  var sq=canvasOf(side,side),x=sq.getContext("2d");
+  if(S.fit==="fit")x.drawImage(c,b.x,b.y,b.w,b.h,Math.round((side-b.w)/2),Math.round((side-b.h)/2),b.w,b.h);
+  else x.drawImage(c,b.x+Math.round((b.w-side)/2),b.y+Math.round((b.h-side)/2),side,side,0,0,side,side);
+  return sq;
+}
+// shrink in halves for a clean result, then a light sharpen on small sizes
+function shrink(src,size){
+  var cur=src;
+  while(cur.width/2>=size*1.0001&&cur.width>size*2){var n=canvasOf(Math.round(cur.width/2),Math.round(cur.height/2)),nx=n.getContext("2d");nx.imageSmoothingQuality="high";nx.drawImage(cur,0,0,n.width,n.height);cur=n}
+  var out=canvasOf(size,size),ox=out.getContext("2d");ox.imageSmoothingEnabled=true;ox.imageSmoothingQuality="high";ox.drawImage(cur,0,0,size,size);
+  if(S.sharp&&size<=56&&src.width>size)sharpen(out,size<=28?.35:.22);
+  return out;
+}
+function sharpen(c,amt){
+  var w=c.width,h=c.height,x=c.getContext("2d"),im=x.getImageData(0,0,w,h),s=im.data,o=new Uint8ClampedArray(s);
+  for(var y=1;y<h-1;y++)for(var xx=1;xx<w-1;xx++){var i=(y*w+xx)*4;if(s[i+3]<8)continue;
+    for(var ch=0;ch<3;ch++){var v=5*s[i+ch]-s[i-4+ch]-s[i+4+ch]-s[i-w*4+ch]-s[i+w*4+ch];o[i+ch]=s[i+ch]+(v-s[i+ch])*amt}}
+  im.data.set(o);x.putImageData(im,0,0);
+}
+function toBlob(c){return new Promise(function(r){c.toBlob(function(b){r(b)},"image/png")})}
+function kb(n){return n<1024?n+" B":n<1048576?(n/1024).toFixed(n<10240?1:0)+" KB":(n/1048576).toFixed(2)+" MB"}
+function slug(n){return String(n||"emote").replace(/\.[a-z0-9]+$/i,"").replace(/[^A-Za-z0-9_-]+/g,"_").replace(/^_+|_+$/g,"").slice(0,40)||"emote"}
+
+/* ---------- building each image's results ---------- */
+async function build(it){
+  Object.keys(it.outs).forEach(function(k){it.outs[k].forEach(function(o){URL.revokeObjectURL(o.url)})});
+  it.outs={};
+  var sq=square(it.img),box=it.el.querySelector(".body");box.innerHTML="";
+  var warn=it.el.querySelector(".warn");
+  var small=Math.min(it.img.naturalWidth,it.img.naturalHeight);
+  warn.textContent=sq.width<112?"This image is small ("+sq.width+" pixels once squared). The bigger sizes will look soft: start from 500 pixels or more if you can.":
+    (S.on.indexOf("kke")>=0&&sq.width<500?"Kick wants 500 pixels; this image is "+sq.width+" once squared, so the Kick emote is stretched up and may look soft.":"");
+  warn.hidden=!warn.textContent;
+  for(var t=0;t<S.on.length;t++){
+    var key=S.on[t],T=TARGETS[key];
+    box.appendChild(Object.assign(document.createElement("div"),{className:"grp",textContent:T[0]}));
+    var row=document.createElement("div");row.className="outs";box.appendChild(row);it.outs[key]=[];
+    for(var s=0;s<T[2].length;s++){
+      var size=T[2][s],c=shrink(sq,size),b=await toBlob(c),url=URL.createObjectURL(b),file=it.name+"_"+T[1]+"_"+size+".png";
+      it.outs[key].push({size:size,blob:b,url:url,file:file});
+      var cell=document.createElement("div");cell.className="out";
+      var pv=document.createElement("div");pv.className="pv"+(size>112?" big":"");var im=document.createElement("img");im.src=url;im.alt=T[0]+" "+size;if(size<=112){im.width=size;im.height=size}pv.appendChild(im);
+      var nm=document.createElement("b");nm.textContent=size+" × "+size;
+      var sz=document.createElement("small");var okSize=b.size<=T[3];sz.className=okSize?"ok":"bad";sz.textContent=kb(b.size)+(okSize?" · fits":" · too big for "+kb(T[3]));
+      var a=document.createElement("a");a.href=url;a.download=file;a.textContent="Download";
+      cell.appendChild(pv);cell.appendChild(nm);cell.appendChild(sz);cell.appendChild(a);row.appendChild(cell);
+    }
+  }
+  previews(it);
+}
+function previews(it){
+  var p=it.el.querySelector(".chats");p.innerHTML="";
+  var em=(it.outs.twe&&it.outs.twe[0])||(it.outs.kke&&it.outs.kke[0])||(it.outs.dce&&it.outs.dce[0]);
+  var bd=(it.outs.twb&&it.outs.twb[0])||(it.outs.kkb&&it.outs.kkb[0]);
+  if(!em&&!bd)return;
+  [["tw-d","Twitch · dark"],["tw-l","Twitch · light"],["kk","Kick"],["dc","Discord"]].forEach(function(x){
+    var c=document.createElement("div");c.className="chat "+x[0];var t=document.createElement("div");t.className="t";t.textContent=x[1];c.appendChild(t);
+    var line=document.createElement("div");
+    if(bd&&x[0]!=="dc"){var b=document.createElement("img");b.className="bdg";b.src=bd.url;b.alt="";line.appendChild(b)}
+    var n=document.createElement("span");n.className="nm";n.style.color=x[0]==="tw-l"?"#8205B4":x[0]==="kk"?"#53FC18":"#B57BFF";n.textContent="Viewer";line.appendChild(n);
+    line.appendChild(document.createTextNode(": that's brilliant "));
+    if(em){for(var i=0;i<2;i++){var e=document.createElement("img");e.className="em";e.src=em.url;e.alt=":"+it.name+":";line.appendChild(e)}}
+    c.appendChild(line);p.appendChild(c);
+  });
+}
+function addItem(img,fname){
+  var it={id:++nid,name:slug(fname),img:img,outs:{}};
+  var el=document.createElement("div");el.className="item";
+  el.innerHTML='<div class="ihead"><input aria-label="Emote name" spellcheck="false" maxlength="40"><span class="src"></span><button class="btn ghost rm" type="button">Remove</button><div class="warn" hidden></div></div><div class="body"></div><div class="chats"></div>';
+  var nm=el.querySelector("input");nm.value=it.name;
+  nm.addEventListener("change",function(){it.name=slug(nm.value);nm.value=it.name;build(it)});
+  el.querySelector(".src").textContent=fname+" · "+img.naturalWidth+" × "+img.naturalHeight;
+  el.querySelector(".rm").addEventListener("click",function(){items=items.filter(function(x){return x!==it});el.remove();Object.keys(it.outs).forEach(function(k){it.outs[k].forEach(function(o){URL.revokeObjectURL(o.url)})});status()});
+  it.el=el;$("items").appendChild(el);items.push(it);
+  return build(it).then(status);
+}
+async function addFiles(list){
+  for(var i=0;i<list.length;i++){var f=list[i];if(!/^image\//.test(f.type))continue;
+    try{await addItem(await loadImg(f),f.name)}catch(e){alertBox(f.name+": "+e.message)}}
+}
+function alertBox(msg){var d=document.createElement("div");d.className="item warn";d.textContent=msg;$("items").prepend(d);setTimeout(function(){d.remove()},6000)}
+function status(){var n=items.length;$("zipAll").disabled=!n||!S.on.length;$("clear").hidden=!n;$("count").textContent=n?(n===1?"1 image":n+" images"):""}
+async function rebuildAll(){for(var i=0;i<items.length;i++)await build(items[i]);status()}
+
+/* ---------- a small zip maker (no compression; PNGs are already compressed) ---------- */
+var CRC=(function(){var t=new Uint32Array(256);for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(b){var c=0xFFFFFFFF;for(var i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+async function zip(files){
+  var parts=[],central=[],off=0,enc=new TextEncoder();
+  function u16(v){return [v&255,(v>>8)&255]}function u32(v){return [v&255,(v>>8)&255,(v>>16)&255,(v>>>24)&255]}
+  for(var i=0;i<files.length;i++){
+    var name=enc.encode(files[i].path),data=new Uint8Array(await files[i].blob.arrayBuffer()),crc=crc32(data);
+    var head=new Uint8Array([].concat([0x50,0x4b,3,4],u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0)));
+    parts.push(head,name,data);
+    central.push(new Uint8Array([].concat([0x50,0x4b,1,2],u16(20),u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off))),name);
+    off+=head.length+name.length+data.length;
+  }
+  var csize=central.reduce(function(a,b){return a+b.length},0);
+  var end=new Uint8Array([].concat([0x50,0x4b,5,6],u16(0),u16(0),u16(files.length),u16(files.length),u32(csize),u32(off),u16(0)));
+  return new Blob(parts.concat(central,[end]),{type:"application/zip"});
+}
+$("zipAll").addEventListener("click",async function(){
+  var files=[];items.forEach(function(it){Object.keys(it.outs).forEach(function(k){it.outs[k].forEach(function(o){files.push({path:it.name+"/"+o.file,blob:o.blob})})})});
+  if(!files.length)return;var b=await zip(files),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=(items.length===1?items[0].name:"emotes")+".zip";document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000);
+});
+$("clear").addEventListener("click",function(){items.forEach(function(it){Object.keys(it.outs).forEach(function(k){it.outs[k].forEach(function(o){URL.revokeObjectURL(o.url)})})});items=[];$("items").innerHTML="";status()});
+
+/* ---------- controls ---------- */
+function save(){try{localStorage.setItem("em_cfg",JSON.stringify(S))}catch(e){}}
+var drop=$("drop"),fi=$("file");
+fi.addEventListener("change",function(){addFiles(Array.from(fi.files));fi.value=""});
+["dragenter","dragover"].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.add("over")})});
+["dragleave","drop"].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.remove("over")})});
+drop.addEventListener("drop",function(ev){addFiles(Array.from(ev.dataTransfer.files||[]))});
+document.addEventListener("paste",function(ev){var f=Array.from((ev.clipboardData&&ev.clipboardData.files)||[]);if(f.length)addFiles(f)});
+$("targets").querySelectorAll("input").forEach(function(cb){cb.checked=S.on.indexOf(cb.value)>=0;cb.addEventListener("change",function(){
+  S.on=Array.from($("targets").querySelectorAll("input")).filter(function(x){return x.checked}).map(function(x){return x.value});save();rebuildAll()})});
+$("fitSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.fit=b.dataset.v;seg();save();rebuildAll()});
+function seg(){$("fitSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.fit)})}
+$("optTrim").checked=S.trim;$("optSharp").checked=S.sharp;
+$("optTrim").addEventListener("change",function(){S.trim=this.checked;save();rebuildAll()});
+$("optSharp").addEventListener("change",function(){S.sharp=this.checked;save();rebuildAll()});
+seg();status();
+})();
+</script>
+</body>
+</html>
