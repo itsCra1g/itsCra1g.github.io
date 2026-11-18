@@ -163,16 +163,17 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
 
   <section id="layout">
     <div class="sec-head"><span class="num">2</span><h2>Vertical layout helper</h2></div>
-    <p>Tell it where your camera sits on stream and pick a layout. It shows what to crop from your 1920×1080 clip and where it goes in the 1080×1920 video, with the numbers to type into CapCut, DaVinci Resolve or any editor.</p>
+    <p>Tell it how you appear on stream (a camera box, green screen with no box, or no camera), where you are, and pick a layout. It shows what to crop from your 1920×1080 clip and where it goes in the 1080×1920 video, with the numbers to type into CapCut, DaVinci Resolve or any editor.</p>
     <div class="opts">
-      <div><div class="lbl">Layout</div><select id="lay"><option value="camtop">Camera on top, game below</option><option value="gametop">Game on top, camera below</option><option value="full">Full-height game, camera bubble</option><option value="nocam">Game only (no camera)</option></select></div>
-      <div><div class="lbl">Camera corner on stream</div><select id="corner"><option value="tl">Top left</option><option value="tr">Top right</option><option value="bl">Bottom left</option><option value="br" selected>Bottom right</option></select></div>
-      <div><div class="lbl">Camera size on stream</div><select id="csize"><option value="400">Small (400×225)</option><option value="512" selected>Medium (512×288)</option><option value="640">Large (640×360)</option></select></div>
-      <div><div class="lbl">Camera gap from edge</div><input class="fld" type="number" id="gap" min="0" max="200" value="30"></div>
+      <div><div class="lbl">Your camera on stream</div><div class="seg" id="ctype"><button data-v="box">In a box</button><button data-v="green">Green screen, no box</button><button data-v="none">No camera</button></div></div>
+      <div id="wLay"><div class="lbl">Layout</div><select id="lay"><option value="camtop">You on top, game below</option><option value="gametop">Game on top, you below</option><option value="full">Full-height game, you in a bubble</option><option value="nocam">Game only</option></select></div>
+      <div id="wPos"><div class="lbl">Where you are on stream</div><select id="pos"><option value="tl">Top left</option><option value="tc">Top middle</option><option value="tr">Top right</option><option value="ml">Middle left</option><option value="mc">Centre</option><option value="mr">Middle right</option><option value="bl">Bottom left</option><option value="bc">Bottom middle</option><option value="br">Bottom right</option><option value="custom">Where I dragged it</option></select></div>
+      <div id="wSize"><div class="lbl" id="sizeLbl">Camera size on stream</div><select id="csize"></select></div>
+      <div id="wGap"><div class="lbl">Gap from the edge (pixels)</div><input class="fld" type="number" id="gap" min="0" max="300" value="30"></div>
       <div><div class="lbl">Game focus</div><div class="seg" id="focus"><button data-v="l">Left</button><button data-v="c">Centre</button><button data-v="r">Right</button></div></div>
     </div>
     <div class="lay">
-      <div class="box"><div class="cap">Your stream (1920×1080): what to crop</div><canvas id="src" width="960" height="540"></canvas></div>
+      <div class="box"><div class="cap">Your stream (1920×1080): what to crop</div><canvas id="src" width="960" height="540" style="cursor:grab;touch-action:none"></canvas><div class="hint" id="dragHint" style="margin:8px 0 0">Not quite right? Drag on this picture to put yourself exactly where you are on stream.</div></div>
       <div class="box"><div class="cap">The Short (1080×1920)</div><canvas id="dst" width="540" height="960"></canvas></div>
       <div class="box nums" id="nums"></div>
     </div>
@@ -242,25 +243,34 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id)};
-var S={lay:"camtop",corner:"br",csize:"512",gap:30,focus:"c",what:"",game:"",who:"",where:"Twitch and Kick"};
-try{var sv=JSON.parse(localStorage.getItem("cl_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+var S={lay:"camtop",ctype:"box",pos:"br",cx:960,cy:540,csize:"512",gap:30,focus:"c",what:"",game:"",who:"",where:"Twitch and Kick"};
+try{var sv=JSON.parse(localStorage.getItem("cl_cfg")||"null");if(sv){for(var k in S)if(k in sv)S[k]=sv[k];if(sv.corner&&!sv.pos)S.pos=sv.corner}}catch(e){}
 try{var br=JSON.parse(localStorage.getItem("br_cfg")||"null");if(br&&br.name&&br.name!=="YourName"&&!S.who)S.who=br.name}catch(e){}
 var saveT;function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem("cl_cfg",JSON.stringify(S))}catch(e){}},300)}
 var CAM="#FF5FA2",GAME="#4DA3FF";
 /* ---------- layout maths ---------- */
-function camBox(){var w=parseInt(S.csize,10),h=Math.round(w*9/16),g=Math.max(0,parseInt(S.gap,10)||0);
-  var x=S.corner[1]==="l"?g:1920-g-w,y=S.corner[0]==="t"?g:1080-g-h;return {x:x,y:y,w:w,h:h}}
-function gameCrop(aspect){ // aspect = w/h of destination region; returns crop in source, avoiding the camera if possible
+function camBox(){var w=parseInt(S.csize,10),green=S.ctype==="green",h=green?Math.round(w*1.05):Math.round(w*9/16),g=Math.max(0,parseInt(S.gap,10)||0),x,y;
+  if(S.pos==="custom"){x=Math.round(S.cx-w/2);y=Math.round(S.cy-h/2)}
+  else{var c=S.pos[1],r=S.pos[0];x=c==="l"?g:c==="c"?Math.round((1920-w)/2):1920-g-w;y=r==="t"?g:r==="m"?Math.round((1080-h)/2):1080-(green?0:g)-h}
+  x=Math.max(0,Math.min(1920-w,x));y=Math.max(0,Math.min(1080-h,y));return {x:x,y:y,w:w,h:h}}
+function clampBox(b){b.x=Math.max(0,Math.min(1920-b.w,Math.round(b.x)));b.y=Math.max(0,Math.min(1080-b.h,Math.round(b.y)));return b}
+function camCrop(cam,aspect){ // the part of the clip that shows you, shaped for the band it goes in
+  if(S.ctype==="box")return {x:cam.x,y:cam.y,w:cam.w,h:cam.h};
+  var ch=Math.min(1080,Math.round(cam.h*.95)),cw=Math.round(ch*aspect);if(cw>1920){cw=1920;ch=Math.round(cw/aspect)}
+  return clampBox({x:cam.x+cam.w/2-cw/2,y:cam.y+cam.h*.55-ch/2,w:cw,h:ch})}
+function bubbleCrop(cam){if(S.ctype==="box")return {x:cam.x+Math.round((cam.w-cam.h)/2),y:cam.y,w:cam.h,h:cam.h};
+  var sz=Math.round(cam.w*.75);return clampBox({x:cam.x+cam.w/2-sz/2,y:cam.y+cam.w*.36-sz/2,w:sz,h:sz})}
+function gameCrop(aspect){
   var h=1080,w=Math.round(h*aspect);if(w>1920){w=1920;h=Math.round(w/aspect)}
   var x=S.focus==="l"?0:S.focus==="r"?1920-w:Math.round((1920-w)/2),y=Math.round((1080-h)/2);return {x:x,y:y,w:w,h:h}}
+function who(){return S.ctype==="green"?"You":"Camera"}
 function layout(){
-  var cam=camBox(),L={regions:[],cam:cam};
-  if(S.lay==="camtop"||S.lay==="gametop"){
-    var ch=608,gh=1920-ch;var camDst={x:0,y:S.lay==="camtop"?0:gh,w:1080,h:ch},gameDst={x:0,y:S.lay==="camtop"?ch:0,w:1080,h:gh};
-    var gc=gameCrop(1080/gh);
-    L.regions=[["Camera",CAM,cam,camDst],["Game",GAME,gc,gameDst]];
-  }else if(S.lay==="full"){
-    var gc2=gameCrop(1080/1920),bub=360;L.regions=[["Game",GAME,gc2,{x:0,y:0,w:1080,h:1920}],["Camera",CAM,{x:cam.x+Math.round((cam.w-cam.h)/2),y:cam.y,w:cam.h,h:cam.h},{x:Math.round((1080-bub)/2),y:Math.round(1920*.13),w:bub,h:bub,round:true}]];
+  var cam=camBox(),L={regions:[],cam:cam},lay=S.ctype==="none"?"nocam":S.lay;
+  if(lay==="camtop"||lay==="gametop"){
+    var ch=608,gh=1920-ch;var camDst={x:0,y:lay==="camtop"?0:gh,w:1080,h:ch},gameDst={x:0,y:lay==="camtop"?ch:0,w:1080,h:gh};
+    L.regions=[[who(),CAM,camCrop(cam,1080/ch),camDst],["Game",GAME,gameCrop(1080/gh),gameDst]];
+  }else if(lay==="full"){
+    var bub=360;L.regions=[["Game",GAME,gameCrop(1080/1920),{x:0,y:0,w:1080,h:1920}],[who(),CAM,bubbleCrop(cam),{x:Math.round((1080-bub)/2),y:Math.round(1920*.13),w:bub,h:bub,round:true}]];
   }else{L.regions=[["Game",GAME,gameCrop(1080/1920),{x:0,y:0,w:1080,h:1920}]]}
   return L;
 }
@@ -269,11 +279,12 @@ function fakeGame(x,W,H){var g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,
   x.fillStyle="rgba(255,255,255,.07)";for(var i=0;i<14;i++){x.fillRect((i*137)%W,H*.55+((i*53)%40),W*.05,H*.45)}
   x.strokeStyle="rgba(255,255,255,.6)";x.lineWidth=W/400;x.beginPath();x.arc(W/2,H/2,W/90,0,Math.PI*2);x.moveTo(W/2-W/45,H/2);x.lineTo(W/2+W/45,H/2);x.moveTo(W/2,H/2-W/45);x.lineTo(W/2,H/2+W/45);x.stroke();
   x.fillStyle="rgba(0,0,0,.4)";x.fillRect(W*.02,H*.03,W*.18,H*.05);x.fillRect(W*.78,H*.88,W*.2,H*.08)}
-function fakeCam(x,b,sc){x.save();x.beginPath();x.rect(b.x*sc,b.y*sc,b.w*sc,b.h*sc);x.clip();x.fillStyle="#3a2a33";x.fillRect(b.x*sc,b.y*sc,b.w*sc,b.h*sc);x.fillStyle="#d9a38b";x.beginPath();x.arc((b.x+b.w/2)*sc,(b.y+b.h*.45)*sc,b.h*.22*sc,0,Math.PI*2);x.fill();
+function fakeCam(x,b,sc){if(S.ctype==="none")return;if(S.ctype==="green"){x.save();x.fillStyle="#d9a38b";x.beginPath();x.arc((b.x+b.w/2)*sc,(b.y+b.w*.36)*sc,b.w*.17*sc,0,Math.PI*2);x.fill();x.fillStyle="#2b3f66";x.beginPath();x.ellipse((b.x+b.w/2)*sc,(b.y+b.h*1.02)*sc,b.w*.44*sc,b.h*.5*sc,0,Math.PI,0);x.lineTo((b.x+b.w*.94)*sc,(b.y+b.h)*sc);x.lineTo((b.x+b.w*.06)*sc,(b.y+b.h)*sc);x.fill();x.restore();return}
+  x.save();x.beginPath();x.rect(b.x*sc,b.y*sc,b.w*sc,b.h*sc);x.clip();x.fillStyle="#3a2a33";x.fillRect(b.x*sc,b.y*sc,b.w*sc,b.h*sc);x.fillStyle="#d9a38b";x.beginPath();x.arc((b.x+b.w/2)*sc,(b.y+b.h*.45)*sc,b.h*.22*sc,0,Math.PI*2);x.fill();
   x.beginPath();x.ellipse((b.x+b.w/2)*sc,(b.y+b.h*1.02)*sc,b.h*.38*sc,b.h*.32*sc,0,0,Math.PI*2);x.fill();x.restore()}
-function drawSrc(L){var cv=$("src"),x=cv.getContext("2d"),sc=cv.width/1920;fakeGame(x,cv.width,cv.height);if(S.lay!=="nocam"||true)fakeCam(x,L.cam,sc);
+function drawSrc(L){var cv=$("src"),x=cv.getContext("2d"),sc=cv.width/1920;fakeGame(x,cv.width,cv.height);fakeCam(x,L.cam,sc);
   L.regions.forEach(function(r){var c=r[2];x.save();x.strokeStyle=r[1];x.lineWidth=3;x.setLineDash(r[0]==="Camera"?[]:[10,6]);x.strokeRect(c.x*sc+1.5,c.y*sc+1.5,c.w*sc-3,c.h*sc-3);
-    x.fillStyle=r[1];x.font="700 14px Inter,sans-serif";var t=r[0]+" crop";var tw=x.measureText(t).width;x.fillRect(c.x*sc+4,c.y*sc+4,tw+12,22);x.fillStyle="#000";x.fillText(t,c.x*sc+10,c.y*sc+20);x.restore()})}
+    x.fillStyle=r[1];x.font="700 14px Inter,sans-serif";var t=(r[0]==="You"?"You":r[0])+" crop";var tw=x.measureText(t).width;x.fillRect(c.x*sc+4,c.y*sc+4,tw+12,22);x.fillStyle="#000";x.fillText(t,c.x*sc+10,c.y*sc+20);x.restore()})}
 function drawDst(L){var cv=$("dst"),x=cv.getContext("2d"),sc=cv.width/1080,src=document.createElement("canvas");src.width=1920;src.height=1080;var s=src.getContext("2d");fakeGame(s,1920,1080);fakeCam(s,L.cam,1);
   x.fillStyle="#000";x.fillRect(0,0,cv.width,cv.height);
   L.regions.forEach(function(r){var c=r[2],d=r[3];x.save();if(d.round){x.beginPath();x.arc((d.x+d.w/2)*sc,(d.y+d.h/2)*sc,d.w/2*sc,0,Math.PI*2);x.clip()}
@@ -291,8 +302,8 @@ function nums(L){var w=$("nums");w.innerHTML="";
     var t="Crop from the clip: "+c.w+"×"+c.h+" starting at x "+c.x+", y "+c.y+" (left "+c.x+", right "+(1920-c.x-c.w)+", top "+c.y+", bottom "+(1080-c.y-c.h)+").\nPlace in the Short: "+d.w+"×"+d.h+" at x "+d.x+", y "+d.y+(d.round?" as a circle":"")+" (scale "+Math.round(d.w/c.w*100)+"%).";
     t.split("\n").forEach(function(l,i){if(i)p.appendChild(document.createElement("br"));p.appendChild(document.createTextNode(l))});w.appendChild(p)});
   var tip=document.createElement("p");tip.className="hint";tip.style.margin="0";
-  var big=L.regions.some(function(r){return r[0]==="Camera"&&r[3].w/r[2].w>1.6});
-  tip.textContent=big?"The camera is scaled up a lot, so it may look soft. A bigger camera on stream, or a separate camera recording, looks sharper.":"Editors measure crops differently: some want the four edges (left, right, top, bottom), some want a size and position. Both are given.";
+  var big=L.regions.some(function(r){return r[0]!=="Game"&&r[3].w/r[2].w>1.6});
+  tip.textContent=S.ctype==="green"?"Green screen: the crop around you includes the game behind you, so it blends in naturally. Want just you, cut out, over the game? Record your camera on its own (OBS's free Source Record plugin does this) and remove the green in your editor.":big?"The camera is scaled up a lot, so it may look soft. A bigger camera on stream, or a separate camera recording, looks sharper.":"Editors measure crops differently: some want the four edges (left, right, top, bottom), some want a size and position. Both are given.";
   w.appendChild(tip)}
 function draw(){var L=layout();drawSrc(L);drawDst(L);nums(L)}
 /* ---------- writing ---------- */
@@ -314,12 +325,22 @@ function copy(t,btn){var o=btn.textContent;function done(m){btn.textContent=m;se
   function fb(){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done("Copied")}catch(e){done("Select and copy")}ta.remove()}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){done("Copied")},fb);else fb()}
 document.querySelectorAll(".cp").forEach(function(b){b.addEventListener("click",function(){copy($(b.dataset.t).value,b)})});
-["lay","corner","csize"].forEach(function(id){$(id).value=S[id];$(id).addEventListener("change",function(){S[id]=this.value;save();draw()})});
+function sizes(){var sel=$("csize"),g=S.ctype==="green",o=[["400","Small"],["512","Medium"],["640","Large"],["800","Extra large"]];sel.innerHTML="";
+  o.forEach(function(v){var e=document.createElement("option");e.value=v[0];var w=+v[0];e.textContent=v[1]+" ("+(g?w+" wide":w+"×"+Math.round(w*9/16))+")";sel.appendChild(e)});
+  sel.value=S.csize;$("sizeLbl").textContent=g?"How much of the screen you fill":"Camera size on stream"}
+function ctl(){$("ctype").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.ctype)});
+  var none=S.ctype==="none";["wLay","wPos","wSize","wGap","dragHint"].forEach(function(id){$(id).hidden=none});sizes();$("pos").value=S.pos;$("lay").value=S.lay}
+$("ctype").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.ctype=b.dataset.v;if(S.ctype==="green"&&S.csize==="512")S.csize="640";save();ctl();draw()});
+["lay","pos","csize"].forEach(function(id){$(id).addEventListener("change",function(){S[id]=this.value;save();draw()})});
+(function(){var cv=$("src"),down=false;function mv(e){var r=cv.getBoundingClientRect();S.cx=Math.round((e.clientX-r.left)/r.width*1920);S.cy=Math.round((e.clientY-r.top)/r.height*1080);S.pos="custom";$("pos").value="custom";draw()}
+  cv.addEventListener("pointerdown",function(e){if(S.ctype==="none")return;down=true;cv.setPointerCapture(e.pointerId);cv.style.cursor="grabbing";mv(e)});
+  cv.addEventListener("pointermove",function(e){if(down)mv(e)});
+  ["pointerup","pointercancel"].forEach(function(t){cv.addEventListener(t,function(){if(down){down=false;cv.style.cursor="grab";save()}})})})();
 $("gap").value=S.gap;$("gap").addEventListener("input",function(){S.gap=this.value;save();draw()});
 $("focus").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.focus=b.dataset.v;save();fseg();draw()});
 function fseg(){$("focus").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.focus)})}
 ["what","game","who","where"].forEach(function(id){$(id).value=S[id];$(id).addEventListener("input",function(){S[id]=this.value;save();writing();draw()})});
-fseg();draw();writing();
+ctl();fseg();draw();writing();
 })();
 </script>
 </body>
