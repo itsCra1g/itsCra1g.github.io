@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OBS Scenes Guide: set up your stream scenes the right way</title>
+<meta name="description" content="Free OBS scenes guide by itsCRA1G: the five scenes every streamer needs, a scene builder that lists every source in the right order, the shared overlays trick, game capture fixes, transitions, audio and backups.">
+<meta property="og:title" content="OBS Scenes Guide">
+<meta property="og:description" content="The scenes you need, every source in the right order, and the fixes for black screens. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --warn:#FFB020; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.65 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:2px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 9px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:12px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:980px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 30px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:15em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:46em}li{margin:4px 0}
+strong{color:var(--fg)}
+code,.k{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.path{font-weight:600;color:var(--fg)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;margin:16px 0;max-width:48em}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* quick start */
+.qs{list-style:none;padding:0;counter-reset:q;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;max-width:none}
+.qs li{counter-increment:q;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 16px 16px 58px;position:relative;margin:0}
+.qs li::before{content:counter(q);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:8px;background:var(--acc-soft);color:var(--acc);font:700 14px/28px var(--display);text-align:center}
+.qs b{display:block;color:var(--fg);font-weight:700;margin-bottom:2px}
+.qs span{font-size:14px}
+/* mic picker */
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:10px 14px;cursor:pointer;text-align:left}
+.seg button small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.mictips{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin-bottom:18px;max-width:none}
+.mictips p{margin:0 0 8px}.mictips ul{margin:0}
+.chain{display:flex;flex-direction:column;gap:10px}
+.flt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.flt.off{opacity:.55}
+.flt .n{width:44px;height:44px;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font:700 16px var(--display)}
+.flt.off .n{background:var(--tile2);color:var(--mute)}
+.flt h4{margin:0;font:700 17px var(--display);color:var(--fg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:700 11px var(--text);letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--acc-soft);color:var(--acc)}
+.tag.opt{background:rgba(255,176,32,.14);color:var(--warn)}.tag.skip{background:var(--tile2);color:var(--mute)}
+.flt p{margin:6px 0 0;font-size:15px}
+.vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vals span{font:13px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:8px;padding:4px 8px}
+.vals span i{font-style:normal;color:var(--mute)}
+/* gate helper */
+.helper{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin:16px 0;max-width:none}
+.helper label{font-weight:600;color:var(--fg);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.helper input{font:600 16px var(--mono);width:90px;color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px}
+.helper output{font:600 15px var(--text);color:var(--fg)}
+/* meter */
+.meter{max-width:760px;margin:10px 0 18px}
+.mrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;margin:8px 0}
+.mrow b{font-size:14px;color:var(--fg)}
+.mtrack{position:relative;height:22px;border-radius:6px;background:linear-gradient(90deg,#14301f 0 66.6%,#3a3412 66.6% 85%,#3a1717 85%)}
+.mfill{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+.mscale{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;font:12px var(--mono);color:var(--mute)}
+.mscale div{position:relative;height:16px}
+.mscale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0 14px;min-width:560px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td:first-child{color:var(--fg);font-weight:600;width:30%}
+.checks{list-style:none;padding:0}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks input{width:18px;height:18px;margin-top:4px;accent-color:var(--acc);flex:0 0 auto}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+
+<style>
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;background:var(--tile);border:1px solid var(--edge);border-radius:18px;padding:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.tgs{display:flex;flex-direction:column;gap:7px}
+.tg{display:flex;align-items:center;gap:9px;font-size:15px;color:var(--fg);cursor:pointer}
+.tg input{width:18px;height:18px;accent-color:var(--acc);flex:0 0 auto}
+.seg{margin:0}.seg button{padding:8px 12px}
+.obs{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:0;margin-top:18px;border:1px solid #3a3d46;border-radius:12px;overflow:hidden;background:#1d1f26;font:14px/1.4 Inter,system-ui,sans-serif;color:#dfe2ea}
+@media (max-width:760px){.obs{grid-template-columns:1fr}}
+.dock{min-width:0}
+.dock h3{margin:0;padding:8px 12px;font:600 13px Inter,sans-serif;color:#c9ccd6;background:#272a33;border-bottom:1px solid #3a3d46}
+.dock + .dock{border-left:1px solid #3a3d46}
+@media (max-width:760px){.dock + .dock{border-left:0;border-top:1px solid #3a3d46}}
+.scn{display:block;width:100%;text-align:left;padding:9px 12px;border:0;background:none;color:#dfe2ea;font:14px Inter,sans-serif;cursor:pointer;border-bottom:1px solid #2a2d36}
+.scn[aria-pressed=true]{background:#2f5ea8;color:#fff}
+.scn small{color:#9aa0ad;margin-left:6px}
+.scn[aria-pressed=true] small{color:#d8e4ff}
+.src{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:start;padding:9px 12px;border-bottom:1px solid #2a2d36}
+.src i{font-style:normal;text-align:center;opacity:.85}
+.src b{font-weight:600;color:#f1f3f8}
+.src small{display:block;color:#9aa0ad;font-size:12.5px;margin-top:2px}
+.src a{font-size:12.5px;white-space:nowrap}
+.src.nest{background:rgba(77,163,255,.08)}
+.note2{padding:10px 12px;color:#9aa0ad;font-size:12.5px}
+.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">OBS Scenes Guide</a>
+  <nav><a href="#need">Scenes you need</a><a href="#build">Scene builder</a><a href="#capture">Capturing</a><a href="#trick">Overlays trick</a><a href="#switch">Switching</a><a href="#audio">Audio</a><a href="#backup">Backups</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free guide · by itsCRA1G</div>
+  <h1>Set up your OBS scenes the right way, once.</h1>
+  <p class="lead">Scenes are the different "screens" your viewers see: starting soon, gameplay, chatting, be right back, ending. Get them right once and every stream is a few clicks. This guide covers the scenes you need, a builder that lists every source in the right order, and the fixes for the problems everyone hits.</p>
+  <div class="chips"><span class="chip">OBS Studio 30+</span><span class="chip">Scene builder</span><span class="chip">Black screen fixes</span><span class="chip">Works with the hub's overlays</span></div>
+</div></div>
+
+<main class="wrap">
+  <section id="need">
+    <div class="sec-head"><span class="num">1</span><h2>The scenes you need</h2></div>
+    <div class="tw"><table>
+      <tr><th>Scene</th><th>When</th><th>What's in it</th></tr>
+      <tr><td>Starting Soon</td><td>The first few minutes, while people arrive</td><td>A <a href="../screens/">Starting Soon screen</a> with a countdown, music, your mic muted.</td></tr>
+      <tr><td>Gameplay</td><td>Most of the stream</td><td>Your game, your camera, alerts, and optionally chat and socials. Try the <a href="../scenes/">Scene Pack</a>'s gameplay frame.</td></tr>
+      <tr><td>Just Chatting</td><td>Talking to chat, before or after games</td><td>A big camera, chat on screen, maybe a topic line. The Scene Pack has a layout for this.</td></tr>
+      <tr><td>Be Right Back</td><td>Breaks</td><td>A <a href="../screens/">BRB screen</a>, music, your mic and game muted.</td></tr>
+      <tr><td>Ending</td><td>Saying goodbye and raiding</td><td>A Stream Ending screen or <a href="../credits/">Credits</a>, music.</td></tr>
+    </table></div>
+    <p class="hint">Start with these five. Add more (a Waiting or Respawn scene, a second game, a camera-only scene) only when you find yourself wanting one.</p>
+  </section>
+
+  <section id="build">
+    <div class="sec-head"><span class="num">2</span><h2>Scene builder</h2></div>
+    <p>Tick what you use and click through your scenes. Each one lists its sources <strong>top to bottom, exactly as OBS shows them</strong>: things higher up the list sit in front of things lower down.</p>
+    <div class="opts">
+      <div><div class="lbl">Scenes</div><div class="tgs" id="scenes">
+        <label class="tg"><input type="checkbox" value="start" checked>Starting Soon</label><label class="tg"><input type="checkbox" value="game" checked>Gameplay</label>
+        <label class="tg"><input type="checkbox" value="chat" checked>Just Chatting</label><label class="tg"><input type="checkbox" value="brb" checked>Be Right Back</label>
+        <label class="tg"><input type="checkbox" value="end" checked>Ending</label><label class="tg"><input type="checkbox" value="wait">Waiting / Respawn</label></div></div>
+      <div><div class="lbl">On screen</div><div class="tgs" id="ov">
+        <label class="tg"><input type="checkbox" value="alerts" checked>Alerts</label><label class="tg"><input type="checkbox" value="chatov">Chat overlay</label>
+        <label class="tg"><input type="checkbox" value="socials" checked>Socials</label><label class="tg"><input type="checkbox" value="np">Now Playing</label>
+        <label class="tg"><input type="checkbox" value="goals">Goal bars or sub goal</label><label class="tg"><input type="checkbox" value="feed">Activity feed</label><label class="tg"><input type="checkbox" value="poll">Chat poll</label></div></div>
+      <div><div class="lbl">Your setup</div><div class="tgs">
+        <label class="tg"><input type="checkbox" id="cam" checked>I use a camera</label>
+        <label class="tg"><input type="checkbox" id="pack">I use the Scene Pack layouts</label>
+        <label class="tg"><input type="checkbox" id="music" checked>Music on breaks (from an app)</label>
+        <label class="tg"><input type="checkbox" id="dc">Discord voice on stream</label>
+        <label class="tg"><input type="checkbox" id="credits">Credits on the Ending scene</label></div></div>
+    </div>
+    <div class="obs">
+      <div class="dock"><h3>Scenes</h3><div id="scList"></div></div>
+      <div class="dock"><h3 id="srcTitle">Sources</h3><div id="srcList"></div></div>
+    </div>
+    <div class="acts"><button class="btn" id="copy">Copy my setup as a checklist</button><span class="hint" id="msg" style="margin:0"></span></div>
+  </section>
+
+  <section id="capture">
+    <div class="sec-head"><span class="num">3</span><h2>Capturing your game and camera</h2></div>
+    <h3>Game: try these in order</h3>
+    <ol>
+      <li><strong>Game Capture</strong> (best): set Mode to <span class="path">Capture specific window</span> and pick your game. It only shows the game, never your desktop or notifications.</li>
+      <li><strong>Black screen?</strong> Run OBS as administrator (right-click → Run as administrator; make it permanent in the shortcut's Properties → Compatibility). Toggle <span class="path">Use anti-cheat compatibility hook</span> off and on.</li>
+      <li><strong>Laptop with two graphics chips?</strong> Windows Settings → search "Graphics settings" → add OBS → Options → <span class="path">High performance</span> → Save, then restart OBS.</li>
+      <li><strong>Still black:</strong> use <strong>Window Capture</strong> with Capture Method <span class="path">Windows 10 (1903 and up)</span>. Some anti-cheat games only work this way.</li>
+      <li><strong>Last resort: Display Capture</strong>, which shows your whole monitor. Turn off notifications and close anything private first.</li>
+    </ol>
+    <h3>Camera</h3>
+    <ul>
+      <li>Add a <strong>Video Capture Device</strong>, then set Resolution/FPS Type to Custom and pick the resolution and frame rate your camera does best (often 1920×1080 or 1280×720 at 30 or 60).</li>
+      <li><strong>Add your camera once.</strong> In other scenes use <span class="path">+ → Video Capture Device → Add Existing</span>, or copy it and use <span class="path">Paste (Reference)</span>. A second "new" camera source will fail with "device in use".</li>
+      <li>Crop with Alt+drag on the edges, or right-click → <span class="path">Filters</span> → Crop/Pad. Add a Chroma Key filter here for a green screen.</li>
+    </ul>
+  </section>
+
+  <section id="trick">
+    <div class="sec-head"><span class="num">4</span><h2>The overlays trick: set it up once</h2></div>
+    <p>Make one scene called <strong>Overlays</strong> and put your alerts, goals, polls and anything else you want everywhere into it. Then add that scene into each of your other scenes: <span class="path">+ → Scene → Add Existing → Overlays</span>.</p>
+    <ul>
+      <li><strong>Change it once, it changes everywhere.</strong> Move your alerts and every scene follows.</li>
+      <li><strong>One copy running, not five.</strong> Each browser source uses memory and CPU; a single shared copy keeps OBS lighter, and alerts never fire twice.</li>
+      <li>Keep the Overlays scene <strong>at the top</strong> of each scene's list so alerts sit in front of everything.</li>
+      <li>The builder above uses this: the shaded row in each scene is the shared Overlays scene.</li>
+    </ul>
+  </section>
+
+  <section id="switch">
+    <div class="sec-head"><span class="num">5</span><h2>Switching scenes and transitions</h2></div>
+    <ul>
+      <li><strong>Hotkeys:</strong> <span class="path">Settings → Hotkeys</span>, find each scene and set "Switch to scene". Function keys or a numpad work well.</li>
+      <li><strong>Stream Deck:</strong> the OBS actions switch scenes, mute sources and start the stream with one press.</li>
+      <li><strong>Studio Mode</strong> (button under Controls) lets you set up the next scene on the left before sending it live. Handy for bigger changes.</li>
+      <li><strong>Transitions:</strong> a quick Fade (300 ms) suits most streams. For something branded, a <strong>Stinger</strong> plays a short video between scenes: it needs a file with a see-through background (WebM or MOV) and a "transition point" when the scene switches behind it.</li>
+      <li>Right-click a scene → <span class="path">Transition Override</span> to give one scene its own transition, like a slower fade into Ending.</li>
+    </ul>
+  </section>
+
+  <section id="audio">
+    <div class="sec-head"><span class="num">6</span><h2>Audio per scene</h2></div>
+    <ul>
+      <li><strong>Your mic</strong> is easiest as a global device in <span class="path">Settings → Audio</span>, so it's in every scene. Mute it with a hotkey or Stream Deck key on breaks.</li>
+      <li><strong>Game audio</strong> as an <span class="path">Application Audio Capture</span> inside the Gameplay scene: it goes quiet automatically when you switch to BRB.</li>
+      <li><strong>Music</strong> for breaks goes in the Starting, BRB and Ending scenes only, so it never plays over gameplay.</li>
+      <li><strong>Discord</strong> as its own Application Audio Capture, in the Overlays scene if you want friends heard everywhere, or only in Gameplay.</li>
+      <li>Levels and filters are in the <a href="../audio/">Mic &amp; Audio Guide</a>, including keeping music off your Twitch VODs.</li>
+    </ul>
+  </section>
+
+  <section id="backup">
+    <div class="sec-head"><span class="num">7</span><h2>Back it up and keep it tidy</h2></div>
+    <ul>
+      <li><strong>Export your scenes:</strong> <span class="path">Scene Collection → Export</span> saves a small file with every scene and source. Do it whenever you make big changes, and before updating OBS.</li>
+      <li><strong>Export your settings too:</strong> <span class="path">Profile → Export</span> saves your stream and output settings.</li>
+      <li><strong>Keep all your images, videos and sounds in one folder</strong> (for example Documents\Stream Assets). Scene files only store where things are, so moving them breaks sources. If it happens, OBS's "missing files" window can search a folder and fix them all at once.</li>
+      <li><strong>Name things clearly</strong>: "Camera", "Game", "Alerts", not "Video Capture Device 3".</li>
+      <li><strong>Lock</strong> sources you've placed (the padlock) so a stray click doesn't move them mid-stream.</li>
+    </ul>
+    <div class="note"><p><strong>Next:</strong> sizes and links for every overlay are on each one's own page. If OBS struggles, the <a href="../obs-settings/">OBS Settings Helper</a> sets your encoder and resolution, and switching Screens, Credits and Now Playing to "Shutdown source when not visible" frees up more.</p></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Written for OBS Studio 30 to 32; menu names can move between versions. Not affiliated with OBS or Elgato.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var S={scenes:["start","game","chat","brb","end"],ov:["alerts","socials"],cam:true,pack:false,music:true,dc:false,credits:false,sel:"game"};
+try{var sv=JSON.parse(localStorage.getItem("sg2_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+function save(){try{localStorage.setItem("sg2_cfg",JSON.stringify(S))}catch(e){}}
+var NAMES={start:"Starting Soon",game:"Gameplay",chat:"Just Chatting",brb:"Be Right Back",end:"Ending",wait:"Waiting",ovl:"Overlays"};
+function has(a,v){return S[a].indexOf(v)>=0}
+// source: [icon, name, note, link]
+var I={browser:"🌐",scene:"🎬",cam:"📷",game:"🎮",audio:"🔊",image:"🖼️"};
+function overlays(){var L=[];
+  if(has("ov","alerts"))L.push([I.browser,"Alerts","Browser source, 900×400. Top, so alerts sit over everything.","../alerts/"]);
+  if(has("ov","poll"))L.push([I.browser,"Chat Poll","Browser source; only shows while a poll is running.","../poll/"]);
+  if(has("ov","goals"))L.push([I.browser,"Goal Bars","Browser source; or the Sub Goal overlay.","../goals/"]);
+  if(has("ov","feed"))L.push([I.browser,"Activity Feed","Browser source.","../activity/"]);
+  if(S.dc)L.push([I.audio,"Discord","Application Audio Capture → Discord. Here so friends are heard in every scene.",""]);
+  return L}
+function scene(id){var L=[],ovl=overlays(),nest=ovl.length?[[I.scene,"Overlays","The shared Overlays scene (+ → Scene → Add Existing).","#trick","nest"]]:[];
+  var music=S.music?[[I.audio,"Music","Application Audio Capture → your music app. Only in break scenes.",""]]:[];
+  var screen=function(n){return [I.browser,n,"Browser source from Screens, 1920×1080. Tick \"Shutdown source when not visible\".","../screens/"]};
+  if(id==="ovl")return ovl;
+  if(id==="start"){L=nest.concat([screen("Starting Soon screen")],music);if(has("ov","np"))L.splice(nest.length,0,[I.browser,"Now Playing","Show what's playing.","../now-playing/"])}
+  if(id==="brb"){L=nest.concat([screen("Be Right Back screen")],music);if(has("ov","np"))L.splice(nest.length,0,[I.browser,"Now Playing","Show what's playing.","../now-playing/"])}
+  if(id==="end"){L=nest.concat([S.credits?[I.browser,"Credits","Browser source, 1920×1080, rolls the names from this stream.","../credits/"]:screen("Stream Ending screen")],music)}
+  if(id==="game"){L=nest.slice();
+    if(has("ov","chatov"))L.push([I.browser,"Chat","Combined Chat browser source.","../chat/"]);
+    if(has("ov","socials"))L.push([I.browser,"Socials","Browser source.","../socials/"]);
+    if(has("ov","np"))L.push([I.browser,"Now Playing","Optional in gameplay; keep it small.","../now-playing/"]);
+    if(S.pack)L.push([I.browser,"Scene Pack: Gameplay","Browser source, 1920×1080. Sits ABOVE the camera, which shows through its window.","../scenes/"]);
+    if(S.cam)L.push([I.cam,"Camera","Video Capture Device, cropped and placed in a corner"+(S.pack?" under the frame's window.":"."),""]);
+    L.push([I.game,"Game","Game Capture (specific window). Bottom, filling the screen. See section 3 if it's black.","#capture"]);
+    L.push([I.audio,"Game audio","Application Audio Capture → your game, so BRB goes quiet by itself.","#audio"])}
+  if(id==="chat"){L=nest.slice();
+    if(has("ov","chatov")||S.pack)L.push([I.browser,"Chat","Combined Chat, placed "+(S.pack?"over the Scene Pack's chat panel.":"down one side."),"../chat/"]);
+    if(S.pack)L.push([I.browser,"Scene Pack: Just Chatting","Browser source, 1920×1080, above the camera.","../scenes/"]);
+    else if(has("ov","socials"))L.push([I.browser,"Socials","Browser source.","../socials/"]);
+    if(S.cam)L.push([I.cam,"Camera","Add Existing (the same camera), big: around 1280×720.",""]);
+    else L.push([I.image,"Background","An image or video, so the scene isn't empty.",""])}
+  if(id==="wait"){L=nest.slice();if(has("ov","chatov")||S.pack)L.push([I.browser,"Chat","Combined Chat.","../chat/"]);if(S.pack)L.push([I.browser,"Scene Pack: Waiting","Browser source, 1920×1080, above the camera.","../scenes/"]);if(S.cam)L.push([I.cam,"Camera","Add Existing (the same camera).",""]);L=L.concat(music)}
+  return L}
+function list(){var l=S.scenes.slice();if(overlays().length)l.push("ovl");return l}
+function render(){
+  var sl=$("scList");sl.innerHTML="";var ls=list();if(ls.indexOf(S.sel)<0)S.sel=ls[0]||"";
+  ls.forEach(function(id){var b=document.createElement("button");b.className="scn";b.setAttribute("aria-pressed",id===S.sel);b.textContent=NAMES[id];
+    if(id==="ovl"){var sm=document.createElement("small");sm.textContent="(shared)";b.appendChild(sm)}
+    b.addEventListener("click",function(){S.sel=id;save();render()});sl.appendChild(b)});
+  var src=$("srcList");src.innerHTML="";$("srcTitle").textContent="Sources"+(S.sel?" for '"+NAMES[S.sel]+"'":"");
+  var L=S.sel?scene(S.sel):[];
+  L.forEach(function(s){var r=document.createElement("div");r.className="src"+(s[4]==="nest"?" nest":"");r.innerHTML="<i></i><div><b></b><small></small></div><span></span>";
+    r.children[0].textContent=s[0];r.querySelector("b").textContent=s[1];r.querySelector("small").textContent=s[2];
+    if(s[3]){var a=document.createElement("a");a.href=s[3];a.textContent=s[3].charAt(0)==="#"?"How →":"Get it →";r.children[2].appendChild(a)}src.appendChild(r)});
+  var n=document.createElement("div");n.className="note2";n.textContent=S.sel==="ovl"?"Add this scene into every other scene, at the top of each list.":"Top of the list = in front. Your mic comes from Settings → Audio, so it's in every scene.";src.appendChild(n);
+}
+function text(){var out=["My OBS scenes (from itscra1g.github.io/scenes-guide)",""];list().forEach(function(id){out.push("["+NAMES[id]+"]"+(id==="ovl"?" (shared; add into every scene)":""));scene(id).forEach(function(s){out.push("  - "+s[1]+": "+s[2])});out.push("")});
+  out.push("Mic: Settings → Audio (global), mute on breaks.");return out.join("\n")}
+function bind(id,key){document.querySelectorAll("#"+id+" input").forEach(function(cb){cb.checked=S[key].indexOf(cb.value)>=0;cb.addEventListener("change",function(){S[key]=Array.from(document.querySelectorAll("#"+id+" input")).filter(function(x){return x.checked}).map(function(x){return x.value});save();render()})})}
+bind("scenes","scenes");bind("ov","ov");
+["cam","pack","music","dc","credits"].forEach(function(id){$(id).checked=S[id];$(id).addEventListener("change",function(){S[id]=this.checked;save();render()})});
+$("copy").addEventListener("click",function(){var t=text(),m=$("msg");function ok(){m.textContent="Copied."}function fb(){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");ok()}catch(e){m.textContent="Couldn't copy here."}ta.remove()}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb()});
+render();
+})();
+</script>
+</body>
+</html>
