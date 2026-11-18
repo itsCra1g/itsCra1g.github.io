@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discord Starter: a server for your stream community</title>
+<meta name="description" content="Free Discord starter for streamers by itsCRA1G: plan your channels and roles, get ready-to-paste welcome, rules and go-live messages, and set up safety, sub roles and live notifications for Twitch and Kick.">
+<meta property="og:title" content="Discord Starter for streamers">
+<meta property="og:description" content="Plan your server, paste in welcome and rules messages, and set up sub roles and live posts. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --warn:#FFB020; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.65 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:2px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 9px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:12px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:980px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 30px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:15em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:46em}li{margin:4px 0}
+strong{color:var(--fg)}
+code,.k{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.path{font-weight:600;color:var(--fg)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;margin:16px 0;max-width:48em}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* quick start */
+.qs{list-style:none;padding:0;counter-reset:q;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;max-width:none}
+.qs li{counter-increment:q;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 16px 16px 58px;position:relative;margin:0}
+.qs li::before{content:counter(q);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:8px;background:var(--acc-soft);color:var(--acc);font:700 14px/28px var(--display);text-align:center}
+.qs b{display:block;color:var(--fg);font-weight:700;margin-bottom:2px}
+.qs span{font-size:14px}
+/* mic picker */
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:10px 14px;cursor:pointer;text-align:left}
+.seg button small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.mictips{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin-bottom:18px;max-width:none}
+.mictips p{margin:0 0 8px}.mictips ul{margin:0}
+.chain{display:flex;flex-direction:column;gap:10px}
+.flt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.flt.off{opacity:.55}
+.flt .n{width:44px;height:44px;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font:700 16px var(--display)}
+.flt.off .n{background:var(--tile2);color:var(--mute)}
+.flt h4{margin:0;font:700 17px var(--display);color:var(--fg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:700 11px var(--text);letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--acc-soft);color:var(--acc)}
+.tag.opt{background:rgba(255,176,32,.14);color:var(--warn)}.tag.skip{background:var(--tile2);color:var(--mute)}
+.flt p{margin:6px 0 0;font-size:15px}
+.vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vals span{font:13px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:8px;padding:4px 8px}
+.vals span i{font-style:normal;color:var(--mute)}
+/* gate helper */
+.helper{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin:16px 0;max-width:none}
+.helper label{font-weight:600;color:var(--fg);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.helper input{font:600 16px var(--mono);width:90px;color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px}
+.helper output{font:600 15px var(--text);color:var(--fg)}
+/* meter */
+.meter{max-width:760px;margin:10px 0 18px}
+.mrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;margin:8px 0}
+.mrow b{font-size:14px;color:var(--fg)}
+.mtrack{position:relative;height:22px;border-radius:6px;background:linear-gradient(90deg,#14301f 0 66.6%,#3a3412 66.6% 85%,#3a1717 85%)}
+.mfill{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+.mscale{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;font:12px var(--mono);color:var(--mute)}
+.mscale div{position:relative;height:16px}
+.mscale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0 14px;min-width:560px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td:first-child{color:var(--fg);font-weight:600;width:30%}
+.checks{list-style:none;padding:0}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks input{width:18px;height:18px;margin-top:4px;accent-color:var(--acc);flex:0 0 auto}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+
+<style>
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;background:var(--tile);border:1px solid var(--edge);border-radius:18px;padding:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.fld{font:600 15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:10px;padding:9px 10px;width:100%;min-width:0}
+.tgs{display:flex;flex-direction:column;gap:7px}
+.tg{display:flex;align-items:center;gap:9px;font-size:15px;color:var(--fg);cursor:pointer}
+.tg input{width:18px;height:18px;accent-color:var(--acc);flex:0 0 auto}
+.seg{margin:0}.seg button{padding:8px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+.btn.sm{padding:6px 10px;font-size:13px}
+.plan{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:16px;margin-top:18px}
+@media (max-width:820px){.plan{grid-template-columns:1fr}}
+.dc{background:#2B2D31;border-radius:14px;padding:14px 10px;color:#949BA4;font:15px/1.3 Inter,system-ui,sans-serif;min-width:0}
+.dc .sv{font:700 16px Inter,sans-serif;color:#F2F3F5;padding:2px 8px 12px;border-bottom:1px solid #1E1F22;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.dc .cat{font:700 12px Inter,sans-serif;letter-spacing:.4px;text-transform:uppercase;color:#949BA4;padding:14px 8px 4px}
+.dc .ch{display:flex;align-items:baseline;gap:6px;padding:5px 8px;border-radius:6px}
+.dc .ch:hover{background:#35373C;color:#DBDEE1}
+.dc .ch b{font-weight:500;color:#DBDEE1;white-space:nowrap}
+.dc .ch span{font-size:12px;color:#80848E;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.dc .ch i{font-style:normal;width:16px;flex:0 0 auto;color:#80848E;text-align:center}
+.dc .ch .lock{font-size:11px;color:#F0B232;margin-left:auto;flex:0 0 auto}
+.roles{background:#2B2D31;border-radius:14px;padding:14px;color:#DBDEE1;font:14px/1.4 Inter,sans-serif;display:flex;flex-direction:column;gap:10px;min-width:0}
+.role{display:grid;grid-template-columns:14px minmax(0,1fr);gap:10px;align-items:start}
+.role .d{width:14px;height:14px;border-radius:50%;margin-top:3px}
+.role b{display:block;color:#F2F3F5}
+.role small{color:#949BA4;font-size:13px}
+.msgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.msg{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.msg h3{margin:0;font-size:16px}
+.msg p{font-size:14px;margin:0;color:var(--mute)}
+.msg textarea{width:100%;min-height:220px;font:13.5px/1.55 var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:10px;padding:10px;resize:vertical}
+.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Discord Starter</a>
+  <nav><a href="#plan">Plan</a><a href="#messages">Messages</a><a href="#setup">Setup</a><a href="#live">Live posts</a><a href="#subs">Sub roles</a><a href="#alive">Keep it alive</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free guide and tool · by itsCRA1G</div>
+  <h1>A Discord your community actually uses.</h1>
+  <p class="lead">Your stream is a few hours a week; Discord is where your community lives the rest of the time. Plan a tidy server that fits your size, get welcome, rules and go-live messages ready to paste, then set up safety, sub roles and live posts for Twitch and Kick.</p>
+  <div class="chips"><span class="chip">Channel and role plan</span><span class="chip">Messages to paste</span><span class="chip">Safety settings</span><span class="chip">Twitch and Kick</span></div>
+</div></div>
+
+<main class="wrap">
+  <section id="plan">
+    <div class="sec-head"><span class="num">1</span><h2>Plan your server</h2></div>
+    <p>Start small. A handful of busy channels beats twenty empty ones: you can always add more when people ask.</p>
+    <div class="opts">
+      <div><div class="lbl">Server name</div><input class="fld" id="sname" maxlength="40"></div>
+      <div><div class="lbl">Your handle</div><input class="fld" id="handle" maxlength="30"></div>
+      <div><div class="lbl">Community name (optional)</div><input class="fld" id="cname" maxlength="30" placeholder="e.g. The Crew"></div>
+      <div><div class="lbl">Where you stream</div><div class="tgs" id="pfs">
+        <label class="tg"><input type="checkbox" value="tw">Twitch</label><label class="tg"><input type="checkbox" value="kk">Kick</label>
+        <label class="tg"><input type="checkbox" value="yt">YouTube</label><label class="tg"><input type="checkbox" value="tt">TikTok</label></div></div>
+      <div><div class="lbl">Size</div><div class="seg" id="size"><button data-v="start">Just starting</button><button data-v="grow">Growing</button></div>
+        <div class="hint" id="sizeHint" style="margin-top:6px"></div></div>
+      <div><div class="lbl">Extras</div><div class="tgs" id="extras">
+        <label class="tg"><input type="checkbox" value="subs">Supporter / sub area</label>
+        <label class="tg"><input type="checkbox" value="squad">Gaming voice channels and LFG</label>
+        <label class="tg"><input type="checkbox" value="clips">Clips and highlights</label>
+        <label class="tg"><input type="checkbox" value="art">Fan art and creations</label>
+        <label class="tg"><input type="checkbox" value="events">Events and game nights</label>
+        <label class="tg"><input type="checkbox" value="ideas">Suggestions</label></div></div>
+    </div>
+    <div class="plan">
+      <div class="dc" id="dcPlan" aria-label="Channel plan"></div>
+      <div class="roles" id="rolePlan" aria-label="Role plan"></div>
+    </div>
+    <div class="acts"><button class="btn" id="cpPlan">Copy the plan as text</button><span class="hint" id="m1" style="margin:0"></span></div>
+    <p class="hint" style="margin-top:8px">Role colours come from your <a href="../brand/">Brand Guide</a> if you've made one on this device.</p>
+  </section>
+
+  <section id="messages">
+    <div class="sec-head"><span class="num">2</span><h2>Messages to paste</h2></div>
+    <p>Edit them here, then copy and paste into Discord. They follow the plan above until you edit one (Reset brings it back). Discord formatting works: <code>**bold**</code> and <code># Heading</code>. After pasting, retype channel names like <code>#rules</code> and role pings like <code>@Live pings</code> in Discord and pick them from the list, so they become real links.</p>
+    <div class="msgs" id="msgs"></div>
+  </section>
+
+  <section id="setup">
+    <div class="sec-head"><span class="num">3</span><h2>Setting it up, in order</h2></div>
+    <ol>
+      <li><strong>Create the server:</strong> the <strong>+</strong> at the bottom of your server list → <span class="path">Create My Own</span> → <span class="path">For a club or community</span>.</li>
+      <li><strong>Make the roles first</strong> (<span class="path">Server Settings → Roles</span>), in the order shown in your plan: higher roles can manage lower ones. Give Mods the moderation permissions and nobody but you Administrator.</li>
+      <li><strong>Make the categories and channels.</strong> Right-click a category → <span class="path">Edit Category → Permissions</span> to make a whole area read-only or role-only, and let channels follow it ("sync").</li>
+      <li><strong>Turn on Community</strong> (<span class="path">Server Settings → Enable Community</span>). It unlocks Onboarding, a rules screen, announcement channels and server insights. Community requires a verification level and the explicit media filter, which you want anyway.</li>
+      <li><strong>Set up Onboarding</strong> (<span class="path">Server Settings → Onboarding</span>): choose the default channels new members see, and add a question like "Want a ping when I go live?" that gives the Live pings role.</li>
+      <li><strong>Safety</strong> (<span class="path">Server Settings → Safety Setup</span>):
+        <ul><li>Verification level <strong>Medium</strong> (registered on Discord for 5+ minutes) or <strong>High</strong> if you get raids.</li>
+        <li>Explicit image filter on for <strong>all members</strong>.</li>
+        <li><strong>AutoMod</strong> on: block spam, mention spam and a keyword list (slurs, scam phrases like "free nitro").</li>
+        <li>Require <strong>two-factor authentication</strong> for moderator actions.</li>
+        <li>Stop <code>@everyone</code> pings for everyone except you and mods.</li></ul></li>
+      <li><strong>Paste in the messages</strong> above: welcome, rules (also add them to the rules screen), and a pinned role-pick message if you're not using Onboarding questions.</li>
+      <li><strong>Add live posts and sub roles</strong> (below), then do a test with a friend's account before you share the invite.</li>
+      <li><strong>Make an invite that never expires</strong> (<span class="path">Invite People → Edit invite link → Expire: Never</span>) and put it in your panels, <code>!discord</code> command and socials.</li>
+    </ol>
+  </section>
+
+  <section id="live">
+    <div class="sec-head"><span class="num">4</span><h2>Go-live posts</h2></div>
+    <p>A post in <code>#going-live</code> every time you start is the single most useful thing your server does. Ways to do it:</p>
+    <div class="tw"><table>
+      <tr><th>Way</th><th>Good for</th><th>Notes</th></tr>
+      <tr><td>Discord Live (this hub)</td><td>Twitch and Kick, your own wording</td><td>A <a href="../discord-live/">Streamer.bot action</a> that posts through a Discord webhook with your title, game and a preview. Pair it with <a href="../stream-report/">Stream Report</a> for an after-stream summary.</td></tr>
+      <tr><td>A notification bot</td><td>Twitch and YouTube, no Streamer.bot</td><td>Bots such as Streamcord post when you go live. Check a bot's permissions before adding it, and only add ones you need.</td></tr>
+      <tr><td>Posting by hand</td><td>Any platform</td><td>Use the go-live message above. Easy to forget, so it's best as a backup.</td></tr>
+    </table></div>
+    <p>Ping a <strong>Live pings</strong> role instead of <code>@everyone</code>: people choose to get it, so nobody gets annoyed and leaves.</p>
+  </section>
+
+  <section id="subs">
+    <div class="sec-head"><span class="num">5</span><h2>Sub and supporter roles</h2></div>
+    <h3>Twitch (built in)</h3>
+    <ol>
+      <li>You need to be a Twitch Affiliate or Partner.</li>
+      <li>In Discord: <span class="path">User Settings → Connections</span> → connect Twitch.</li>
+      <li><span class="path">Server Settings → Integrations</span> → Twitch → follow the steps. Discord creates a Twitch Subscriber role plus one for each tier, and keeps them in sync.</li>
+      <li>Set the <strong>grace period</strong> (how long someone keeps the role after their sub ends), then rename and colour the roles to suit your server.</li>
+      <li>Viewers connect their own Twitch account in Discord to get the role.</li>
+    </ol>
+    <h3>Kick</h3>
+    <p>Kick doesn't have a built-in Discord connection yet. Options: a third-party bot that links Kick subs (read its reviews and permissions first), or a simple <strong>Kick Sub</strong> role your mods give out when someone shows their sub badge.</p>
+    <h3>YouTube</h3>
+    <p>If your channel has memberships, check <span class="path">Server Settings → Integrations</span> for a YouTube option to sync member roles.</p>
+  </section>
+
+  <section id="alive">
+    <div class="sec-head"><span class="num">6</span><h2>Keep it alive</h2></div>
+    <ul>
+      <li><strong>Be there yourself.</strong> Reply to people, especially early on. A server the streamer never visits goes quiet fast.</li>
+      <li><strong>Post your schedule weekly</strong> (the <a href="../schedule/">Schedule Maker</a> gives you an image and text) and pin it.</li>
+      <li><strong>Give a reason to visit between streams:</strong> clips, polls, behind-the-scenes, a weekly question, game nights with the community.</li>
+      <li><strong>Talk about it on stream</strong>, and add a <code>!discord</code> command and a Discord panel (<a href="../panels/">Panel Maker</a>).</li>
+      <li><strong>Pick mods you trust</strong>, write down what's allowed, and back them up. Never give anyone a role with Administrator unless you'd trust them with the whole server.</li>
+      <li><strong>Watch for scams:</strong> fake "free Nitro" links, fake brand deals and people pretending to be you. Tell members you'll never DM them first asking for anything.</li>
+    </ul>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Discord settings checked November 2026; menu names can change. Not affiliated with Discord, Twitch, Kick, YouTube or TikTok.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var S={sname:"",handle:"",cname:"",pfs:["tw","kk"],size:"start",extras:["clips","squad"],edits:{}};
+try{var sv=JSON.parse(localStorage.getItem("dc_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+var B={m:"#4DA3FF",s:"#9AA3B2"};try{var br=JSON.parse(localStorage.getItem("br_cfg")||"null");if(br&&br.m){B.m=br.m;B.s=br.s||B.s;if(!S.handle&&br.name&&br.name!=="YourName")S.handle=br.name}}catch(e){}
+var saveT;function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem("dc_cfg",JSON.stringify(S))}catch(e){}},300)}
+var PN={tw:"Twitch",kk:"Kick",yt:"YouTube",tt:"TikTok"};
+function has(x){return S.extras.indexOf(x)>=0}
+function hn(){return S.handle||"[your name]"}
+function cn(){return S.cname||"the community"}
+function plan(){
+  var grow=S.size==="grow",C=[];
+  var info=["📌 INFO",[["#","welcome","say hi and start here","read"],["#","rules","read before chatting","read"],["#","announcements","news and schedule","read"],["#","going-live","automatic go-live posts","read"]]];
+  if(grow)info[1].push(["#","roles","pick your pings and roles","read"]);
+  C.push(info);
+  var chat=["💬 COMMUNITY",[["#","general","main chat"]]];
+  if(grow)chat[1].push(["#","off-topic","anything goes (within the rules)"]);
+  if(has("clips"))chat[1].push(["#","clips","best moments from stream"]);
+  if(has("art"))chat[1].push(["#","fan-art","art and creations"]);
+  if(has("ideas"))chat[1].push(["#","suggestions","ideas for stream and server"]);
+  if(grow)chat[1].push(["#","self-promo","share your own stuff here only"]);
+  C.push(chat);
+  if(has("squad")||has("events")){var g=["🎮 PLAY",[]];if(has("squad")){g[1].push(["#","lfg","looking for a group"]);g[1].push(["🔊","Squad 1",""]);if(grow)g[1].push(["🔊","Squad 2",""])}
+    if(has("events")){g[1].push(["#","events","game nights and community events"]);if(grow)g[1].push(["🔊","Stage","watch parties and Q&As"])}C.push(g)}
+  C.push(["🔊 HANG OUT",[["🔊","Lounge",""]].concat(grow?[["🔊","AFK",""]]:[])]);
+  if(has("subs"))C.push(["⭐ SUPPORTERS",[["#","supporters","thank-you chat for subs","sub"]].concat(grow?[["🔊","Supporters VC","","sub"]]:[])]);
+  C.push(["🛡️ MODS",[["#","mod-chat","private, mods only","mod"],["#","mod-log","bot and AutoMod logs","mod"]]]);
+  return C;
+}
+function roles(){
+  var R=[["Owner","You","#F2F3F5"],["Mods","Kick, ban, timeout, manage messages; 2FA on",B.m]];
+  R.push(["Bots","Only the permissions each bot needs","#949BA4"]);
+  if(has("subs")){if(S.pfs.indexOf("tw")>=0)R.push(["Twitch Subscriber","Made and synced by Discord's Twitch link","#9146FF"]);if(S.pfs.indexOf("kk")>=0)R.push(["Kick Sub","Given by mods (no built-in link yet)","#53FC18"]);if(S.pfs.indexOf("yt")>=0)R.push(["YouTube Member","Synced if your channel has memberships","#FF4E45"])}
+  if(S.size==="grow")R.push(["VIP","Regulars and friends of the stream",B.s]);
+  R.push([(S.cname||"Member"),"Everyone who's read the rules","#80848E"]);
+  R.push(["Live pings","Opt-in role pinged when you go live",B.m]);
+  if(has("events"))R.push(["Game night pings","Opt-in for events",B.s]);
+  return R;
+}
+function render(){
+  var P=plan(),d=$("dcPlan");d.innerHTML="";
+  var h=document.createElement("div");h.className="sv";h.textContent=S.sname||((S.handle?S.handle+"'s ":"Your ")+"server");d.appendChild(h);
+  P.forEach(function(c){var cat=document.createElement("div");cat.className="cat";cat.textContent=c[0].replace(/^\S+\s/,"");d.appendChild(cat);
+    c[1].forEach(function(ch){var r=document.createElement("div");r.className="ch";r.innerHTML="<i></i><b></b><span></span>";r.children[0].textContent=ch[0]==="#"?"#":"🔊";r.children[1].textContent=ch[1];r.children[2].textContent=ch[2];
+      if(ch[3]){var l=document.createElement("span");l.className="lock";l.textContent=ch[3]==="read"?"read-only":ch[3]==="sub"?"supporters":"mods";r.appendChild(l)}d.appendChild(r)})});
+  var rp=$("rolePlan");rp.innerHTML='<div class="lbl" style="color:#949BA4;margin:0">Roles, top to bottom</div>';
+  roles().forEach(function(r){var e=document.createElement("div");e.className="role";e.innerHTML='<i class="d"></i><div><b></b><small></small></div>';e.querySelector(".d").style.background=r[2];e.querySelector("b").textContent=r[0];e.querySelector("small").textContent=r[1];rp.appendChild(e)});
+  $("sizeHint").textContent=S.size==="grow"?"More channels, a VIP role, a roles channel and self-promo.":"The essentials. Add more when people ask for them.";
+  messages();
+}
+function planText(){var L=[];L.push((S.sname||"Server")+" plan","");plan().forEach(function(c){L.push(c[0]);c[1].forEach(function(ch){L.push("  "+(ch[0]==="#"?"#":"🔊 ")+ch[1]+(ch[2]?" — "+ch[2]:"")+(ch[3]?" ("+(ch[3]==="read"?"read-only":ch[3]==="sub"?"supporters only":"mods only")+")":""))});L.push("")});
+  L.push("Roles (top to bottom)");roles().forEach(function(r){L.push("  "+r[0]+" — "+r[1])});return L.join("\n")}
+function where(){return S.pfs.map(function(p){return PN[p]}).join(", ").replace(/, ([^,]*)$/," and $1")||"[where you stream]"}
+function MSG(){
+  var c=cn(),h=hn(),M=[];
+  M.push(["welcome","Welcome","Post in #welcome.","# Welcome to "+(S.sname||h+"'s server")+"! 👋\n\nThis is the home of "+(S.cname&&S.cname!==S.sname?"**"+S.cname+"**, ":"")+h+"'s community: we stream on "+where()+".\n\n**Start here**\n1. Read #rules\n2. Say hi in #general\n3. Want a ping when "+h+" goes live? Grab the **Live pings** role"+(S.size==="grow"?" in #roles":"")+".\n\nSchedule and news go in #announcements, and every stream is posted in #going-live. Glad you're here!"]);
+  var rules=["Be kind. No harassment, hate speech, slurs or bullying, including in DMs to other members.","Keep it safe for work. No NSFW, gore or shocking content.","No spam, and no self-promotion"+(S.size==="grow"?" outside #self-promo":"")+".","No spoilers outside spoiler tags (||like this||).","Don't share anyone's personal information, including your own.","No scams or suspicious links. Staff will never DM you first asking for anything.","Follow Discord's Terms of Service and Community Guidelines.","Mods have the final say. If something's wrong, ping a Mod or message one."];
+  M.push(["rules","Rules","Post in #rules and add them to the rules screen (Community settings).","# Rules\n\n"+rules.map(function(r,i){return "**"+(i+1)+".** "+r}).join("\n")+"\n\nBreaking the rules can mean a warning, a timeout or a ban, depending on how serious it is."]);
+  M.push(["live","Go-live post","For posting by hand, or as wording for Discord Live.","@Live pings **"+h+" is live!** 🔴\n\n**[Stream title]**\nPlaying: [Game]\n\n"+S.pfs.map(function(p){return PN[p]+": "+({tw:"twitch.tv/",kk:"kick.com/",yt:"youtube.com/@",tt:"tiktok.com/@"}[p])+(S.handle||"[you]").toLowerCase()+(p==="tt"?"/live":"")}).join("\n")]);
+  var rp="# Pick your roles\n\nReact to get a role, react again to remove it.\n\n🔴 **Live pings**: a ping when "+h+" goes live";
+  if(has("events"))rp+="\n🎮 **Game night pings**: community events and game nights";
+  rp+="\n\n(Use a role bot or Onboarding questions to hand these out automatically.)";
+  M.push(["roles","Role picker","Post in #roles or #welcome if you're not using Onboarding questions.",rp]);
+  M.push(["announce","Announcement","For #announcements.","# 📢 [Headline]\n\n[What's happening and when]\n\n"+(S.cname?"Thanks for being part of "+S.cname+"! ":"")+"See you on stream. 💙"]);
+  return M;
+}
+var userEdit={};
+function messages(){
+  var w=$("msgs");w.innerHTML="";
+  MSG().forEach(function(m){var box=document.createElement("div");box.className="msg";box.innerHTML='<h3></h3><p></p><textarea spellcheck="true"></textarea><div class="acts" style="margin:0"><button class="btn sm">Copy</button><button class="btn ghost sm rs">Reset</button><span class="hint" style="margin:0"></span></div>';
+    box.querySelector("h3").textContent=m[1];box.querySelector("p").textContent=m[2];var ta=box.querySelector("textarea"),key=m[0];
+    ta.value=S.edits[key]!=null?S.edits[key]:m[3];
+    ta.addEventListener("input",function(){S.edits[key]=ta.value;save()});
+    box.querySelector(".rs").addEventListener("click",function(){delete S.edits[key];save();ta.value=m[3]});
+    var bt=box.querySelector(".btn"),hn2=box.querySelector(".acts .hint");bt.addEventListener("click",function(){copy(ta.value,hn2,ta)});
+    w.appendChild(box)});
+}
+function copy(t,msg,ta){function ok(){msg.textContent="Copied."}function fb(){if(ta){ta.select()}try{if(!ta){var x=document.createElement("textarea");x.value=t;document.body.appendChild(x);x.select();document.execCommand("copy");x.remove()}else document.execCommand("copy");ok()}catch(e){msg.textContent="Select and copy it."}}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb()}
+["sname","handle","cname"].forEach(function(id){$(id).value=S[id];$(id).addEventListener("input",function(){S[id]=this.value;save();render()})});
+document.querySelectorAll("#pfs input").forEach(function(cb){cb.checked=S.pfs.indexOf(cb.value)>=0;cb.addEventListener("change",function(){S.pfs=Array.from(document.querySelectorAll("#pfs input")).filter(function(x){return x.checked}).map(function(x){return x.value});save();render()})});
+document.querySelectorAll("#extras input").forEach(function(cb){cb.checked=S.extras.indexOf(cb.value)>=0;cb.addEventListener("change",function(){S.extras=Array.from(document.querySelectorAll("#extras input")).filter(function(x){return x.checked}).map(function(x){return x.value});save();render()})});
+$("size").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.size=b.dataset.v;save();seg();render()});
+function seg(){$("size").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.size)})}
+$("cpPlan").addEventListener("click",function(){copy(planText(),$("m1"))});
+seg();render();
+})();
+</script>
+</body>
+</html>
