@@ -286,7 +286,7 @@ function draw(cv){
   tiles=tiles.slice(0,4);
   if(tiles.length){var tg=20,tw2=(W-pad*2-tg*(tiles.length-1))/tiles.length,th=150;
     tiles.forEach(function(t,i){var X=pad+i*(tw2+tg);rr(x,X,y,tw2,th,22);x.fillStyle=P.card;x.fill();x.lineWidth=2;x.strokeStyle=P.edge;x.stroke();
-      x.fillStyle=accText;var vs=fit(x,t[0],tw2-40,70,true);hf(x,vs);x.fillText(t[0],X+24,y+82);x.font="600 22px Inter,sans-serif";x.fillStyle=P.sub;x.fillText(t[1],X+24,y+124)});
+      x.fillStyle=accText;var vs=fit(x,t[0],tw2-40,70,true);hf(x,vs);x.fillText(t[0],X+24,y+82);x.fillStyle=P.sub;var ls=22,lw=tw2-40;x.font="600 "+ls+"px Inter,sans-serif";while(x.measureText(t[1]).width>lw&&ls>18){ls--;x.font="600 "+ls+"px Inter,sans-serif"}if(x.measureText(t[1]).width<=lw)x.fillText(t[1],X+24,y+124);else{var wl=wrap(x,t[1],lw).slice(0,2);x.fillText(wl[0],X+24,y+112);if(wl[1])x.fillText(wl[1],X+24,y+136)}});
     y+=th+16;if(S.period){x.font="500 20px Inter,sans-serif";x.fillStyle=P.sub;x.fillText("Stats: "+S.period,pad,y+16);y+=28}y+=22}
   function head(t){x.font="800 22px Inter,sans-serif";x.fillStyle=accText;try{x.letterSpacing="4px"}catch(e){}x.fillText(t.toUpperCase(),pad,y+22);try{x.letterSpacing="0px"}catch(e){}x.fillStyle=rgba(c,.6);x.fillRect(pad,y+34,60,4);y+=58}
   // two columns: platforms | content & audience
