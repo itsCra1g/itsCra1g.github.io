@@ -111,8 +111,8 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
 .form{display:flex;flex-direction:column;gap:14px}
 .grp{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
 .grp h3{margin:0 0 10px;font-size:16px}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.f label{display:block;font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);margin-bottom:5px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
+.f label{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);margin-bottom:5px}
 .f input,.f textarea,.f select{font:15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px;width:100%;min-width:0}
 .f textarea{min-height:90px;resize:vertical;line-height:1.5}
 .plat{display:grid;grid-template-columns:110px minmax(0,1fr) 110px;gap:8px;align-items:center;margin-bottom:6px}
@@ -168,20 +168,20 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
         </div>
         <div class="grp"><h3>Platforms and followers</h3><div id="plats"></div><div class="hint" style="margin:4px 0 0">Leave a row blank to hide it. Followers like 1,250 or 1.2K both work.</div></div>
         <div class="grp"><h3>Stream stats</h3>
-          <div class="row"><div class="f"><label for="avg">Average viewers</label><input id="avg" maxlength="10"></div><div class="f"><label for="peak">Peak viewers</label><input id="peak" maxlength="10"></div>
-          <div class="f"><label for="hours">Hours live per month</label><input id="hours" maxlength="10"></div><div class="f"><label for="watch">Hours watched per month</label><input id="watch" maxlength="12"></div></div>
+          <div class="row" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="f"><label for="avg">Average viewers</label><input id="avg" maxlength="10"></div><div class="f"><label for="peak">Peak viewers</label><input id="peak" maxlength="10"></div>
+          <div class="f"><label for="hours">Hours live / month</label><input id="hours" maxlength="10"></div><div class="f"><label for="watch">Watched / month</label><input id="watch" maxlength="12"></div></div>
           <div class="f" style="margin-top:10px"><label for="period">Stats from</label><input id="period" maxlength="40" placeholder="e.g. Last 30 days, to 18 Nov 2026"></div>
         </div>
         <div class="grp"><h3>Content and audience</h3>
-          <div class="f"><label for="cats">Games and categories (comma separated)</label><input id="cats" maxlength="160"></div>
+          <div class="f"><label for="cats">Games and categories (use commas)</label><input id="cats" maxlength="160"></div>
           <div class="row" style="margin-top:10px"><div class="f"><label for="sched">When you're live</label><input id="sched" maxlength="60" placeholder="e.g. Mon, Wed, Fri evenings (UK)"></div><div class="f"><label for="geo">Top countries</label><input id="geo" maxlength="60" placeholder="e.g. UK, US, Canada"></div>
           <div class="f"><label for="age">Main age group</label><input id="age" maxlength="40" placeholder="e.g. Mostly 18–34"></div></div>
         </div>
         <div class="grp"><h3>What you offer</h3><div class="tgs" id="offers"></div>
           <div class="f" style="margin-top:10px"><label for="rates">Rates line</label><input id="rates" maxlength="80"></div>
-          <div class="f" style="margin-top:10px"><label for="past">Worked with (optional, comma separated)</label><input id="past" maxlength="160"></div></div>
+          <div class="f" style="margin-top:10px"><label for="past">Worked with (optional, use commas)</label><input id="past" maxlength="160"></div></div>
         <div class="grp"><h3>Contact</h3>
-          <div class="row"><div class="f"><label for="email">Business email</label><input id="email" maxlength="60" placeholder="a separate email for brand deals"></div><div class="f"><label for="site">Website or link page</label><input id="site" maxlength="60"></div><div class="f"><label for="dc">Discord or other</label><input id="dc" maxlength="60"></div></div>
+          <div class="row"><div class="f"><label for="email">Business email</label><input id="email" maxlength="60" placeholder="a separate email"></div><div class="f"><label for="site">Website / links</label><input id="site" maxlength="60"></div><div class="f"><label for="dc">Discord / other</label><input id="dc" maxlength="60"></div></div>
         </div>
         <div class="grp"><h3>Look</h3>
           <div class="row"><div><div class="f"><label>Colour</label></div><div class="sw" id="sw"></div></div>
@@ -271,9 +271,11 @@ function draw(cv){
   if(photo){x.save();x.beginPath();x.arc(px+ps/2,py+ps/2,ps/2,0,Math.PI*2);x.clip();var s=Math.max(ps/photo.width,ps/photo.height);x.drawImage(photo,px+(ps-photo.width*s)/2,py+(ps-photo.height*s)/2,photo.width*s,photo.height*s);x.restore();
     x.lineWidth=8;x.strokeStyle=ink;x.beginPath();x.arc(px+ps/2,py+ps/2,ps/2,0,Math.PI*2);x.stroke()}
   var tx=photo?px+ps+50:pad,tw=W-tx-pad;
-  x.textBaseline="alphabetic";x.fillStyle=ink;x.font="700 24px Inter,sans-serif";try{x.letterSpacing="5px"}catch(e){}x.globalAlpha=.8;x.fillText("MEDIA KIT",tx,py+38);x.globalAlpha=1;try{x.letterSpacing="0px"}catch(e){}
-  var nm=S.name||"Your Name",ns=fit(x,nm,tw,96,true);hf(x,ns);x.fillText(nm,tx,py+38+ns*1.05);
-  if(S.tag){x.font="600 32px Inter,sans-serif";var tl=wrap(x,S.tag,tw).slice(0,2);tl.forEach(function(l,i){x.fillText(l,tx,py+38+ns*1.05+50+i*40)})}
+  x.textBaseline="alphabetic";x.fillStyle=ink;
+  var nm=S.name||"Your Name",ns=fit(x,nm,tw,104,true),tl=[];if(S.tag){x.font="600 32px Inter,sans-serif";tl=wrap(x,S.tag,tw).slice(0,2)}
+  var blockH=ns*.82+(tl.length?20+tl.length*40:0),by=(hb-blockH)/2+ns*.82;
+  hf(x,ns);x.fillText(nm,tx,by);
+  x.font="600 32px Inter,sans-serif";tl.forEach(function(l,i){x.fillText(l,tx,by+50+i*40)});
   y=hb+52;
   // about
   if(S.about){x.font="500 27px Inter,sans-serif";x.fillStyle=P.fg;wrap(x,S.about,W-pad*2).slice(0,5).forEach(function(l){x.fillText(l,pad,y+27);y+=39});y+=24}
