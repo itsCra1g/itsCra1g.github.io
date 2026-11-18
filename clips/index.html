@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clips to Shorts: turn stream moments into TikToks, Shorts and Reels</title>
+<meta name="description" content="Free guide and tools by itsCRA1G: turn Twitch and Kick clips into TikToks, YouTube Shorts and Instagram Reels, with a vertical layout helper that gives you exact crop numbers and a title and caption writer.">
+<meta property="og:title" content="Clips to Shorts guide">
+<meta property="og:description" content="Vertical layouts with exact crops, captions and titles, and a workflow that fits around streaming. Free, by itsCRA1G.">
+<meta property="og:image" content="img/logo.png">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --warn:#FFB020; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.65 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:2px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 9px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:12px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:980px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 30px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:15em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:46em}li{margin:4px 0}
+strong{color:var(--fg)}
+code,.k{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.path{font-weight:600;color:var(--fg)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;margin:16px 0;max-width:48em}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* quick start */
+.qs{list-style:none;padding:0;counter-reset:q;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;max-width:none}
+.qs li{counter-increment:q;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 16px 16px 58px;position:relative;margin:0}
+.qs li::before{content:counter(q);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:8px;background:var(--acc-soft);color:var(--acc);font:700 14px/28px var(--display);text-align:center}
+.qs b{display:block;color:var(--fg);font-weight:700;margin-bottom:2px}
+.qs span{font-size:14px}
+/* mic picker */
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:10px 14px;cursor:pointer;text-align:left}
+.seg button small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.mictips{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin-bottom:18px;max-width:none}
+.mictips p{margin:0 0 8px}.mictips ul{margin:0}
+.chain{display:flex;flex-direction:column;gap:10px}
+.flt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.flt.off{opacity:.55}
+.flt .n{width:44px;height:44px;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font:700 16px var(--display)}
+.flt.off .n{background:var(--tile2);color:var(--mute)}
+.flt h4{margin:0;font:700 17px var(--display);color:var(--fg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:700 11px var(--text);letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--acc-soft);color:var(--acc)}
+.tag.opt{background:rgba(255,176,32,.14);color:var(--warn)}.tag.skip{background:var(--tile2);color:var(--mute)}
+.flt p{margin:6px 0 0;font-size:15px}
+.vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vals span{font:13px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:8px;padding:4px 8px}
+.vals span i{font-style:normal;color:var(--mute)}
+/* gate helper */
+.helper{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin:16px 0;max-width:none}
+.helper label{font-weight:600;color:var(--fg);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.helper input{font:600 16px var(--mono);width:90px;color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px}
+.helper output{font:600 15px var(--text);color:var(--fg)}
+/* meter */
+.meter{max-width:760px;margin:10px 0 18px}
+.mrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;margin:8px 0}
+.mrow b{font-size:14px;color:var(--fg)}
+.mtrack{position:relative;height:22px;border-radius:6px;background:linear-gradient(90deg,#14301f 0 66.6%,#3a3412 66.6% 85%,#3a1717 85%)}
+.mfill{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+.mscale{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;font:12px var(--mono);color:var(--mute)}
+.mscale div{position:relative;height:16px}
+.mscale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0 14px;min-width:560px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td:first-child{color:var(--fg);font-weight:600;width:30%}
+.checks{list-style:none;padding:0}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks input{width:18px;height:18px;margin-top:4px;accent-color:var(--acc);flex:0 0 auto}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+
+<style>
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;background:var(--tile);border:1px solid var(--edge);border-radius:18px;padding:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.fld,.opts select{font:600 15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:10px;padding:9px 10px;width:100%;min-width:0}
+.seg{margin:0}.seg button{padding:8px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+.btn.sm{padding:6px 10px;font-size:13px}
+.lay{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,.7fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+@media (max-width:900px){.lay{grid-template-columns:1fr}}
+.box{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:14px;min-width:0}
+.box canvas{width:100%;height:auto;display:block;border-radius:8px}
+.box .cap{font:700 11px var(--text);letter-spacing:1.4px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.nums{font:14px/1.6 var(--text)}
+.nums b{color:var(--fg)}
+.nums .k{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.nums p{margin:0 0 10px}
+.wr{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:16px}
+.out{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.out h3{margin:0;font-size:16px;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.out h3 small{font:600 12px var(--text);color:var(--mute)}
+.out textarea{width:100%;min-height:110px;font:14px/1.5 var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:10px;padding:10px;resize:vertical}
+.hooks{display:flex;flex-direction:column;gap:6px}
+.hooks button{text-align:left;font:600 14px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:10px;padding:9px 12px;cursor:pointer}
+.hooks button:hover{border-color:var(--acc)}
+.over{color:var(--bad)!important}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Clips to Shorts</a>
+  <nav><a href="#flow">Workflow</a><a href="#layout">Vertical layout</a><a href="#write">Titles</a><a href="#edit">Editing</a><a href="#post">Posting</a><a href="#specs">Specs</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free guide and tools · by itsCRA1G</div>
+  <h1>Turn stream moments into Shorts that bring people back.</h1>
+  <p class="lead">Short videos are how most people find new streamers now. This guide covers a workflow that fits around streaming, a vertical layout helper that gives you exact crop numbers for your editor, a title and caption writer, and what each platform wants.</p>
+  <div class="chips"><span class="chip">TikTok</span><span class="chip">YouTube Shorts</span><span class="chip">Instagram Reels</span><span class="chip">Crop numbers for your editor</span><span class="chip">Titles and captions</span></div>
+</div></div>
+
+<main class="wrap">
+  <section id="flow">
+    <div class="sec-head"><span class="num">1</span><h2>A workflow you'll actually keep up</h2></div>
+    <ol class="qs">
+      <li><b>Clip while you're live</b><span>On Twitch, Alt+X (or the clapperboard) grabs the last 90 seconds, so clip just after the moment. Put a clip button on your Stream Deck or a chat command for mods.</span></li>
+      <li><b>Note the time</b><span>Can't clip? Say "clip that" or drop a stream marker, then find it in the VOD later.</span></li>
+      <li><b>Pick your best three</b><span>After the stream, pick three moments. The one you'd tell a mate about is the one to post.</span></li>
+      <li><b>Edit once, vertical</b><span>One 1080×1920 version with captions, using the layout below. Batch a week's worth in one sitting.</span></li>
+      <li><b>Post everywhere</b><span>The same video to TikTok, Shorts and Reels, without another app's watermark.</span></li>
+      <li><b>Learn from the numbers</b><span>Check which ones people watched to the end, and make more like those.</span></li>
+    </ol>
+    <div class="note"><p><strong>What makes a good clip:</strong> a clear payoff (a clutch, a fail, a big reaction, a funny line), understandable without context, and over in under a minute. If it needs "you had to be there", leave it.</p></div>
+  </section>
+
+  <section id="layout">
+    <div class="sec-head"><span class="num">2</span><h2>Vertical layout helper</h2></div>
+    <p>Tell it where your camera sits on stream and pick a layout. It shows what to crop from your 1920×1080 clip and where it goes in the 1080×1920 video, with the numbers to type into CapCut, DaVinci Resolve or any editor.</p>
+    <div class="opts">
+      <div><div class="lbl">Layout</div><select id="lay"><option value="camtop">Camera on top, game below</option><option value="gametop">Game on top, camera below</option><option value="full">Full-height game, camera bubble</option><option value="nocam">Game only (no camera)</option></select></div>
+      <div><div class="lbl">Camera corner on stream</div><select id="corner"><option value="tl">Top left</option><option value="tr">Top right</option><option value="bl">Bottom left</option><option value="br" selected>Bottom right</option></select></div>
+      <div><div class="lbl">Camera size on stream</div><select id="csize"><option value="400">Small (400×225)</option><option value="512" selected>Medium (512×288)</option><option value="640">Large (640×360)</option></select></div>
+      <div><div class="lbl">Camera gap from edge</div><input class="fld" type="number" id="gap" min="0" max="200" value="30"></div>
+      <div><div class="lbl">Game focus</div><div class="seg" id="focus"><button data-v="l">Left</button><button data-v="c">Centre</button><button data-v="r">Right</button></div></div>
+    </div>
+    <div class="lay">
+      <div class="box"><div class="cap">Your stream (1920×1080): what to crop</div><canvas id="src" width="960" height="540"></canvas></div>
+      <div class="box"><div class="cap">The Short (1080×1920)</div><canvas id="dst" width="540" height="960"></canvas></div>
+      <div class="box nums" id="nums"></div>
+    </div>
+    <p class="hint" style="margin-top:10px">Faint bands on the Short show where the app's buttons and captions cover the video: keep faces and text out of them.</p>
+  </section>
+
+  <section id="write">
+    <div class="sec-head"><span class="num">3</span><h2>Hooks, titles and captions</h2></div>
+    <p>The first second decides whether people keep watching, so put a short line of text on screen right away. Fill this in and pick a hook.</p>
+    <div class="opts">
+      <div><div class="lbl">What happens</div><input class="fld" id="what" maxlength="80" placeholder="e.g. 1v4 clutch with a pistol"></div>
+      <div><div class="lbl">Game</div><input class="fld" id="game" maxlength="40" placeholder="e.g. Warzone"></div>
+      <div><div class="lbl">Your handle</div><input class="fld" id="who" maxlength="30" placeholder="yourname"></div>
+      <div><div class="lbl">Where you stream</div><input class="fld" id="where" maxlength="60" placeholder="Twitch and Kick"></div>
+    </div>
+    <div class="wr">
+      <div class="out"><h3>On-screen hook <small>tap one to use it</small></h3><div class="hooks" id="hooks"></div></div>
+      <div class="out"><h3>YouTube Shorts title <small id="cYt"></small></h3><textarea id="tYt"></textarea><div><button class="btn sm cp" data-t="tYt">Copy</button></div></div>
+      <div class="out"><h3>TikTok caption <small id="cTt"></small></h3><textarea id="tTt"></textarea><div><button class="btn sm cp" data-t="tTt">Copy</button></div></div>
+      <div class="out"><h3>Instagram caption <small id="cIg"></small></h3><textarea id="tIg"></textarea><div><button class="btn sm cp" data-t="tIg">Copy</button></div></div>
+    </div>
+    <p class="hint" style="margin-top:10px">Three to five relevant hashtags beat thirty random ones on every platform. Instagram has been cutting how many it allows, so keep it short.</p>
+  </section>
+
+  <section id="edit">
+    <div class="sec-head"><span class="num">4</span><h2>Editing that works</h2></div>
+    <ul>
+      <li><strong>Start on the payoff, or straight before it.</strong> Cut the build-up hard: most viewers decide in the first second or two.</li>
+      <li><strong>15 to 35 seconds</strong> is the sweet spot. Longer only if it stays interesting the whole way.</li>
+      <li><strong>Burn captions in</strong> (most people watch with the sound off), big and in the middle third. Check the words: auto-captions get game terms, names and emotes wrong.</li>
+      <li><strong>Your name on screen</strong> for the whole video, small, inside the safe area, so people know who to look for.</li>
+      <li><strong>Zoom or punch in</strong> on the important moment, and keep your face visible for reactions.</li>
+      <li><strong>Loop it:</strong> if the end flows back into the start, people watch it twice, which helps it spread.</li>
+      <li><strong>Tools:</strong> CapCut (free, easy, auto-captions; Twitch's promo partner), DaVinci Resolve (free, more control), Twitch's own clip editor (trim, portrait crop and captions; no layers). AI clipping tools can find moments for you; check the results and the price.</li>
+    </ul>
+  </section>
+
+  <section id="post">
+    <div class="sec-head"><span class="num">5</span><h2>Posting</h2></div>
+    <ul>
+      <li><strong>Post the same video to all three</strong>, uploaded fresh each time. Don't repost a TikTok with its watermark on Shorts or Reels: platforms push those down.</li>
+      <li><strong>Little and often:</strong> three or four a week you can keep up beats a burst of twenty then nothing.</li>
+      <li><strong>Point people back:</strong> your link in bio, your schedule in a pinned comment, and "live [days] on Twitch and Kick" in captions.</li>
+      <li><strong>Reply to comments</strong> in the first hour; it helps the video and builds the habit of people talking to you.</li>
+      <li><strong>Music:</strong> copyrighted songs can get videos muted or blocked. Use each app's licensed sounds, royalty-free music, or none.</li>
+      <li><strong>Clips other people make:</strong> on Twitch, anyone can clip your stream; you can delete clips from your channel in Creator Dashboard → Content → Clips.</li>
+    </ul>
+  </section>
+
+  <section id="specs">
+    <div class="sec-head"><span class="num">6</span><h2>What each platform wants</h2></div>
+    <div class="tw"><table>
+      <tr><th>Platform</th><th>Size</th><th>Length</th><th>Notes</th></tr>
+      <tr><td>Twitch clips</td><td>Landscape or portrait</td><td>Up to 60 s (5 minutes announced, no date yet)</td><td>Alt+X grabs the last 90 s; download from Share → Download as landscape or portrait.</td></tr>
+      <tr><td>Kick clips</td><td>Landscape</td><td>Short clips from the stream</td><td>Clip from the player, then download from the clip's page.</td></tr>
+      <tr><td>TikTok</td><td>1080×1920 (9:16)</td><td>Up to 10 min in-app; best 15–35 s</td><td>Turn on auto-captions as a backup, but burn your own in.</td></tr>
+      <tr><td>YouTube Shorts</td><td>1080×1920 (9:16)</td><td>Up to 3 min</td><td>Title up to 100 characters; a Short can link to your full video or live stream.</td></tr>
+      <tr><td>Instagram Reels</td><td>1080×1920 (9:16)</td><td>Up to 3 min</td><td>The grid shows the middle 3:4, so keep the key bit centred.</td></tr>
+    </table></div>
+    <p class="hint">Checked November 2026. Safe areas: keep text out of roughly the top 12%, the bottom 25% and the right-hand 15%, where buttons and captions sit.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Twitch, Kick, TikTok, YouTube, Instagram, CapCut or Blackmagic Design.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var S={lay:"camtop",corner:"br",csize:"512",gap:30,focus:"c",what:"",game:"",who:"",where:"Twitch and Kick"};
+try{var sv=JSON.parse(localStorage.getItem("cl_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+try{var br=JSON.parse(localStorage.getItem("br_cfg")||"null");if(br&&br.name&&br.name!=="YourName"&&!S.who)S.who=br.name}catch(e){}
+var saveT;function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem("cl_cfg",JSON.stringify(S))}catch(e){}},300)}
+var CAM="#FF5FA2",GAME="#4DA3FF";
+/* ---------- layout maths ---------- */
+function camBox(){var w=parseInt(S.csize,10),h=Math.round(w*9/16),g=Math.max(0,parseInt(S.gap,10)||0);
+  var x=S.corner[1]==="l"?g:1920-g-w,y=S.corner[0]==="t"?g:1080-g-h;return {x:x,y:y,w:w,h:h}}
+function gameCrop(aspect){ // aspect = w/h of destination region; returns crop in source, avoiding the camera if possible
+  var h=1080,w=Math.round(h*aspect);if(w>1920){w=1920;h=Math.round(w/aspect)}
+  var x=S.focus==="l"?0:S.focus==="r"?1920-w:Math.round((1920-w)/2),y=Math.round((1080-h)/2);return {x:x,y:y,w:w,h:h}}
+function layout(){
+  var cam=camBox(),L={regions:[],cam:cam};
+  if(S.lay==="camtop"||S.lay==="gametop"){
+    var ch=608,gh=1920-ch;var camDst={x:0,y:S.lay==="camtop"?0:gh,w:1080,h:ch},gameDst={x:0,y:S.lay==="camtop"?ch:0,w:1080,h:gh};
+    var gc=gameCrop(1080/gh);
+    L.regions=[["Camera",CAM,cam,camDst],["Game",GAME,gc,gameDst]];
+  }else if(S.lay==="full"){
+    var gc2=gameCrop(1080/1920),bub=360;L.regions=[["Game",GAME,gc2,{x:0,y:0,w:1080,h:1920}],["Camera",CAM,{x:cam.x+Math.round((cam.w-cam.h)/2),y:cam.y,w:cam.h,h:cam.h},{x:Math.round((1080-bub)/2),y:Math.round(1920*.13),w:bub,h:bub,round:true}]];
+  }else{L.regions=[["Game",GAME,gameCrop(1080/1920),{x:0,y:0,w:1080,h:1920}]]}
+  return L;
+}
+/* ---------- drawing ---------- */
+function fakeGame(x,W,H){var g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,"#1d3b2a");g.addColorStop(.5,"#2f5e3d");g.addColorStop(1,"#6f8f4e");x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.fillStyle="rgba(255,255,255,.07)";for(var i=0;i<14;i++){x.fillRect((i*137)%W,H*.55+((i*53)%40),W*.05,H*.45)}
+  x.strokeStyle="rgba(255,255,255,.6)";x.lineWidth=W/400;x.beginPath();x.arc(W/2,H/2,W/90,0,Math.PI*2);x.moveTo(W/2-W/45,H/2);x.lineTo(W/2+W/45,H/2);x.moveTo(W/2,H/2-W/45);x.lineTo(W/2,H/2+W/45);x.stroke();
+  x.fillStyle="rgba(0,0,0,.4)";x.fillRect(W*.02,H*.03,W*.18,H*.05);x.fillRect(W*.78,H*.88,W*.2,H*.08)}
+function fakeCam(x,b,sc){x.save();x.beginPath();x.rect(b.x*sc,b.y*sc,b.w*sc,b.h*sc);x.clip();x.fillStyle="#3a2a33";x.fillRect(b.x*sc,b.y*sc,b.w*sc,b.h*sc);x.fillStyle="#d9a38b";x.beginPath();x.arc((b.x+b.w/2)*sc,(b.y+b.h*.45)*sc,b.h*.22*sc,0,Math.PI*2);x.fill();
+  x.beginPath();x.ellipse((b.x+b.w/2)*sc,(b.y+b.h*1.02)*sc,b.h*.38*sc,b.h*.32*sc,0,0,Math.PI*2);x.fill();x.restore()}
+function drawSrc(L){var cv=$("src"),x=cv.getContext("2d"),sc=cv.width/1920;fakeGame(x,cv.width,cv.height);if(S.lay!=="nocam"||true)fakeCam(x,L.cam,sc);
+  L.regions.forEach(function(r){var c=r[2];x.save();x.strokeStyle=r[1];x.lineWidth=3;x.setLineDash(r[0]==="Camera"?[]:[10,6]);x.strokeRect(c.x*sc+1.5,c.y*sc+1.5,c.w*sc-3,c.h*sc-3);
+    x.fillStyle=r[1];x.font="700 14px Inter,sans-serif";var t=r[0]+" crop";var tw=x.measureText(t).width;x.fillRect(c.x*sc+4,c.y*sc+4,tw+12,22);x.fillStyle="#000";x.fillText(t,c.x*sc+10,c.y*sc+20);x.restore()})}
+function drawDst(L){var cv=$("dst"),x=cv.getContext("2d"),sc=cv.width/1080,src=document.createElement("canvas");src.width=1920;src.height=1080;var s=src.getContext("2d");fakeGame(s,1920,1080);fakeCam(s,L.cam,1);
+  x.fillStyle="#000";x.fillRect(0,0,cv.width,cv.height);
+  L.regions.forEach(function(r){var c=r[2],d=r[3];x.save();if(d.round){x.beginPath();x.arc((d.x+d.w/2)*sc,(d.y+d.h/2)*sc,d.w/2*sc,0,Math.PI*2);x.clip()}
+    x.drawImage(src,c.x,c.y,c.w,c.h,d.x*sc,d.y*sc,d.w*sc,d.h*sc);x.restore();
+    x.save();x.strokeStyle=r[1];x.lineWidth=3;if(d.round){x.beginPath();x.arc((d.x+d.w/2)*sc,(d.y+d.h/2)*sc,d.w/2*sc-1.5,0,Math.PI*2);x.stroke()}else x.strokeRect(d.x*sc+1.5,d.y*sc+1.5,d.w*sc-3,d.h*sc-3);x.restore()});
+  // safe zones
+  x.fillStyle="rgba(255,255,255,.12)";x.fillRect(0,0,cv.width,cv.height*.12);x.fillRect(0,cv.height*.75,cv.width,cv.height*.25);x.fillRect(cv.width*.85,cv.height*.12,cv.width*.15,cv.height*.63);
+  // caption sample
+  x.font="800 "+Math.round(cv.width*.07)+"px Inter,sans-serif";x.textAlign="center";x.lineWidth=6;x.strokeStyle="#000";x.fillStyle="#fff";var cy=S.lay==="gametop"?cv.height*.5:cv.height*.62;
+  x.strokeText("CAPTIONS HERE",cv.width*.46,cy);x.fillText("CAPTIONS HERE",cv.width*.46,cy);
+  x.font="600 "+Math.round(cv.width*.035)+"px Inter,sans-serif";x.fillStyle="rgba(255,255,255,.85)";x.fillText("@"+(S.who||"yourname"),cv.width*.46,cv.height*.71)}
+function nums(L){var w=$("nums");w.innerHTML="";
+  var h=document.createElement("p");h.innerHTML="<b>Set your project to 1080×1920, 30 or 60 fps.</b> Then add your clip once per row below, crop it, and place it.";w.appendChild(h);
+  L.regions.forEach(function(r){var c=r[2],d=r[3],p=document.createElement("p");p.innerHTML='<span class="k"></span><b></b><br>';p.querySelector(".k").style.background=r[1];p.querySelector("b").textContent=r[0];
+    var t="Crop from the clip: "+c.w+"×"+c.h+" starting at x "+c.x+", y "+c.y+" (left "+c.x+", right "+(1920-c.x-c.w)+", top "+c.y+", bottom "+(1080-c.y-c.h)+").\nPlace in the Short: "+d.w+"×"+d.h+" at x "+d.x+", y "+d.y+(d.round?" as a circle":"")+" (scale "+Math.round(d.w/c.w*100)+"%).";
+    t.split("\n").forEach(function(l,i){if(i)p.appendChild(document.createElement("br"));p.appendChild(document.createTextNode(l))});w.appendChild(p)});
+  var tip=document.createElement("p");tip.className="hint";tip.style.margin="0";
+  var big=L.regions.some(function(r){return r[0]==="Camera"&&r[3].w/r[2].w>1.6});
+  tip.textContent=big?"The camera is scaled up a lot, so it may look soft. A bigger camera on stream, or a separate camera recording, looks sharper.":"Editors measure crops differently: some want the four edges (left, right, top, bottom), some want a size and position. Both are given.";
+  w.appendChild(tip)}
+function draw(){var L=layout();drawSrc(L);drawDst(L);nums(L)}
+/* ---------- writing ---------- */
+function writing(){
+  var what=(S.what||"[what happens]").trim(),game=(S.game||"").trim(),who=(S.who||"").trim(),where=(S.where||"").trim(),tag=function(s){return "#"+s.replace(/[^A-Za-z0-9]/g,"")};
+  var hooks=["Wait for it…","I did NOT expect this","Chat said I couldn't…",what.charAt(0).toUpperCase()+what.slice(1),"How did that work?!",(game?game+" moment of the year":"Moment of the year")];
+  var hw=$("hooks");hw.innerHTML="";hooks.forEach(function(h){var b=document.createElement("button");b.textContent=h;b.addEventListener("click",function(){copy(h,b)});hw.appendChild(b)});
+  var tags=[game?tag(game):"",tag("gaming"),"#streamer",tag("twitch")].filter(Boolean).slice(0,4);
+  setT("tYt",what.charAt(0).toUpperCase()+what.slice(1)+(game?" | "+game:"")+" #shorts");
+  setT("tTt",what+(game?" in "+game:"")+" 😳"+(where?"\n\nLive on "+where+(who?": "+who:""):"")+"\n\n"+tags.join(" ")+" #fyp");
+  setT("tIg",what+(game?" in "+game:"")+(where?"\n\nCatch it live on "+where+" (link in bio)":"")+"\n\n"+tags.slice(0,4).join(" "));
+  counts();
+}
+var edited={};
+function setT(id,v){if(!edited[id])$(id).value=v}
+function counts(){[["tYt","cYt",100],["tTt","cTt",4000],["tIg","cIg",2200]].forEach(function(a){var n=$(a[0]).value.length,c=$(a[1]);c.textContent=n+" / "+a[2];c.className=n>a[2]?"over":""})}
+["tYt","tTt","tIg"].forEach(function(id){$(id).addEventListener("input",function(){edited[id]=true;counts()})});
+function copy(t,btn){var o=btn.textContent;function done(m){btn.textContent=m;setTimeout(function(){btn.textContent=o},1400)}
+  function fb(){var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done("Copied")}catch(e){done("Select and copy")}ta.remove()}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){done("Copied")},fb);else fb()}
+document.querySelectorAll(".cp").forEach(function(b){b.addEventListener("click",function(){copy($(b.dataset.t).value,b)})});
+["lay","corner","csize"].forEach(function(id){$(id).value=S[id];$(id).addEventListener("change",function(){S[id]=this.value;save();draw()})});
+$("gap").value=S.gap;$("gap").addEventListener("input",function(){S.gap=this.value;save();draw()});
+$("focus").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.focus=b.dataset.v;save();fseg();draw()});
+function fseg(){$("focus").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.focus)})}
+["what","game","who","where"].forEach(function(id){$(id).value=S[id];$(id).addEventListener("input",function(){S[id]=this.value;save();writing();draw()})});
+fseg();draw();writing();
+})();
+</script>
+</body>
+</html>
