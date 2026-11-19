@@ -7,6 +7,13 @@
 <meta name="description" content="Free tools and resources for streamers by itsCRA1G: guides for new streamers, tools, OBS overlays, Streamer.bot actions and Stream Deck plugins.">
 <meta property="og:title" content="itsCRA1G: free tools for streamers">
 <meta property="og:description" content="Guides, tools, OBS overlays, Streamer.bot actions and Stream Deck plugins for streamers. Free.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="itsCRA1G">
+<meta property="og:url" content="https://itscra1g.github.io/">
+<meta property="og:image" content="https://itscra1g.github.io/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="pilot-logo.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
@@ -42,6 +49,20 @@ a.card:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-soft),0 20px
 .start p{margin:0;font-size:15px;max-width:40em}
 .start .arr{margin-left:auto;font:700 30px "Space Grotesk",sans-serif;color:var(--acc);padding-left:8px}
 @media (max-width:560px){.start{flex-direction:column;align-items:flex-start}.start .arr{display:none}}
+.tools-bar{margin-top:30px;display:flex;flex-direction:column;gap:12px}
+.news{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.news .lbl{font:700 11px Inter,sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);align-self:center;flex:0 0 auto}
+.news a{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;font-size:13.5px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);border-radius:12px;padding:8px 12px;text-decoration:none;max-width:240px}
+.news a small{font-weight:500;color:var(--mute);font-size:12px}
+.news a:hover{border-color:var(--acc)}
+.find{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.find input{flex:1 1 260px;min-width:0;font:500 15px Inter,sans-serif;color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:11px 14px}
+.find input:focus{outline:none;border-color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font:600 13px Inter,sans-serif;color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chips button[aria-pressed=true]{color:#000;background:var(--acc);border-color:var(--acc)}
+.nores{display:none;margin-top:28px;color:var(--mute)}
+.card .sbt{font:700 10px Inter,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#C9A7FF;background:rgba(169,112,255,.16);border-radius:6px;padding:2px 6px}
 footer{margin-top:56px;font-size:13.5px;color:var(--mute)}
 </style>
 </head>
@@ -53,6 +74,20 @@ footer{margin-top:56px;font-size:13.5px;color:var(--mute)}
   <nav class="jump"><a href="start/">Start here</a><a href="#guides">Guides</a><a href="#tools">Tools</a><a href="#overlays">OBS overlays</a><a href="#sb">Streamer.bot actions</a><a href="#deck">Stream Deck plugins</a></nav>
 
   <a class="start" href="start/"><img src="start/img/logo.png?v=1" alt=""><div><span class="badge new">New to streaming?</span><h2>Start here</h2><p>A step-by-step path through everything on this site: get set up, look the part, go live properly, build a community and grow. Tick things off as you go.</p></div><span class="arr">→</span></a>
+
+  <div class="tools-bar">
+    <div class="news" aria-label="What's new"><span class="lbl">What's new</span>
+      <a href="#overlays">Overlays reconnect on their own<small>19 Nov · Sub Goal, Poll, Alerts…</small></a>
+      <a href="scenes-guide/">OBS Scenes Guide<small>18 Nov · Scene builder and fixes</small></a>
+      <a href="start/">Start Here<small>18 Nov · A path for new streamers</small></a>
+      <a href="media-kit/">Media Kit Maker<small>18 Nov · A one-page kit for brands</small></a>
+      <a href="clips/">Clips to Shorts<small>18 Nov · Vertical crops and captions</small></a>
+      <a href="discord-starter/">Discord Starter<small>17 Nov · Plan your server</small></a>
+    </div>
+    <div class="find"><input type="search" id="q" placeholder="Search everything: alerts, Discord, emotes, audio…" aria-label="Search the hub" autocomplete="off">
+      <div class="chips" id="chips" role="group" aria-label="Filter"><button data-f="all" aria-pressed="true">All</button><button data-f="guides">Guides</button><button data-f="tools">Tools</button><button data-f="overlays">Overlays</button><button data-f="sb">Streamer.bot</button><button data-f="deck">Stream Deck</button><button data-f="nosb">No Streamer.bot needed</button></div></div>
+  </div>
+  <p class="nores" id="nores">Nothing matches that. Try another word, or <a href="#" id="clearq">show everything</a>.</p>
 
   <section id="guides">
     <div class="sh"><h2>Guides</h2><span>For new streams and growing ones</span></div>
@@ -117,5 +152,25 @@ footer{margin-top:56px;font-size:13.5px;color:var(--mute)}
 
   <footer>Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. Not affiliated with Elgato, Activision, Spotify, Streamer.bot, OBS, Twitch, Kick or Discord.</footer>
 </div>
+<script>
+(function(){
+var NEED=["sub-goal/","goals/","credits/","chat/","activity/","poll/","raid-welcome/","discord-live/","stream-report/","trivia/"];
+var cards=[].slice.call(document.querySelectorAll("section a.card, section div.card"));
+cards.forEach(function(c){var sec=c.closest("section");c.dataset.sec=sec?sec.id:"";var h=c.getAttribute("href")||"";
+  c.dataset.sb=(sec&&sec.id==="sb")||NEED.indexOf(h)>=0?"1":"0";c.dataset.text=c.textContent.toLowerCase();
+  if(c.dataset.sb==="1"&&sec&&sec.id!=="sb"){var h3=c.querySelector("h3");if(h3){var t=document.createElement("span");t.className="sbt";t.textContent="Streamer.bot";h3.appendChild(t)}}});
+var q=document.getElementById("q"),f="all";
+function run(){var term=(q.value||"").trim().toLowerCase(),words=term.split(/\s+/).filter(Boolean),any=false;
+  cards.forEach(function(c){var empty=c.classList.contains("empty")||(c.classList.contains("soon")&&!c.getAttribute("href"));
+    var okF=f==="all"||(f==="nosb"?c.dataset.sb==="0"&&c.dataset.sec!=="sb":c.dataset.sec===f);
+    var okT=words.every(function(w){return c.dataset.text.indexOf(w)>=0});
+    var show=okF&&okT&&!(empty&&(term||f!=="all"));c.style.display=show?"":"none";if(show&&!empty)any=true});
+  document.querySelectorAll("main section, body section").forEach(function(s){if(!s.querySelector(".card"))return;var vis=[].some.call(s.querySelectorAll(".card"),function(c){return c.style.display!=="none"});s.style.display=vis?"":"none"});
+  document.getElementById("nores").style.display=any?"none":"block"}
+q.addEventListener("input",run);
+document.getElementById("chips").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;f=b.dataset.f;this.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});run()});
+document.getElementById("clearq").addEventListener("click",function(e){e.preventDefault();q.value="";f="all";document.querySelectorAll("#chips button").forEach(function(x){x.setAttribute("aria-pressed",x.dataset.f==="all")});run();q.focus()});
+})();
+</script>
 </body>
 </html>
