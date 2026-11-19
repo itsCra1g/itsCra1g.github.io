@@ -114,10 +114,10 @@ footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px
 <style>
 .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
 @media (max-width:960px){.cols{grid-template-columns:1fr}}
-.form{display:flex;flex-direction:column;gap:14px}
-.grp{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.form{display:flex;flex-direction:column;gap:14px;min-width:0}
+.grp{min-width:0;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
 .grp h3{margin:0 0 10px;font-size:16px}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));gap:10px;align-items:end}
 .f label{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);margin-bottom:5px}
 .f input,.f textarea,.f select{font:15px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px;width:100%;min-width:0}
 .f textarea{min-height:90px;resize:vertical;line-height:1.5}
@@ -355,5 +355,6 @@ function fontReady(){var f=S.font.split("|");if(!document.fonts||!document.fonts
 build();look();up();fontReady().then(function(){draw()});if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){draw()});
 })();
 </script>
+<script src="../follow.js?v=2"></script>
 </body>
 </html>
