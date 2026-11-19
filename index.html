@@ -50,11 +50,6 @@ a.card:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-soft),0 20px
 .start .arr{margin-left:auto;font:700 30px "Space Grotesk",sans-serif;color:var(--acc);padding-left:8px}
 @media (max-width:560px){.start{flex-direction:column;align-items:flex-start}.start .arr{display:none}}
 .tools-bar{margin-top:30px;display:flex;flex-direction:column;gap:12px}
-.news{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
-.news .lbl{font:700 11px Inter,sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);align-self:center;flex:0 0 auto}
-.news a{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;font-size:13.5px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);border-radius:12px;padding:8px 12px;text-decoration:none;max-width:240px}
-.news a small{font-weight:500;color:var(--mute);font-size:12px}
-.news a:hover{border-color:var(--acc)}
 .find{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .find input{flex:1 1 260px;min-width:0;font:500 15px Inter,sans-serif;color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:11px 14px}
 .find input:focus{outline:none;border-color:var(--acc)}
@@ -75,15 +70,9 @@ footer{margin-top:56px;font-size:13.5px;color:var(--mute)}
 
   <a class="start" href="start/"><img src="start/img/logo.png?v=1" alt=""><div><span class="badge new">New to streaming?</span><h2>Start here</h2><p>A step-by-step path through everything on this site: get set up, look the part, go live properly, build a community and grow. Tick things off as you go.</p></div><span class="arr">→</span></a>
 
+  <div id="follow-hero"></div>
+
   <div class="tools-bar">
-    <div class="news" aria-label="What's new"><span class="lbl">What's new</span>
-      <a href="#overlays">Overlays reconnect on their own<small>19 Nov · Sub Goal, Poll, Alerts…</small></a>
-      <a href="scenes-guide/">OBS Scenes Guide<small>18 Nov · Scene builder and fixes</small></a>
-      <a href="start/">Start Here<small>18 Nov · A path for new streamers</small></a>
-      <a href="media-kit/">Media Kit Maker<small>18 Nov · A one-page kit for brands</small></a>
-      <a href="clips/">Clips to Shorts<small>18 Nov · Vertical crops and captions</small></a>
-      <a href="discord-starter/">Discord Starter<small>17 Nov · Plan your server</small></a>
-    </div>
     <div class="find"><input type="search" id="q" placeholder="Search everything: alerts, Discord, emotes, audio…" aria-label="Search the hub" autocomplete="off">
       <div class="chips" id="chips" role="group" aria-label="Filter"><button data-f="all" aria-pressed="true">All</button><button data-f="guides">Guides</button><button data-f="tools">Tools</button><button data-f="overlays">Overlays</button><button data-f="sb">Streamer.bot</button><button data-f="deck">Stream Deck</button><button data-f="nosb">No Streamer.bot needed</button></div></div>
   </div>
@@ -172,5 +161,6 @@ document.getElementById("chips").addEventListener("click",function(e){var b=e.ta
 document.getElementById("clearq").addEventListener("click",function(e){e.preventDefault();q.value="";f="all";document.querySelectorAll("#chips button").forEach(function(x){x.setAttribute("aria-pressed",x.dataset.f==="all")});run();q.focus()});
 })();
 </script>
+<script src="follow.js?v=2"></script>
 </body>
 </html>
