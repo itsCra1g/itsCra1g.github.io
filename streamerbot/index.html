@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streamer.bot Starter: set it up once, use it everywhere</title>
+<meta name="description" content="A beginner's guide to Streamer.bot: install it, connect Twitch, Kick and OBS, turn on the WebSocket server overlays need, import actions safely and fix common problems. With links to the official docs, Discord and videos.">
+<meta property="og:title" content="Streamer.bot Starter guide">
+<meta property="og:description" content="Install Streamer.bot, connect Twitch, Kick and OBS, and get overlays working.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="itsCRA1G">
+<meta property="og:url" content="https://itscra1g.github.io/streamerbot/">
+<meta property="og:image" content="https://itscra1g.github.io/streamerbot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --warn:#FFB020; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.65 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:2px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 9px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:12px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:980px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 30px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:15em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:46em}li{margin:4px 0}
+strong{color:var(--fg)}
+code,.k{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.path{font-weight:600;color:var(--fg)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;margin:16px 0;max-width:48em}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* quick start */
+.qs{list-style:none;padding:0;counter-reset:q;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;max-width:none}
+.qs li{counter-increment:q;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 16px 16px 58px;position:relative;margin:0}
+.qs li::before{content:counter(q);position:absolute;left:16px;top:15px;width:28px;height:28px;border-radius:8px;background:var(--acc-soft);color:var(--acc);font:700 14px/28px var(--display);text-align:center}
+.qs b{display:block;color:var(--fg);font-weight:700;margin-bottom:2px}
+.qs span{font-size:14px}
+/* mic picker */
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 18px}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:10px 14px;cursor:pointer;text-align:left}
+.seg button small{display:block;font-weight:500;font-size:12px;color:var(--mute)}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.mictips{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin-bottom:18px;max-width:none}
+.mictips p{margin:0 0 8px}.mictips ul{margin:0}
+.chain{display:flex;flex-direction:column;gap:10px}
+.flt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.flt.off{opacity:.55}
+.flt .n{width:44px;height:44px;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:grid;place-items:center;font:700 16px var(--display)}
+.flt.off .n{background:var(--tile2);color:var(--mute)}
+.flt h4{margin:0;font:700 17px var(--display);color:var(--fg);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font:700 11px var(--text);letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--acc-soft);color:var(--acc)}
+.tag.opt{background:rgba(255,176,32,.14);color:var(--warn)}.tag.skip{background:var(--tile2);color:var(--mute)}
+.flt p{margin:6px 0 0;font-size:15px}
+.vals{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.vals span{font:13px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:8px;padding:4px 8px}
+.vals span i{font-style:normal;color:var(--mute)}
+/* gate helper */
+.helper{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px 18px;margin:16px 0;max-width:none}
+.helper label{font-weight:600;color:var(--fg);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.helper input{font:600 16px var(--mono);width:90px;color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px}
+.helper output{font:600 15px var(--text);color:var(--fg)}
+/* meter */
+.meter{max-width:760px;margin:10px 0 18px}
+.mrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;align-items:center;margin:8px 0}
+.mrow b{font-size:14px;color:var(--fg)}
+.mtrack{position:relative;height:22px;border-radius:6px;background:linear-gradient(90deg,#14301f 0 66.6%,#3a3412 66.6% 85%,#3a1717 85%)}
+.mfill{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--acc);box-shadow:0 0 12px var(--acc)}
+.mscale{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;font:12px var(--mono);color:var(--mute)}
+.mscale div{position:relative;height:16px}
+.mscale div span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tw{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px;margin:8px 0 14px;min-width:560px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td:first-child{color:var(--fg);font-weight:600;width:30%}
+.checks{list-style:none;padding:0}
+.checks li{display:flex;gap:10px;align-items:flex-start}
+.checks input{width:18px;height:18px;margin-top:4px;accent-color:var(--acc);flex:0 0 auto}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+</style>
+
+<style>
+.uses{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:8px 0 16px;max-width:none}
+.uses a{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:10px 12px;text-decoration:none;color:var(--fg);font-weight:600;font-size:15px}
+.uses a img{width:40px;height:40px;border-radius:10px}
+.uses a small{display:block;font-weight:500;font-size:12.5px;color:var(--mute)}
+.uses a:hover{border-color:var(--acc);color:var(--fg)}
+.steps{list-style:none;padding:0;counter-reset:s;max-width:52em}
+.steps>li{counter-increment:s;position:relative;padding:0 0 0 46px;margin:0 0 16px}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:9px;background:var(--acc-soft);color:var(--acc);font:700 14px/30px var(--display);text-align:center}
+.steps>li>b{display:block;color:var(--fg)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:10px 0 18px;max-width:none}
+.lk{display:flex;flex-direction:column;gap:4px;background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px;text-decoration:none;color:var(--body);font-size:14.5px;line-height:1.5}
+.lk b{font:700 17px var(--display);color:var(--fg)}
+.lk span.u{font:12.5px var(--mono);color:var(--acc);word-break:break-all}
+.lk:hover{border-color:var(--acc);color:var(--body)}
+.lk .who{font-size:12.5px;color:var(--mute)}
+.ideas{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:none;margin:10px 0 16px}
+.idea{background:var(--tile);border:1px solid var(--edge);border-radius:16px;padding:16px}
+.idea b{display:block;font:700 18px var(--display);color:var(--fg);margin-bottom:4px}
+.idea p{margin:0;font-size:14.5px}
+.prog{display:flex;align-items:center;gap:12px;margin:0 0 12px;max-width:520px}
+.prog .tr{flex:1;height:8px;border-radius:999px;background:var(--tile2);border:1px solid var(--edge2);overflow:hidden}
+.prog .tr i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.prog b{font:700 14px var(--display);color:var(--fg);white-space:nowrap}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Streamer.bot Starter</a>
+  <nav><a href="#why">Why</a><a href="#install">Install</a><a href="#connect">Connect</a><a href="#overlays">Overlays</a><a href="#basics">Basics</a><a href="#safe">Stay safe</a><a href="#fixes">Fixes</a><a href="#learn">Learn more</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free guide · by itsCRA1G</div>
+  <h1>Set up Streamer.bot once, then use it for everything.</h1>
+  <p class="lead">Streamer.bot is a free app for Windows that listens to Twitch, Kick and YouTube and does things when they happen: thank a sub, run a chat command, change an OBS scene, feed an overlay. Lots of tools on this site use it. This guide gets it installed, connected and ready, in about 20 minutes.</p>
+  <div class="chips"><span class="chip">Free</span><span class="chip">Windows</span><span class="chip">Twitch, Kick and YouTube</span><span class="chip">OBS</span><span class="chip">Official links and videos</span></div>
+</div></div>
+
+<main class="wrap">
+  <section id="why">
+    <div class="sec-head"><span class="num">1</span><h2>What it is and why you'd want it</h2></div>
+    <p>Think of it as a remote control for your stream that reacts on its own. Something happens (a follow, a sub, a raid, someone types <code>!discord</code>) and Streamer.bot runs whatever steps you've set: send a chat message, play a sound, show a source in OBS, or pass the news to an overlay.</p>
+    <ul>
+      <li><strong>It runs on your PC,</strong> next to OBS. It only works while it's open, so start it before you go live.</li>
+      <li><strong>It talks to Twitch and Kick at the same time,</strong> so one action can handle both. Handy if you multistream.</li>
+      <li><strong>It's free.</strong> There's an optional Patreon, but everything in this guide works without it.</li>
+    </ul>
+    <h3>Tools on this site that use it</h3>
+    <div class="uses">
+      <a href="../chat/"><img src="../chat/img/logo.png" alt=""><span>Combined Chat<small>Overlay · WebSocket only</small></span></a>
+      <a href="../alerts/"><img src="../alerts/img/logo.png" alt=""><span>Alerts<small>Overlay · Twitch-only option without it</small></span></a>
+      <a href="../sub-goal/"><img src="../sub-goal/img/logo.png" alt=""><span>Sub Goal<small>Overlay + import</small></span></a>
+      <a href="../goals/"><img src="../goals/img/logo.png" alt=""><span>Goal Bars<small>Overlay · WebSocket only</small></span></a>
+      <a href="../activity/"><img src="../activity/img/logo.png" alt=""><span>Activity Feed<small>Overlay · WebSocket only</small></span></a>
+      <a href="../poll/"><img src="../poll/img/logo.png" alt=""><span>Chat Poll<small>Overlay + import</small></span></a>
+      <a href="../credits/"><img src="../credits/img/logo.png" alt=""><span>Credits<small>Overlay + import</small></span></a>
+      <a href="../raid-welcome/"><img src="../raid-welcome/img/logo.png" alt=""><span>Raid Welcome<small>Import</small></span></a>
+      <a href="../discord-live/"><img src="../discord-live/img/logo.png" alt=""><span>Discord Live<small>Action</small></span></a>
+      <a href="../stream-report/"><img src="../stream-report/img/logo.png" alt=""><span>Stream Report<small>Action</small></span></a>
+      <a href="../trivia/"><img src="../trivia/img/logo.png" alt=""><span>Trivia<small>Import</small></span></a>
+    </div>
+    <p>"WebSocket only" means there's nothing to import: once section 5 is done, the overlay just works.</p>
+  </section>
+
+  <section id="install">
+    <div class="sec-head"><span class="num">2</span><h2>Download and install</h2></div>
+    <div class="prog"><b id="pct">0 of 0 done</b><div class="tr"><i id="fill"></i></div></div>
+    <ol class="steps">
+      <li><b>Download it from the official site only</b>Go to <a href="https://streamer.bot/downloads" target="_blank" rel="noopener">streamer.bot/downloads</a> and get the newest stable version. It comes as a zip. Don't download it from anywhere else.</li>
+      <li><b>Unzip it to a normal folder</b>Something like <code>C:\Streamer.bot</code> or a folder in Documents is fine. Avoid OneDrive, Google Drive and other synced folders: the official docs say they cause problems.</li>
+      <li><b>Open Streamer.bot.exe</b>There's no installer. The folder is the app, and everything you set up is saved inside it. Pin it to your taskbar so it's easy to open before streams.</li>
+      <li><b>Don't run it as administrator</b>The docs warn this causes trouble later, especially if you run it as admin once and then switch back.</li>
+      <li><b>Let it update itself</b>It tells you when a new stable version is out. To check yourself, open the menu at the top left and pick <span class="path">Check for Updates</span>. It backs up your settings before updating.</li>
+    </ol>
+    <ul class="checks" id="ck1">
+      <li><input type="checkbox" data-k="dl" id="c-dl"><label for="c-dl">Downloaded from streamer.bot and unzipped to a normal folder</label></li>
+      <li><input type="checkbox" data-k="open" id="c-open"><label for="c-open">Opened it (not as administrator) and pinned it to the taskbar</label></li>
+    </ul>
+  </section>
+
+  <section id="connect">
+    <div class="sec-head"><span class="num">3</span><h2>Connect your platforms</h2></div>
+    <h3>Twitch</h3>
+    <ol class="steps">
+      <li><b>Log in as yourself</b>Open <span class="path">Platforms → Twitch → Accounts</span>. Next to <span class="path">Broadcaster Account</span>, press <span class="path">Login</span> and allow everything Twitch asks for. If you untick permissions, some events won't arrive.</li>
+      <li><b>Bot account (optional)</b>If you've made a separate Twitch account for your bot, log it in as the <span class="path">Bot Account</span>. Messages then come from the bot instead of you. Skip this if you don't have one: everything works with just your own account.</li>
+    </ol>
+    <h3>Kick</h3>
+    <p>Kick works differently: its events reach Streamer.bot through the Streamer.bot website, so there are two places to connect. Use the same Kick account in both.</p>
+    <ol class="steps">
+      <li><b>Log in to Streamer.bot itself</b>Press <span class="path">Login</span> at the bottom left of the app and sign in through your browser.</li>
+      <li><b>Connect Kick in the app</b>Open <span class="path">Platforms → Kick</span>. Next to <span class="path">Broadcaster Account</span>, press <span class="path">Login</span> and allow every permission.</li>
+      <li><b>Connect Kick on the website</b>On <a href="https://streamer.bot" target="_blank" rel="noopener">streamer.bot</a>, open <span class="path">Account Settings</span> and, under <span class="path">Connections</span>, press <span class="path">Connect</span> for Kick. It should say <em>Connected as</em> your Kick name.</li>
+      <li><b>Restart Streamer.bot</b>Close it and open it again so the connection takes.</li>
+    </ol>
+    <div class="note"><p><strong>Kick events can be a few seconds slower than Twitch.</strong> That's normal: it's how Kick sends them. If Kick goes quiet after a while, disconnect and reconnect Kick on the Streamer.bot website.</p></div>
+    <h3>YouTube and TikTok</h3>
+    <ul>
+      <li><strong>YouTube:</strong> <span class="path">Platforms → YouTube → Accounts</span>, press <span class="path">Sign in with Google</span>, allow access and tick <span class="path">Auto Connect</span>. If your channel is a brand account, sign in with the main Google account first and pick the channel on the next screen.</li>
+      <li><strong>TikTok:</strong> Streamer.bot has no official TikTok connection, because TikTok doesn't offer a public API for it. Some streamers use a separate app called TikFinity alongside it.</li>
+    </ul>
+    <ul class="checks" id="ck2">
+      <li><input type="checkbox" data-k="tw" id="c-tw"><label for="c-tw">Twitch connected</label></li>
+      <li><input type="checkbox" data-k="kick" id="c-kick"><label for="c-kick">Kick connected in the app and on the website (if you stream there)</label></li>
+    </ul>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">4</span><h2>Connect OBS</h2></div>
+    <p>This lets Streamer.bot switch scenes, show and hide sources, and run filters for you. You need OBS 28 or newer, which has the connection built in.</p>
+    <ol class="steps">
+      <li><b>Turn it on in OBS</b>In OBS, open <span class="path">Tools → WebSocket Server Settings</span> and tick <span class="path">Enable WebSocket server</span>. Press <span class="path">Show Connect Info</span> and keep that window open: you need the port and password. If the menu item is missing, use <span class="path">Help → Verify Files</span>.</li>
+      <li><b>Add OBS in Streamer.bot</b>Open <span class="path">Stream Apps → OBS</span>, right-click the empty list and pick <span class="path">Add</span>. Give it a name, set the version to <code>v5.x</code>, host <code>127.0.0.1</code>, and copy in the port and password from OBS.</li>
+      <li><b>Connect</b>Press <span class="path">OK</span>, then right-click the new connection and pick <span class="path">Connect</span>.</li>
+    </ol>
+    <div class="note"><p><strong>OBS on a second PC?</strong> Use that PC's local IP address instead of <code>127.0.0.1</code>.</p></div>
+    <ul class="checks" id="ck3">
+      <li><input type="checkbox" data-k="obs" id="c-obs"><label for="c-obs">OBS connected</label></li>
+    </ul>
+  </section>
+
+  <section id="overlays">
+    <div class="sec-head"><span class="num">5</span><h2>Turn on the WebSocket server (for overlays)</h2></div>
+    <p>This is the one most people miss. It's how browser overlays, like the ones on this site, hear from Streamer.bot. It's a different thing from the OBS connection above.</p>
+    <ol class="steps">
+      <li><b>Open the server settings</b>In Streamer.bot, open <span class="path">Servers/Clients → WebSocket Server</span>.</li>
+      <li><b>Tick Auto Start</b>So it starts every time you open Streamer.bot.</li>
+      <li><b>Press Start Server</b>Leave the address as <code>127.0.0.1</code> and the port as <code>8080</code>. Every overlay on this site expects those unless you change them in the overlay's settings.</li>
+    </ol>
+    <div class="note"><p><strong>Using an overlay on another PC?</strong> Set the address to <code>0.0.0.0</code> so other devices on your network can reach it, and put this PC's IP address in the overlay's connection settings.</p></div>
+    <ul class="checks" id="ck4">
+      <li><input type="checkbox" data-k="ws" id="c-ws"><label for="c-ws">WebSocket server on Auto Start and running</label></li>
+    </ul>
+  </section>
+
+  <section id="basics">
+    <div class="sec-head"><span class="num">6</span><h2>The basics in plain English</h2></div>
+    <div class="ideas">
+      <div class="idea"><b>Actions</b><p>A list of steps to run. "Thank a new follower" is an action. Find them in the <span class="path">Actions</span> tab.</p></div>
+      <div class="idea"><b>Triggers</b><p>What starts an action: a Twitch follow, a Kick sub, a command, going live. One action can have several.</p></div>
+      <div class="idea"><b>Sub-actions</b><p>The steps inside an action, run top to bottom: send a message, wait two seconds, show an OBS source.</p></div>
+      <div class="idea"><b>Commands</b><p>Things chat types, like <code>!lurk</code>. Set them up in the <span class="path">Commands</span> tab, then use one as a trigger.</p></div>
+    </div>
+    <h3>Importing someone else's action</h3>
+    <p>Many tools (including Sub Goal, Chat Poll, Raid Welcome and Trivia here) give you an <em>import string</em>: a long block of text with the whole action packed inside.</p>
+    <ol class="steps">
+      <li><b>Press Import</b>It's in Streamer.bot's top bar.</li>
+      <li><b>Paste the string</b>Into the <span class="path">Import String</span> box. You can also drag a <code>.sb</code> file onto it. It shows what's inside before anything is added.</li>
+      <li><b>Press Import, then switch on the commands</b>Imported commands come in switched off. Open <span class="path">Commands</span>, right-click each one and enable it, and tick Kick as a source if you stream there.</li>
+      <li><b>Test it</b>Right-click a trigger and pick <span class="path">Test Trigger</span> to fire it without waiting for a real event.</li>
+    </ol>
+    <ul class="checks" id="ck5">
+      <li><input type="checkbox" data-k="imp" id="c-imp"><label for="c-imp">Imported something and tested it</label></li>
+    </ul>
+  </section>
+
+  <section id="safe">
+    <div class="sec-head"><span class="num">7</span><h2>Stay safe and keep a backup</h2></div>
+    <ul>
+      <li><strong>Only import from people you trust.</strong> Imports can contain C# code that runs on your PC. Stick to the official docs, well-known creators and tools you can read first.</li>
+      <li><strong>Never share your Streamer.bot folder or its <code>data</code> folder.</strong> The <code>auth.db</code> file inside holds your Twitch, Kick and YouTube logins. If someone asks for "your files" to help, send screenshots or a single export instead.</li>
+      <li><strong>Backups happen on their own.</strong> Every time Streamer.bot opens or updates, it saves a copy of your settings in the <code>backups</code> folder next to <code>data</code>. To find it: menu at the top left → <span class="path">Open Log Folder</span>, then go up one folder.</li>
+      <li><strong>To restore one:</strong> close Streamer.bot, open the backup zip, copy what's inside into the <code>data</code> folder (replace the files) and open Streamer.bot again.</li>
+      <li><strong>Moving PC or reinstalling Windows?</strong> Copy the whole Streamer.bot folder across. Keep a copy somewhere safe, just not in a public or shared place.</li>
+    </ul>
+  </section>
+
+  <section id="fixes">
+    <div class="sec-head"><span class="num">8</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>An overlay shows nothing</td><td>Check Streamer.bot is open and the WebSocket server is started (section 5). The overlays on this site reconnect on their own once the server is back. Still blank? Double-click the overlay in OBS and press <span class="path">Refresh cache of current page</span>.</td></tr>
+      <tr><td>Nothing happens on Kick</td><td>Kick has to be connected in the app <em>and</em> on the Streamer.bot website with the same account, and you need to be logged in to Streamer.bot at the bottom left. Restart Streamer.bot after connecting.</td></tr>
+      <tr><td>A command doesn't reply</td><td>Imported commands start switched off: enable it in <span class="path">Commands</span>. For Kick, tick Kick as a source on the command too.</td></tr>
+      <tr><td>OBS won't connect</td><td>The version must be <code>v5.x</code>, and the port and password must match OBS's <span class="path">Show Connect Info</span> exactly. Check OBS's WebSocket server is enabled.</td></tr>
+      <tr><td>It says "Complete" but nothing happened</td><td>Action History shows "Complete" even when code inside fails. The real error is in the log: menu → <span class="path">Open Log Folder</span>, open today's log and search for the action's name.</td></tr>
+      <tr><td>An import says it's too old</td><td>It was made for an older Streamer.bot. Ask the maker for a new one, or check the official FAQ.</td></tr>
+      <tr><td>Still stuck</td><td>Ask in the official Streamer.bot Discord (below). Say your Streamer.bot version, what you expected, and what happened, with a screenshot.</td></tr>
+    </table></div>
+  </section>
+
+  <section id="learn">
+    <div class="sec-head"><span class="num">9</span><h2>Learn more</h2></div>
+    <h3>Official links</h3>
+    <div class="cards">
+      <a class="lk" href="https://streamer.bot" target="_blank" rel="noopener"><b>Website and downloads</b>Get the app and manage your account.<span class="u">streamer.bot</span></a>
+      <a class="lk" href="https://docs.streamer.bot/get-started" target="_blank" rel="noopener"><b>Docs: Get Started</b>The official setup guide, every trigger and sub-action, and examples.<span class="u">docs.streamer.bot</span></a>
+      <a class="lk" href="https://discord.streamer.bot" target="_blank" rel="noopener"><b>Streamer.bot Discord</b>The main place for help, from the team and lots of experienced users. Read the support channel rules first.<span class="u">discord.streamer.bot</span></a>
+      <a class="lk" href="https://youtube.com/@streamerdotbot" target="_blank" rel="noopener"><b>Official YouTube</b>Streamer.bot's own channel, including streams where creators build things live.<span class="u">youtube.com/@streamerdotbot</span></a>
+      <a class="lk" href="https://docs.streamer.bot/examples/starter-pack" target="_blank" rel="noopener"><b>Official Starter Pack</b>One import with community-made extras: !followage, !shoutout, !socials, a death counter, a wheel of fortune and more.<span class="u">docs.streamer.bot/examples/starter-pack</span></a>
+      <a class="lk" href="https://extensions.streamer.bot" target="_blank" rel="noopener"><b>Extensions</b>Community-shared actions and how-tos. Same rule as always: only import what you trust.<span class="u">extensions.streamer.bot</span></a>
+      <a class="lk" href="https://reddit.com/r/streamerbot" target="_blank" rel="noopener"><b>r/streamerbot</b>Questions, examples and what other streamers are building.<span class="u">reddit.com/r/streamerbot</span></a>
+    </div>
+    <h3>Good videos to start with</h3>
+    <p>Made by other creators, not by me or the Streamer.bot team. Menus may look slightly different in newer versions.</p>
+    <div class="cards">
+      <a class="lk" href="https://www.youtube.com/watch?v=pdau4gderhM" target="_blank" rel="noopener"><b>How to Install and Setup Streamerbot</b>A quick walkthrough: install it, then connect Twitch, YouTube, Kick and OBS.<span class="who">JerenDraws · Dec 2025 · about 6 min</span></a>
+      <a class="lk" href="https://www.youtube.com/watch?v=znnDH__VJL4" target="_blank" rel="noopener"><b>How To Set Up StreamerBot Fast and Easy!</b>Install, connect OBS and Twitch, then actions, sub-actions and triggers explained, with ideas to try.<span class="who">Gael LEVEL · Oct 2025 · 13 min</span></a>
+      <a class="lk" href="https://www.youtube.com/watch?v=4PfGTnxePxQ" target="_blank" rel="noopener"><b>The ONE Concept That Unlocks Everything</b>Once you're set up: If/Else logic without code, building a first-chatter greeting and a subs-only command.<span class="who">OSUPhoenix · Apr 2026 · 13 min</span></a>
+      <a class="lk" href="https://www.youtube.com/playlist?list=PLkgvJ3pG_SXecWjdobzkTWcADFC8h3wkQ" target="_blank" rel="noopener"><b>Starter Pack build streams</b>The streams where community creators built the official Starter Pack. Good for seeing how people think.<span class="who">Official playlist</span></a>
+    </div>
+    <div class="note"><p><strong>Next on this site:</strong> try <a href="../chat/">Combined Chat</a> first. It needs nothing but the WebSocket server, so it's a quick way to check everything's working. Then work through the <a href="../start/">Start Here</a> path.</p></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Menus checked against the official docs in November 2026. Not affiliated with Streamer.bot, OBS, Twitch, Kick, YouTube or TikTok.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var S={};try{S=JSON.parse(localStorage.getItem("sbs_cfg")||"{}")||{}}catch(e){S={}}
+var boxes=document.querySelectorAll(".checks input[data-k]");
+function prog(){var n=0;boxes.forEach(function(b){if(b.checked)n++});
+  document.getElementById("pct").textContent="Setup: "+n+" of "+boxes.length+" ticked";
+  document.getElementById("fill").style.width=(n/boxes.length*100)+"%"}
+boxes.forEach(function(b){b.checked=!!S[b.dataset.k];
+  b.addEventListener("change",function(){S[b.dataset.k]=b.checked;try{localStorage.setItem("sbs_cfg",JSON.stringify(S))}catch(e){}prog()})});
+prog();
+})();
+</script>
+<script src="../follow.js?v=2"></script>
+</body>
+</html>
