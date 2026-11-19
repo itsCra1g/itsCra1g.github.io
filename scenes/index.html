@@ -173,6 +173,16 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;width:1920px;height:1080p
 .demo.chat{border-radius:0;background:none;padding:64px 24px 20px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;font:500 21px/1.35 var(--text);color:#D7DCE4}
 .demo.chat b{font-weight:700}
 </style>
+<script>/* keep the Streamer.bot link alive: if it stops answering, drop it so the overlay reconnects */
+(function(){var W=window.WebSocket;if(!W||W.__ka)return;
+function K(u,p){var ws=p?new W(u,p):new W(u);if(String(u).indexOf("ws://")!==0)return ws;
+var last=Date.now(),ping=0,t=null;
+ws.addEventListener("message",function(){last=Date.now()});
+ws.addEventListener("open",function(){last=Date.now();t=setInterval(function(){if(ws.readyState!==1)return;
+if(ping&&last<ping){if(Date.now()-ping>20000){try{ws.close()}catch(e){}}return}
+ping=Date.now();try{ws.send(JSON.stringify({request:"GetInfo",id:"keepalive"}))}catch(e){}},15000)});
+ws.addEventListener("close",function(){clearInterval(t)});return ws}
+K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;window.WebSocket=K})();</script>
 </head>
 <body>
 <div id="ovr"><div id="sn" class="sn"></div></div>

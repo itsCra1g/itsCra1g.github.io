@@ -140,6 +140,16 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;width:800px;transform-ori
 .pl .foot b{color:#fff}
 @media (prefers-reduced-motion:reduce){.pl.in{animation:none}.op .fill{transition:none}}
 </style>
+<script>/* keep the Streamer.bot link alive: if it stops answering, drop it so the overlay reconnects */
+(function(){var W=window.WebSocket;if(!W||W.__ka)return;
+function K(u,p){var ws=p?new W(u,p):new W(u);if(String(u).indexOf("ws://")!==0)return ws;
+var last=Date.now(),ping=0,t=null;
+ws.addEventListener("message",function(){last=Date.now()});
+ws.addEventListener("open",function(){last=Date.now();t=setInterval(function(){if(ws.readyState!==1)return;
+if(ping&&last<ping){if(Date.now()-ping>20000){try{ws.close()}catch(e){}}return}
+ping=Date.now();try{ws.send(JSON.stringify({request:"GetInfo",id:"keepalive"}))}catch(e){}},15000)});
+ws.addEventListener("close",function(){clearInterval(t)});return ws}
+K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;window.WebSocket=K})();</script>
 </head>
 <body>
 <div id="ovr"></div>
@@ -717,10 +727,12 @@ function overlay(){
   function subscribe(){
     if(live)return;live=true;
     send({request:"Subscribe",id:"pl-sub",events:{General:["Custom"]}});
-    send({request:"DoAction",id:"pl-sync",action:{name:"Poll"},args:{mode:"sync"}});
+    askSync(0);
   }
+  var got=false;function askSync(n){if(!live||got)return;send({request:"DoAction",id:"pl-sync",action:{name:"Poll"},args:{mode:"sync"}});if(n<12)setTimeout(function(){askSync(n+1)},5000)}
+  setInterval(function(){if(live)send({request:"DoAction",id:"pl-sync",action:{name:"Poll"},args:{mode:"sync"}})},300000);
   function connect(){
-    live=false;
+    live=false;got=false;
     try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.port+"/")}catch(e){setTimeout(connect,5000);return}
     var helloT=setTimeout(subscribe,1500);
     ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
@@ -729,7 +741,7 @@ function overlay(){
       if(m.event&&m.event.source==="General"&&m.event.type==="Custom"){
         var d=m.data;if(typeof d==="string"){try{d=JSON.parse(d)}catch(x){return}}
         if(d&&d.data&&d.data.poll)d=d.data;
-        if(d&&d.poll)apply(d.poll);
+        if(d&&d.poll){got=true;apply(d.poll)}
       }
     };
     ws.onclose=function(){clearTimeout(helloT);live=false;setTimeout(connect,3000)};

@@ -143,6 +143,16 @@ html.ov.ly-ticker .tkbox{position:relative;flex:1;min-width:0;overflow:hidden;he
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
 @media (prefers-reduced-motion:reduce){.it.new,.it.new .ic{animation:none}}
 </style>
+<script>/* keep the Streamer.bot link alive: if it stops answering, drop it so the overlay reconnects */
+(function(){var W=window.WebSocket;if(!W||W.__ka)return;
+function K(u,p){var ws=p?new W(u,p):new W(u);if(String(u).indexOf("ws://")!==0)return ws;
+var last=Date.now(),ping=0,t=null;
+ws.addEventListener("message",function(){last=Date.now()});
+ws.addEventListener("open",function(){last=Date.now();t=setInterval(function(){if(ws.readyState!==1)return;
+if(ping&&last<ping){if(Date.now()-ping>20000){try{ws.close()}catch(e){}}return}
+ping=Date.now();try{ws.send(JSON.stringify({request:"GetInfo",id:"keepalive"}))}catch(e){}},15000)});
+ws.addEventListener("close",function(){clearInterval(t)});return ws}
+K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;window.WebSocket=K})();</script>
 </head>
 <body>
 <div id="ovr"></div>
