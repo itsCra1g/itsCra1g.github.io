@@ -157,15 +157,20 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
 @keyframes slOut{to{opacity:0;transform:translateX(-110%)}}
 @media (prefers-reduced-motion:reduce){.al,.al.out,.al .ic:after{animation-duration:.01s!important}}
 </style>
-<script>/* keep the Streamer.bot link alive: if it stops answering, drop it so the overlay reconnects */
+<script>/* keep the Streamer.bot link alive: if it stops answering, drop it so the overlay reconnects.
+   Also checks Streamer.bot confirms each event subscription; if it doesn't (e.g. it was still starting up), ask again, then reconnect. */
 (function(){var W=window.WebSocket;if(!W||W.__ka)return;
 function K(u,p){var ws=p?new W(u,p):new W(u);if(String(u).indexOf("ws://")!==0)return ws;
-var last=Date.now(),ping=0,t=null;
-ws.addEventListener("message",function(){last=Date.now()});
+var last=Date.now(),ping=0,t=null,pend={},osend=ws.send.bind(ws);
+function arm(id){var r=pend[id];if(!r)return;clearTimeout(r.t);r.t=setTimeout(function(){if(!pend[id])return;
+if(ws.readyState===0){arm(id);return}if(ws.readyState!==1)return;
+if(r.n<2){r.n++;try{osend(r.d)}catch(e){}arm(id)}else{try{ws.close()}catch(e){}}},5000)}
+ws.send=function(d){try{var j=JSON.parse(d);if(j&&j.request==="Subscribe"&&j.id){pend[j.id]={d:d,n:0};arm(j.id)}}catch(e){}return osend(d)};
+ws.addEventListener("message",function(e){last=Date.now();try{var j=JSON.parse(e.data);if(j&&j.id&&pend[j.id]){clearTimeout(pend[j.id].t);delete pend[j.id]}}catch(x){}});
 ws.addEventListener("open",function(){last=Date.now();t=setInterval(function(){if(ws.readyState!==1)return;
 if(ping&&last<ping){if(Date.now()-ping>20000){try{ws.close()}catch(e){}}return}
-ping=Date.now();try{ws.send(JSON.stringify({request:"GetInfo",id:"keepalive"}))}catch(e){}},15000)});
-ws.addEventListener("close",function(){clearInterval(t)});return ws}
+ping=Date.now();try{osend(JSON.stringify({request:"GetInfo",id:"keepalive"}))}catch(e){}},15000)});
+ws.addEventListener("close",function(){clearInterval(t);for(var k in pend)clearTimeout(pend[k].t);pend={}});return ws}
 K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;window.WebSocket=K})();</script>
 </head>
 <body>
