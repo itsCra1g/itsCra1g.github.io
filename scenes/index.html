@@ -100,6 +100,13 @@ textarea.tin{resize:vertical;min-height:96px;line-height:1.5}
 @media (max-width:900px){.sgrid{grid-template-columns:1fr}}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hint{font-size:13px;color:var(--mute);margin-top:6px}
+.bgo{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.bgo .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14.5px;color:var(--body)}
+.bgo input[type=color]{width:44px;height:36px;padding:2px;border:1px solid var(--edge2);border-radius:9px;background:var(--tile2);cursor:pointer}
+.bgo input[type=range]{flex:1 1 140px;accent-color:var(--acc)}
+.bgo label.ck{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:14.5px;color:var(--body)}
+.bgo label.ck input{width:18px;height:18px;accent-color:var(--acc)}
+
 .links{display:flex;flex-direction:column;gap:10px;max-width:46em}
 .lrow{display:grid;grid-template-columns:140px minmax(0,1fr) auto;gap:8px;align-items:center}
 .lrow b{color:var(--fg);font:700 15px var(--display)}
@@ -129,6 +136,10 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;width:1920px;height:1080p
 .sn .blob.b2{width:700px;height:700px;opacity:.14;background:#B57BFF;animation-duration:24s;animation-direction:alternate-reverse}
 @keyframes drift{0%{transform:translate(-260px,-320px)}100%{transform:translate(1300px,240px)}}
 .sn.clear .bgx,.sn.game .bgx{display:none}
+.sn.solid .bgx>*,.sn.img .bgx>*{display:none}
+.sn.still .blob,.sn.still .grid{animation:none!important}
+.sn.still .blob{transform:translate(380px,-260px)}.sn.still .blob.b2{transform:translate(1100px,320px)}
+.img .kick,.img .big,.img .topic,.img .ln,.img .away{text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 3px rgba(0,0,0,.9)}
 /* frames */
 .fr{position:absolute;border-radius:var(--r);border:3px solid rgb(var(--gr));box-shadow:0 0 26px -2px rgba(var(--gr),.75),inset 0 0 18px -4px rgba(var(--gr),.6);pointer-events:none}
 .fr .tag{position:absolute;left:22px;bottom:0;transform:translateY(50%);font:800 20px/1 var(--text);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:rgb(var(--gr));padding:9px 16px;border-radius:999px;box-shadow:0 0 20px rgba(var(--gr),.7);white-space:nowrap}
@@ -228,8 +239,15 @@ K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;
     <div class="sec-head"><span class="num">2</span><h2>Look</h2></div>
     <div class="look">
       <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
-      <div><div class="lbl">Background (Just Chatting and Waiting)</div><div class="seg" id="bgSeg"><button data-v="anim" aria-pressed="true">Animated</button><button data-v="clear" aria-pressed="false">Transparent</button></div>
-        <div class="hint">Transparent shows just the frames, panels and text, so you can put your own background behind them. Gameplay is always see-through.</div></div>
+      <div><div class="lbl">Background (Just Chatting and Waiting)</div><div class="seg" id="bgSeg"><button data-v="anim" aria-pressed="true">Animated</button><button data-v="solid" aria-pressed="false">Solid colour</button><button data-v="img" aria-pressed="false">Your image</button><button data-v="clear" aria-pressed="false">Transparent</button></div>
+        <div class="hint" id="bgHintClear">Transparent shows just the frames, panels and text, so you can put your own background behind them in OBS. Gameplay is always see-through.</div>
+        <div class="bgo">
+          <div id="bgoAnim"><label class="ck"><input type="checkbox" id="bgStill">Keep it still (no movement, lighter on your PC)</label></div>
+          <div id="bgoSolid" hidden><div class="row"><input type="color" id="bgCol" value="#0B0C0F" aria-label="Background colour"><span id="bgColName">#0B0C0F</span></div></div>
+          <div id="bgoImg" hidden><input class="tin" id="bgImg" type="url" placeholder="https://… link to a .png or .jpg" spellcheck="false">
+            <div class="row" style="margin-top:8px"><span>Darken</span><input type="range" id="bgDim" min="0" max="80" step="5" value="35" aria-label="Darken the image"><span id="bgDimV">35%</span></div>
+            <div class="hint">Use a link that ends in .png or .jpg and won't expire, such as one from Imgur or your own site. Discord links stop working after a while. Image on your PC? Pick Transparent and add it in OBS underneath instead.</div></div>
+        </div></div>
       <div><div class="lbl">Corners</div><div class="seg" id="crSeg"><button data-v="rd" aria-pressed="true">Rounded</button><button data-v="sq" aria-pressed="false">Square</button></div></div>
     </div>
   </section>
@@ -342,11 +360,21 @@ function overlay(){
   function fit(){ovr.style.transform="scale("+Math.min(innerWidth/1920,innerHeight/1080)+")"}
   addEventListener("resize",fit);
   function el(t,c,txt){var e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e}
+  function bgOf(p){var bg=p.get("bg");bg=["clear","solid","img"].indexOf(bg)>=0?bg:"anim";
+    var bc=(p.get("bc")||"0B0C0F");if(!/^[0-9a-fA-F]{6}$/.test(bc))bc="0B0C0F";
+    var bi=p.get("bi")||"";if(!/^https?:\/\//i.test(bi))bi="";if(bg==="img"&&!bi)bg="anim";
+    var bd=parseInt(p.get("bd"),10);if(!(bd>=0&&bd<=80))bd=35;
+    return {bg:bg,bc:bc,bi:bi,bd:bd,still:p.get("mo")==="0"}}
+  function bgPaint(el,c){if(!el)return;
+    if(c.bg==="solid")el.style.background="#"+c.bc;
+    else if(c.bg==="img"){var d=c.bd/100,u=c.bi.replace(/["'()\\\s]/g,function(ch){return encodeURIComponent(ch)});
+      el.style.background="linear-gradient(rgba(0,0,0,"+d+"),rgba(0,0,0,"+d+")),url(\""+u+"\") center/cover no-repeat,#000"}
+    else el.style.background=""}
   function read(){
-    var p=new URLSearchParams(location.hash.slice(1));
+    var p=new URLSearchParams(location.hash.slice(1));var B=bgOf(p);
     var g=p.get("g")||"4DA3FF";if(!/^[0-9a-fA-F]{6}$/.test(g))g="4DA3FF";
     var k=DEF[p.get("sc")]?p.get("sc"):"game";
-    cfg={k:k,g:g.toUpperCase(),bg:p.get("bg")==="clear"?"clear":"anim",sq:p.get("cr")==="sq",n:p.get("n")||"",s:dec(p.get("s")),f:p.get("f")==="at"?"at":"link",
+    cfg={k:k,g:g.toUpperCase(),bg:B.bg,B:B,sq:p.get("cr")==="sq",n:p.get("n")||"",s:dec(p.get("s")),f:p.get("f")==="at"?"at":"link",
       lv:p.get("lv")!=="0",cp:["tl","tr","bl","br"].indexOf(p.get("cp"))>=0?p.get("cp"):DEF.game.cp,cs:["s","m","l","off"].indexOf(p.get("cs"))>=0?p.get("cs"):DEF.game.cs,
       ib:["top","bottom","off"].indexOf(p.get("ib"))>=0?p.get("ib"):DEF.game.ib,nt:p.get("nt")!=="0",
       tp:p.has("tp")?p.get("tp"):DEF.chat.tp,side:p.get("side")==="left"?"left":"right",
@@ -371,7 +399,7 @@ function overlay(){
   var CAM_SVG='<svg viewBox="0 0 100 80" aria-hidden="true"><circle cx="50" cy="28" r="17"/><path d="M12 80c2-22 18-32 38-32s36 10 38 32z"/></svg>';
   function build(){
     clearInterval(rot);clearInterval(srot);clearInterval(tick);
-    sn.className="sn "+cfg.k+(cfg.bg==="clear"?" clear":"")+(cfg.sq?" sq":"");
+    sn.className="sn "+cfg.k+(cfg.bg!=="anim"?" "+cfg.bg:"")+(cfg.bg==="anim"&&cfg.B.still?" still":"")+(cfg.sq?" sq":"");
     sn.style.setProperty("--g","#"+cfg.g);sn.style.setProperty("--gr",hx2rgb(cfg.g));sn.style.setProperty("--ink",lum(cfg.g)>.35?"#000":"#fff");
     sn.innerHTML="";var L=layout(cfg);
     // stand-ins for the preview only, drawn underneath everything
@@ -380,7 +408,7 @@ function overlay(){
       if(L.cam){var dc=box(L.cam,"demo cam");dc.innerHTML=CAM_SVG;sn.appendChild(dc)}
     }
     var bg=el("div","bgx");bg.innerHTML='<div class="blob"></div><div class="blob b2"></div><div class="grid"></div>';
-    var m=holes(L);bg.style.webkitMaskImage=m;bg.style.maskImage=m;sn.appendChild(bg);
+    bgPaint(bg,cfg.B);var m=holes(L);bg.style.webkitMaskImage=m;bg.style.maskImage=m;sn.appendChild(bg);
     if(L.chat){var pn=box(L.chat,"panel");pn.appendChild(el("div","ph","Chat"));sn.appendChild(pn);
       if(cfg.demo){var dch=box(L.chat,"demo chat");[["NightOwlTV","#B57BFF","that was a clean round"],["Kezza_Plays","#53FC18","gg"],["pixelpete","#4DA3FF","how long you been streaming?"],["Morag","#FF6FB5","hello from Glasgow"]].forEach(function(x){var d=el("div");var b=el("b",null,x[0]+": ");b.style.color=x[1];d.appendChild(b);d.appendChild(document.createTextNode(x[2]));dch.appendChild(d)});sn.appendChild(dch)}}
     if(L.cam){var fr=box(L.cam,"fr");if((cfg.k!=="game"||cfg.nt)&&cfg.n)fr.appendChild(el("div","tag",cfg.n));sn.appendChild(fr)}
@@ -522,10 +550,10 @@ function overlay(){
 
 function setup(){
   var $=function(id){return document.getElementById(id)};
-  var S={n:"",list:[{p:"twitch",h:""},{p:"kick",h:""},{p:"tiktok",h:""}],f:"link",g:"4DA3FF",bg:"anim",cr:"rd",lv:1,h:"127.0.0.1",p:"8080",tab:"game",scr:JSON.parse(JSON.stringify(DEF))};
+  var S={n:"",list:[{p:"twitch",h:""},{p:"kick",h:""},{p:"tiktok",h:""}],f:"link",g:"4DA3FF",bg:"anim",bc:"0B0C0F",bi:"",bd:35,still:0,cr:"rd",lv:1,h:"127.0.0.1",p:"8080",tab:"game",scr:JSON.parse(JSON.stringify(DEF))};
   try{var sv=JSON.parse(ls("sn_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
   // first visit: borrow the name and socials from Screens if they're set up on this browser
-  if(!ls("sn_cfg")){try{var sc=JSON.parse(ls("sc_cfg")||"null");if(sc){if(sc.n)S.n=sc.n;if(Array.isArray(sc.list)&&sc.list.length)S.list=sc.list;if(sc.f)S.f=sc.f;if(sc.g)S.g=sc.g;if(sc.bg)S.bg=sc.bg}}catch(e){}}
+  if(!ls("sn_cfg")){try{var sc=JSON.parse(ls("sc_cfg")||"null");if(sc){if(sc.n)S.n=sc.n;if(Array.isArray(sc.list)&&sc.list.length)S.list=sc.list;if(sc.f)S.f=sc.f;if(sc.g)S.g=sc.g;if(sc.bg)S.bg=sc.bg;["bc","bi","bd","still"].forEach(function(x){if(x in sc)S[x]=sc[x]})}}catch(e){}}
   ["game","chat","wait"].forEach(function(k){S.scr[k]=Object.assign({},DEF[k],S.scr[k]||{})});
   $("chName").value=S.n;$("chName").addEventListener("input",function(){S.n=this.value;sync()});
   var box=$("items");
@@ -557,7 +585,14 @@ function setup(){
   var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
   sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
   function segv(id,get,set){$(id).addEventListener("click",function(e){var b=e.target.closest("button");if(b){set(b.dataset.v);sync()}})}
-  segv("bgSeg",0,function(v){S.bg=v});segv("fmtSeg",0,function(v){S.f=v});segv("crSeg",0,function(v){S.cr=v});
+  segv("bgSeg",0,function(v){S.bg=v});
+  (function(){var still=$("bgStill"),col=$("bgCol"),img=$("bgImg"),dim=$("bgDim");
+    still.addEventListener("change",function(){S.still=this.checked?1:0;sync()});
+    col.addEventListener("input",function(){S.bc=this.value.slice(1).toUpperCase();sync()});
+    img.addEventListener("input",function(){S.bi=this.value.trim();sync()});
+    dim.addEventListener("input",function(){S.bd=parseInt(this.value,10)||0;sync()});
+    still.checked=!!S.still;col.value="#"+(S.bc||"0B0C0F");img.value=S.bi||"";dim.value=S.bd==null?35:S.bd;})();
+segv("fmtSeg",0,function(v){S.f=v});segv("crSeg",0,function(v){S.cr=v});
   segv("cpSeg",0,function(v){S.scr.game.cp=v});segv("csSeg",0,function(v){S.scr.game.cs=v});segv("ibSeg",0,function(v){S.scr.game.ib=v});segv("chSeg",0,function(v){S.scr.chat.side=v});
   $("optNt").addEventListener("change",function(){S.scr.game.nt=this.checked?1:0;sync()});
   $("optUp").addEventListener("change",function(){S.scr.wait.up=this.checked?1:0;sync()});
@@ -579,7 +614,7 @@ function setup(){
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select();
   })});
   function hash(k,extra){extra=extra||{};var c=S.scr[k],p=new URLSearchParams();p.set("ov","1");p.set("sc",k);p.set("g",S.g);
-    if(S.bg!=="anim")p.set("bg",S.bg);if(S.cr==="sq")p.set("cr","sq");if(S.n.trim())p.set("n",S.n.trim());
+    if(S.bg!=="anim")p.set("bg",S.bg);if(S.bg==="solid")p.set("bc",S.bc||"0B0C0F");if(S.bg==="img"&&S.bi){p.set("bi",S.bi);if(S.bd!==35&&S.bd!=null)p.set("bd",String(S.bd))}if(S.bg==="anim"&&S.still)p.set("mo","0");if(S.cr==="sq")p.set("cr","sq");if(S.n.trim())p.set("n",S.n.trim());
     var real=S.list.filter(function(x){return x.h});if(real.length)p.set("s",enc(real));if(S.f!=="link")p.set("f",S.f);
     if(k==="game"){p.set("cp",c.cp);p.set("cs",c.cs);p.set("ib",c.ib);if(!c.nt)p.set("nt","0")}
     else if(k==="chat"){p.set("tp",c.tp);if(c.side==="left")p.set("side","left")}
@@ -600,6 +635,8 @@ function setup(){
     sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
     var isC=!GLOWS.some(function(g){return g[0]===S.g});cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
     nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("bgHintClear").hidden=S.bg!=="clear";$("bgoAnim").hidden=S.bg!=="anim";$("bgoSolid").hidden=S.bg!=="solid";$("bgoImg").hidden=S.bg!=="img";
+    $("bgColName").textContent="#"+(S.bc||"0B0C0F");$("bgDimV").textContent=(S.bd==null?35:S.bd)+"%";
     seg("bgSeg",S.bg);seg("fmtSeg",S.f);seg("crSeg",S.cr);seg("cpSeg",S.scr.game.cp);seg("csSeg",S.scr.game.cs);seg("ibSeg",S.scr.game.ib);seg("chSeg",S.scr.chat.side);
     $("cpSeg").parentNode.style.opacity=S.scr.game.cs==="off"?.45:1;
     $("optNt").checked=!!S.scr.game.nt;$("optUp").checked=!!S.scr.wait.up;$("optLv").checked=!!S.lv;

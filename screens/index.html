@@ -100,6 +100,13 @@ textarea.tin{resize:vertical;min-height:96px;line-height:1.5}
 @media (max-width:900px){.sgrid{grid-template-columns:1fr}}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hint{font-size:13px;color:var(--mute);margin-top:6px}
+.bgo{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.bgo .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14.5px;color:var(--body)}
+.bgo input[type=color]{width:44px;height:36px;padding:2px;border:1px solid var(--edge2);border-radius:9px;background:var(--tile2);cursor:pointer}
+.bgo input[type=range]{flex:1 1 140px;accent-color:var(--acc)}
+.bgo label.ck{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:14.5px;color:var(--body)}
+.bgo label.ck input{width:18px;height:18px;accent-color:var(--acc)}
+
 .links{display:flex;flex-direction:column;gap:10px;max-width:46em}
 .lrow{display:grid;grid-template-columns:140px minmax(0,1fr) auto;gap:8px;align-items:center}
 .lrow b{color:var(--fg);font:700 15px var(--display)}
@@ -128,6 +135,10 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;width:1920px;height:1080p
 @keyframes drift{0%{transform:translate(-260px,-320px)}100%{transform:translate(1300px,240px)}}
 .sc .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 2px,transparent 2px 4px)}
 .sc.clear .bgx{display:none}
+.sc.solid .bgx>*,.sc.img .bgx>*{display:none}
+.sc.still .blob,.sc.still .grid{animation:none!important}
+.sc.still .blob{transform:translate(380px,-260px)}.sc.still .blob.b2{transform:translate(1100px,320px)}
+.sc.img .mid,.sc.img .soc{text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 3px rgba(0,0,0,.9)}
 .sc.clear .mid,.sc.clear .soc{text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 3px rgba(0,0,0,.9)}
 .sc .mid{position:absolute;left:0;right:0;top:250px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:0 120px}
 .sc .ch{font:700 26px var(--text);letter-spacing:8px;text-transform:uppercase;color:var(--g)}
@@ -206,8 +217,15 @@ html.ov.vert #ovr{width:1080px;height:1920px}
     <div class="sec-head"><span class="num">2</span><h2>Look</h2></div>
     <div class="look">
       <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
-      <div><div class="lbl">Background</div><div class="seg" id="bgSeg"><button data-v="anim" aria-pressed="true">Animated</button><button data-v="clear" aria-pressed="false">Transparent</button></div>
-        <div class="hint">Transparent shows just the text, timer and socials, so you can put your own background behind them.</div></div>
+      <div><div class="lbl">Background</div><div class="seg" id="bgSeg"><button data-v="anim" aria-pressed="true">Animated</button><button data-v="solid" aria-pressed="false">Solid colour</button><button data-v="img" aria-pressed="false">Your image</button><button data-v="clear" aria-pressed="false">Transparent</button></div>
+        <div class="hint" id="bgHintClear">Transparent shows just the text, timer and socials, so you can put your own background behind them in OBS.</div>
+        <div class="bgo">
+          <div id="bgoAnim"><label class="ck"><input type="checkbox" id="bgStill">Keep it still (no movement, lighter on your PC)</label></div>
+          <div id="bgoSolid" hidden><div class="row"><input type="color" id="bgCol" value="#0B0C0F" aria-label="Background colour"><span id="bgColName">#0B0C0F</span></div></div>
+          <div id="bgoImg" hidden><input class="tin" id="bgImg" type="url" placeholder="https://… link to a .png or .jpg" spellcheck="false">
+            <div class="row" style="margin-top:8px"><span>Darken</span><input type="range" id="bgDim" min="0" max="80" step="5" value="35" aria-label="Darken the image"><span id="bgDimV">35%</span></div>
+            <div class="hint">Use a link that ends in .png or .jpg and won't expire, such as one from Imgur or your own site. Discord links stop working after a while. Image on your PC? Pick Transparent and add it in OBS underneath instead.</div></div>
+        </div></div>
       <div><div class="lbl">Canvas</div><div class="seg" id="cvSeg"><button data-v="h" aria-pressed="true">Landscape 1920 × 1080</button><button data-v="v" aria-pressed="false">Vertical 1080 × 1920</button></div>
         <div class="hint">Vertical is for TikTok LIVE, phone-shaped streams or a vertical canvas in OBS.</div></div>
     </div>
@@ -292,16 +310,26 @@ function overlay(){
   var cfg,t0=Date.now(),li=0,tick=null,rot=null;
   function fit(){var v=cfg&&cfg.cv==="v",W=v?1080:1920,H=v?1920:1080;var k=Math.min(innerWidth/W,innerHeight/H);ovr.style.transform="scale("+k+")"}
   addEventListener("resize",fit);
+  function bgOf(p){var bg=p.get("bg");bg=["clear","solid","img"].indexOf(bg)>=0?bg:"anim";
+    var bc=(p.get("bc")||"0B0C0F");if(!/^[0-9a-fA-F]{6}$/.test(bc))bc="0B0C0F";
+    var bi=p.get("bi")||"";if(!/^https?:\/\//i.test(bi))bi="";if(bg==="img"&&!bi)bg="anim";
+    var bd=parseInt(p.get("bd"),10);if(!(bd>=0&&bd<=80))bd=35;
+    return {bg:bg,bc:bc,bi:bi,bd:bd,still:p.get("mo")==="0"}}
+  function bgPaint(el,c){if(!el)return;
+    if(c.bg==="solid")el.style.background="#"+c.bc;
+    else if(c.bg==="img"){var d=c.bd/100,u=c.bi.replace(/["'()\\\s]/g,function(ch){return encodeURIComponent(ch)});
+      el.style.background="linear-gradient(rgba(0,0,0,"+d+"),rgba(0,0,0,"+d+")),url(\""+u+"\") center/cover no-repeat,#000"}
+    else el.style.background=""}
   function read(){
-    var p=new URLSearchParams(location.hash.slice(1));
+    var p=new URLSearchParams(location.hash.slice(1));var B=bgOf(p);
     var g=p.get("g")||"4DA3FF";if(!/^[0-9a-fA-F]{6}$/.test(g))g="4DA3FF";
     var k=MODES[p.get("sc")]?p.get("sc"):"start";
     var tm=p.get("tm")||DEF[k].tm;if(!MODES[k].some(function(m){return m[0]===tm}))tm=MODES[k][0][0];
-    cfg={k:k,g:g,bg:p.get("bg")==="clear"?"clear":"anim",n:p.get("n")||"",t:p.has("t")?p.get("t"):DEF[k].t,tm:tm,
+    cfg={k:k,g:g,bg:B.bg,B:B,n:p.get("n")||"",t:p.has("t")?p.get("t"):DEF[k].t,tm:tm,
       d:Math.max(1,Math.min(180,parseInt(p.get("d"),10)||DEF[k].d)),at:/^\d{1,2}:\d{2}$/.test(p.get("at")||"")?p.get("at"):DEF[k].at,
       ln:p.has("ln")?p.getAll("ln").filter(Boolean):DEF[k].ln,s:dec(p.get("s")),f:p.get("f")==="at"?"at":"link",cv:p.get("cv")==="v"?"v":"h"};
     document.documentElement.classList.toggle("vert",cfg.cv==="v");
-    sc.className="sc"+(cfg.bg==="clear"?" clear":"");
+    sc.className="sc"+(cfg.bg!=="anim"?" "+cfg.bg:"")+(cfg.bg==="anim"&&B.still?" still":"");bgPaint(sc.querySelector(".bgx"),B);
     sc.style.setProperty("--g","#"+g);sc.style.setProperty("--gr",hx2rgb(g));
     $("ch").textContent=cfg.n;$("ti").textContent=cfg.t;
     var so=$("soc");so.innerHTML="";
@@ -328,7 +356,7 @@ function overlay(){
 
 function setup(){
   var $=function(id){return document.getElementById(id)};
-  var S={n:"",list:[{p:"twitch",h:""},{p:"tiktok",h:""},{p:"discord",h:""}],f:"link",g:"4DA3FF",bg:"anim",cv:"h",scr:JSON.parse(JSON.stringify(DEF)),tab:"start"};
+  var S={n:"",list:[{p:"twitch",h:""},{p:"tiktok",h:""},{p:"discord",h:""}],f:"link",g:"4DA3FF",bg:"anim",bc:"0B0C0F",bi:"",bd:35,still:0,cv:"h",scr:JSON.parse(JSON.stringify(DEF)),tab:"start"};
   try{var sv=JSON.parse(ls("sc_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
   $("chName").value=S.n;
   $("chName").addEventListener("input",function(){S.n=this.value;sync()});
@@ -361,6 +389,12 @@ function setup(){
   var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
   sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
   $("bgSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.bg=b.dataset.v;sync()}});
+  (function(){var still=$("bgStill"),col=$("bgCol"),img=$("bgImg"),dim=$("bgDim");
+    still.addEventListener("change",function(){S.still=this.checked?1:0;sync()});
+    col.addEventListener("input",function(){S.bc=this.value.slice(1).toUpperCase();sync()});
+    img.addEventListener("input",function(){S.bi=this.value.trim();sync()});
+    dim.addEventListener("input",function(){S.bd=parseInt(this.value,10)||0;sync()});
+    still.checked=!!S.still;col.value="#"+(S.bc||"0B0C0F");img.value=S.bi||"";dim.value=S.bd==null?35:S.bd;})();
   $("fmtSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.f=b.dataset.v;sync()}});
   $("cvSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.cv=b.dataset.v;sync()}});
   $("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.tab=b.dataset.k;fillTab();sync()}});
@@ -382,7 +416,7 @@ function setup(){
     var el=$(b.dataset.copy),o=b.textContent,done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select();
   })});
-  function hash(k){var c=S.scr[k],p=new URLSearchParams();p.set("ov","1");p.set("sc",k);p.set("g",S.g);if(S.bg!=="anim")p.set("bg",S.bg);if(S.cv==="v")p.set("cv","v");
+  function hash(k){var c=S.scr[k],p=new URLSearchParams();p.set("ov","1");p.set("sc",k);p.set("g",S.g);if(S.bg!=="anim")p.set("bg",S.bg);if(S.bg==="solid")p.set("bc",S.bc||"0B0C0F");if(S.bg==="img"&&S.bi){p.set("bi",S.bi);if(S.bd!==35&&S.bd!=null)p.set("bd",String(S.bd))}if(S.bg==="anim"&&S.still)p.set("mo","0");if(S.cv==="v")p.set("cv","v");
     if(S.n.trim())p.set("n",S.n.trim());p.set("t",c.t);if(k!=="end"){p.set("tm",c.tm);if(c.tm==="scene")p.set("d",String(c.d));if(c.tm==="clock")p.set("at",c.at)}
     c.ln.forEach(function(l){p.append("ln",l)});var real=S.list.filter(function(x){return x.h});if(real.length)p.set("s",enc(real));if(S.f!=="link")p.set("f",S.f);return p.toString()}
   function frame(el,h){var u=BASE+"#"+h;if(!el.dataset.on){el.src=u;el.dataset.on=1}else el.contentWindow.location.replace(u)}
@@ -393,6 +427,8 @@ function setup(){
     var isC=!GLOWS.some(function(g){return g[0]===S.g});cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
     nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
     $("bgSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.bg)});
+    $("bgHintClear").hidden=S.bg!=="clear";$("bgoAnim").hidden=S.bg!=="anim";$("bgoSolid").hidden=S.bg!=="solid";$("bgoImg").hidden=S.bg!=="img";
+    $("bgColName").textContent="#"+(S.bc||"0B0C0F");$("bgDimV").textContent=(S.bd==null?35:S.bd)+"%";
     $("fmtSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.f)});
     $("cvSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.cv)});
     $("prevFrame").parentNode.classList.toggle("v",S.cv==="v");
