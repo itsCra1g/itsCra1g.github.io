@@ -220,7 +220,7 @@ html.ov.vert #ovr{width:1080px;height:1920px}
       <div><div class="lbl">Background</div><div class="seg" id="bgSeg"><button data-v="anim" aria-pressed="true">Animated</button><button data-v="solid" aria-pressed="false">Solid colour</button><button data-v="img" aria-pressed="false">Your image</button><button data-v="clear" aria-pressed="false">Transparent</button></div>
         <div class="hint" id="bgHintClear">Transparent shows just the text, timer and socials, so you can put your own background behind them in OBS.</div>
         <div class="bgo">
-          <div id="bgoAnim"><label class="ck"><input type="checkbox" id="bgStill">Keep it still (no movement, lighter on your PC)</label></div>
+          <div id="bgoAnim"><label class="ck"><input type="checkbox" id="bgStill">Keep it still (no movement, lighter on your PC)</label><div class="hint">The glow normally drifts slowly, so the difference shows over a few seconds.</div></div>
           <div id="bgoSolid" hidden><div class="row"><input type="color" id="bgCol" value="#0B0C0F" aria-label="Background colour"><span id="bgColName">#0B0C0F</span></div></div>
           <div id="bgoImg" hidden><input class="tin" id="bgImg" type="url" placeholder="https://… link to a .png or .jpg" spellcheck="false">
             <div class="row" style="margin-top:8px"><span>Darken</span><input type="range" id="bgDim" min="0" max="80" step="5" value="35" aria-label="Darken the image"><span id="bgDimV">35%</span></div>
@@ -356,7 +356,7 @@ function overlay(){
 
 function setup(){
   var $=function(id){return document.getElementById(id)};
-  var S={n:"",list:[{p:"twitch",h:""},{p:"tiktok",h:""},{p:"discord",h:""}],f:"link",g:"4DA3FF",bg:"anim",bc:"0B0C0F",bi:"",bd:35,still:0,cv:"h",scr:JSON.parse(JSON.stringify(DEF)),tab:"start"};
+  var S={n:"",list:[{p:"twitch",h:""},{p:"tiktok",h:""},{p:"discord",h:""}],f:"link",g:"4DA3FF",bg:"anim",bc:"0B0C0F",bi:"",bd:35,still:0,bcSet:0,cv:"h",scr:JSON.parse(JSON.stringify(DEF)),tab:"start"};
   try{var sv=JSON.parse(ls("sc_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
   $("chName").value=S.n;
   $("chName").addEventListener("input",function(){S.n=this.value;sync()});
@@ -388,10 +388,11 @@ function setup(){
   var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
   var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
   sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
-  $("bgSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.bg=b.dataset.v;sync()}});
+  function darkOf(h){var n=parseInt(h,16);return [n>>16,(n>>8)&255,n&255].map(function(v){return ("0"+Math.round(v*.22).toString(16)).slice(-2)}).join("").toUpperCase()}
+  $("bgSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.bg=b.dataset.v;if(S.bg==="solid"&&!S.bcSet){S.bc=darkOf(S.g);S.bcSet=1;$("bgCol").value="#"+S.bc}sync()}});
   (function(){var still=$("bgStill"),col=$("bgCol"),img=$("bgImg"),dim=$("bgDim");
     still.addEventListener("change",function(){S.still=this.checked?1:0;sync()});
-    col.addEventListener("input",function(){S.bc=this.value.slice(1).toUpperCase();sync()});
+    col.addEventListener("input",function(){S.bcSet=1;S.bc=this.value.slice(1).toUpperCase();sync()});
     img.addEventListener("input",function(){S.bi=this.value.trim();sync()});
     dim.addEventListener("input",function(){S.bd=parseInt(this.value,10)||0;sync()});
     still.checked=!!S.still;col.value="#"+(S.bc||"0B0C0F");img.value=S.bi||"";dim.value=S.bd==null?35:S.bd;})();
