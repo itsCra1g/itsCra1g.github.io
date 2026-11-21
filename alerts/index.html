@@ -386,7 +386,7 @@ var TYPES=[
   ["raid","Raid","Twitch + Kick","Raiding with {amount} viewers","viewers"]];
 var DEF={};TYPES.forEach(function(t){DEF[t[0]]=t[3]});
 var MINK={cheer:"mb",kicks:"mk",raid:"mr"};
-var BASE=location.origin+location.pathname;
+var BASE=location.origin+location.pathname,OLINK=BASE+"?v=4";
 var TW_CID="zknz506nc6j1bzvv8uihyn1j84fz9z",TW_SCOPES="moderator:read:followers channel:read:subscriptions bits:read";
 var TW_SVG='<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>';
 var KK_SVG='<svg viewBox="0 0 24 24"><path d="M1.5 1.5h7.2v4.8h2.4V3.9h2.4V1.5h9v7.2h-2.4v2.4h-2.4v1.8h2.4v2.4h2.4v7.2h-9v-2.4h-2.4v-2.4H8.7v4.8H1.5z"/></svg>';
@@ -749,7 +749,7 @@ function setup(){
     TYPES.forEach(function(t){if(S.t[t[0]])p.set("t_"+t[0],S.t[t[0]]);if(S.im[t[0]])p.set("im_"+t[0],S.im[t[0]])});if(Object.keys(S.im).length&&S.ims==="l")p.set("ims","l");if(S.tb)p.set("tb","1");
     if(S.mode!=="tw"){if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw)}
     for(var k in extra)p.set(k,extra[k]);return p.toString()}
-  function frame(el,h){var u=BASE+"#"+h;el.onload=function(){if(el.src.indexOf("about:")!==0)el.style.visibility=""};
+  function frame(el,h){var u=OLINK+"#"+h;el.onload=function(){if(el.src.indexOf("about:")!==0)el.style.visibility=""};
     if(!el.dataset.on){el.src=u;el.dataset.on=1}else{el.style.visibility="hidden";el.src="about:blank";setTimeout(function(){el.src=u},30)}}
   var pvT=null;
   function sync(){
@@ -774,7 +774,7 @@ function setup(){
     tvList.querySelectorAll(".tv-row").forEach(function(r){var k=r.dataset.k,v=S.tv[k]==null?100:S.tv[k];r.querySelector("input").value=v;r.querySelector("b").textContent=v+"%";r.hidden=tw&&k==="kicks"});
     var ob=$("obsUrl"),cb=document.querySelector('[data-copy=obsUrl]');
     if(tw&&!TK){ob.type="text";ob.value="Log in with Twitch in step 1 first";cb.disabled=true}
-    else{ob.type=tw?"password":"text";ob.value=BASE+"#"+hash({});cb.disabled=false}
+    else{ob.type=tw?"password":"text";ob.value=OLINK+"#"+hash({});cb.disabled=false}
     clearTimeout(pvT);pvT=setTimeout(function(){frame($("prevFrame"),hash({demo:"1"}))},300);
   }
   frame($("heroFrame"),"ov=1&demo=1&ly=pop&g=platform&snd=0&fs=22");
