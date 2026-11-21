@@ -148,7 +148,7 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
 @keyframes tm{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 .al .ic.img{background:#000;width:2.7em;height:2.7em;border-radius:.75em}
 .al .ic.img>b{z-index:2}
-.al .ic.img>img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.al .ic.img>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
 .al .ic.img.big{background:none;box-shadow:none;width:5.2em;height:5.2em;border-radius:.6em}
 .al .ic.img.big>img{object-fit:contain}
 .ly-pop .al .ic.img:after{display:none}
@@ -386,7 +386,7 @@ var TYPES=[
   ["raid","Raid","Twitch + Kick","Raiding with {amount} viewers","viewers"]];
 var DEF={};TYPES.forEach(function(t){DEF[t[0]]=t[3]});
 var MINK={cheer:"mb",kicks:"mk",raid:"mr"};
-var BASE=location.origin+location.pathname,OLINK=BASE+"?v=4";
+var BASE=location.origin+location.pathname,OLINK=BASE+"?v=5";
 var TW_CID="zknz506nc6j1bzvv8uihyn1j84fz9z",TW_SCOPES="moderator:read:followers channel:read:subscriptions bits:read";
 var TW_SVG='<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>';
 var KK_SVG='<svg viewBox="0 0 24 24"><path d="M1.5 1.5h7.2v4.8h2.4V3.9h2.4V1.5h9v7.2h-2.4v2.4h-2.4v1.8h2.4v2.4h2.4v7.2h-9v-2.4h-2.4v-2.4H8.7v4.8H1.5z"/></svg>';
