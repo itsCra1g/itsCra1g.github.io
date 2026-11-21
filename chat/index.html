@@ -106,6 +106,12 @@ html.ov #ovr{display:flex;position:fixed;inset:0;flex-direction:column;justify-c
 .m{--g:#4DA3FF;--gr:77,163,255;--o:.85;position:relative;color:#F2F5F9;line-height:1.35;word-wrap:break-word;overflow-wrap:anywhere;animation:in .35s cubic-bezier(.2,.9,.2,1);transition:opacity .6s,transform .6s}
 @keyframes in{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
 .m.bye{opacity:0;transform:translateX(-10px)}
+html.ov.dir-down #ovr,html.ov.dir-top #ovr{justify-content:flex-start}
+html.ov.dir-down #ovr{-webkit-mask-image:linear-gradient(to top,transparent 0,#000 60px);mask-image:linear-gradient(to top,transparent 0,#000 60px)}
+html.ov.dir-top #ovr{-webkit-mask-image:none;mask-image:none}
+.dir-up .m{animation-name:inUp}.dir-down .m{animation-name:inDown}
+@keyframes inUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes inDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
 .m .who{font-weight:700;white-space:nowrap}
 .m .bd{height:1em;width:auto;vertical-align:-.15em;margin-right:4px}
 .m .av{display:inline-block;width:1.45em;height:1.45em;border-radius:50%;object-fit:cover;vertical-align:-.4em;margin-right:7px;background:#2A303B}
@@ -185,6 +191,8 @@ K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;
       <div class="ctl">
         <div><div class="lbl">Style</div><div class="seg" id="lySeg"><button data-v="cards" aria-pressed="true">Cards</button><button data-v="classic" aria-pressed="false">Classic</button><button data-v="clean" aria-pressed="false">Clean</button></div>
           <div class="hint">Cards: a glowing bubble each. Classic: name and message on a dark strip. Clean: just text with a shadow.</div></div>
+        <div><div class="lbl">Message order</div><div class="seg" id="dirSeg"><button data-v="up" aria-pressed="true">Newest at bottom</button><button data-v="down" aria-pressed="false">Newest at top</button><button data-v="top" aria-pressed="false">Fill from top</button></div>
+          <div class="hint" id="dirHint"></div></div>
         <div><div class="lbl">Card glow</div><div class="sw" id="glowSw"></div></div>
         <div><div class="lbl">Background <b id="opV">85%</b></div><input type="range" id="op" min="0" max="100" step="5" value="85" aria-label="Background opacity"></div>
         <div><div class="lbl">Text size <b id="fsV">22</b></div><input type="range" id="fs" min="14" max="40" step="1" value="22" aria-label="Text size"></div>
@@ -256,12 +264,12 @@ function overlay(){
     var p=new URLSearchParams(location.hash.slice(1));
     var g=p.get("g")||"platform";if(g!=="platform"&&!/^[0-9a-fA-F]{6}$/.test(g))g="platform";
     var o=parseInt(p.get("o"),10);if(isNaN(o))o=85;
-    cfg={ly:["cards","classic","clean"].indexOf(p.get("ly"))>=0?p.get("ly"):"cards",g:g,o:Math.max(0,Math.min(100,o))/100,
+    cfg={dir:["down","top"].indexOf(p.get("dir"))>=0?p.get("dir"):"up",ly:["cards","classic","clean"].indexOf(p.get("ly"))>=0?p.get("ly"):"cards",g:g,o:Math.max(0,Math.min(100,o))/100,
       fs:Math.max(12,Math.min(48,parseInt(p.get("fs"),10)||22)),ttl:Math.max(0,parseInt(p.get("ttl"),10)||0),
       pf:p.get("pf")!=="0",av:p.get("av")!=="0",bd:p.get("bd")!=="0",col:p.get("col")!=="0",cmd:p.get("cmd")!=="0",bot:p.get("bot")!=="0",
       hide:(p.get("hide")||"").toLowerCase().split(",").map(function(x){return x.trim().replace(/^@/,"")}).filter(Boolean),
       h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1",max:60};
-    document.documentElement.className="ov ov-"+cfg.ly;box.style.setProperty("--fs",cfg.fs+"px");
+    document.documentElement.className="ov ov-"+cfg.ly+" dir-"+cfg.dir;box.style.setProperty("--fs",cfg.fs+"px");
   }
   function el(t,c){var e=document.createElement(t);if(c)e.className=c;return e}
   function safeUrl(u){return typeof u==="string"&&/^https:\/\//.test(u)?u:""}
@@ -342,8 +350,9 @@ function overlay(){
     who.style.color=cfg.col&&/^#?[0-9a-fA-F]{6}$/.test(x.color)?(x.color[0]==="#"?x.color:"#"+x.color):"#"+(cfg.ly==="cards"?"F2F5F9":pc);
     head.appendChild(who);m.appendChild(head);
     m.appendChild(body(x.d,x.text));
-    box.appendChild(m);
-    while(box.children.length>cfg.max)box.removeChild(box.firstChild);
+    if(cfg.dir==="down"){box.insertBefore(m,box.firstChild);while(box.children.length>cfg.max)box.removeChild(box.lastChild)}
+    else{box.appendChild(m);while(box.children.length>cfg.max)box.removeChild(box.firstChild);
+      if(cfg.dir==="top")while(box.children.length>1&&box.scrollHeight>box.clientHeight+1)box.removeChild(box.firstChild)}
     if(cfg.ttl)setTimeout(function(){bye(m)},cfg.ttl*1000);
   }
   function bye(m){if(!m.parentNode)return;m.classList.add("bye");setTimeout(function(){if(m.parentNode)m.parentNode.removeChild(m)},650)}
@@ -391,7 +400,7 @@ function overlay(){
 
 function setup(){
   var $=function(id){return document.getElementById(id)};
-  var S={ly:"cards",g:"platform",o:85,fs:22,ttl:0,av:1,pf:1,bd:1,col:1,cmd:1,bot:1,hide:"",h:"127.0.0.1",p:"8080"};
+  var S={dir:"up",ly:"cards",g:"platform",o:85,fs:22,ttl:0,av:1,pf:1,bd:1,col:1,cmd:1,bot:1,hide:"",h:"127.0.0.1",p:"8080"};
   try{var sv=JSON.parse(ls("cc_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
   var sw=$("glowSw");
   GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);
@@ -401,6 +410,7 @@ function setup(){
   var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
   sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
   $("lySeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.ly=b.dataset.v;sync()}});
+  $("dirSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.dir=b.dataset.v;sync()}});
   [["op","o"],["fs","fs"],["ttl","ttl"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=+this.value;sync()})});
   [["optAv","av"],["optPf","pf"],["optBd","bd"],["optCol","col"],["optCmd","cmd"],["optBot","bot"]].forEach(function(x){$(x[0]).addEventListener("change",function(){S[x[1]]=this.checked?1:0;sync()})});
   [["hide","hide"],["host","h"],["port","p"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value.trim();sync()})});
@@ -409,7 +419,7 @@ function setup(){
     var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select()})});
   $("hide").value=S.hide;$("host").value=S.h;$("port").value=S.p;
-  function hash(extra){var p=new URLSearchParams();p.set("ov","1");p.set("ly",S.ly);p.set("g",S.g);if(S.o!==85)p.set("o",String(S.o));if(S.fs!==22)p.set("fs",String(S.fs));if(S.ttl)p.set("ttl",String(S.ttl));
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");p.set("ly",S.ly);if(S.dir!=="up")p.set("dir",S.dir);p.set("g",S.g);if(S.o!==85)p.set("o",String(S.o));if(S.fs!==22)p.set("fs",String(S.fs));if(S.ttl)p.set("ttl",String(S.ttl));
     ["av","pf","bd","col","cmd","bot"].forEach(function(k){if(!S[k])p.set(k,"0")});if(S.hide)p.set("hide",S.hide);
     if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw);
     for(var k in extra)p.set(k,extra[k]);return p.toString()}
@@ -418,6 +428,8 @@ function setup(){
   function sync(){
     ls("cc_cfg",JSON.stringify(S));
     $("lySeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.ly)});
+    $("dirSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.dir)});
+    $("dirHint").textContent=S.dir==="down"?"New messages appear at the top and push older ones down.":S.dir==="top"?"Messages start at the top and fill downwards, newest at the bottom, like a chat window.":"New messages appear at the bottom and push older ones up. The usual chat look.";
     var isC=!GLOWS.some(function(g){return g[0]===S.g});sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
     cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
     nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
