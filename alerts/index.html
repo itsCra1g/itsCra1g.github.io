@@ -146,9 +146,10 @@ html.ov.ly-slide #ovr{justify-content:flex-start}
 .al .ms .em{height:1.5em;width:auto;vertical-align:-.4em;margin:0 1px}
 .al .tm{position:absolute;left:1em;right:1em;bottom:0;height:2px;border-radius:2px;background:rgb(var(--gr));opacity:.7;transform-origin:left;animation:tm var(--dur) linear forwards}
 @keyframes tm{from{transform:scaleX(1)}to{transform:scaleX(0)}}
-.al .ic.img{background:#000;width:2.7em;height:2.7em;border-radius:.75em;overflow:hidden}
+.al .ic.img{background:#000;width:2.7em;height:2.7em;border-radius:.75em}
+.al .ic.img>b{z-index:2}
 .al .ic.img>img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
-.al .ic.img.big{background:none;box-shadow:none;width:5.2em;height:5.2em;border-radius:.6em;overflow:visible}
+.al .ic.img.big{background:none;box-shadow:none;width:5.2em;height:5.2em;border-radius:.6em}
 .al .ic.img.big>img{object-fit:contain}
 .ly-pop .al .ic.img:after{display:none}
 /* pop */
