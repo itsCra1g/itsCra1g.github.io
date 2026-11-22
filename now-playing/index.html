@@ -15,7 +15,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="img/logo.png">
-<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";else if(/(^#|&)dock=1(&|$)/.test(location.hash))document.documentElement.className="dk";</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
@@ -105,7 +105,18 @@ code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px so
 .tog{display:flex;flex-direction:column;gap:10px}
 .tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
 .tog input{width:18px;height:18px;accent-color:var(--acc)}
+.prev{position:sticky;top:84px}
 .prev .stage iframe{width:84%}
+.ctl select{font:600 14px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 12px;max-width:100%}
+.ctl .sub{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:14px;color:var(--body)}
+.ctl .sub input[type=range]{flex:1;max-width:200px;accent-color:var(--acc)}
+.ctl .two{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.dock-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,320px);gap:28px;align-items:start}
+@media (max-width:860px){.dock-grid{grid-template-columns:1fr}}
+.dkprev{border:1px solid var(--edge);border-radius:14px;overflow:hidden;background:#0B0C0F}
+.dkprev .tb{font:600 12px var(--text);color:var(--mute);background:#16181d;padding:7px 12px;border-bottom:1px solid var(--edge)}
+.dkprev iframe{display:block;width:100%;height:268px;border:0;background:#0B0C0F}
+.cap{font-size:13px;color:var(--mute)}
 .prev .cap{font-size:13px;color:var(--mute);margin:10px 0 0}
 .locked{opacity:.5}
 .size{font:600 14px var(--text);color:var(--fg)}
@@ -120,7 +131,7 @@ html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0}
 html.ov .site{display:none}
 #ovr{display:none}
 html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
-.np{--g:#4DA3FF;--gr:77,163,255;position:absolute;left:20px;top:20px;font-family:var(--text);color:#E8ECF2;
+.np{--g:#4DA3FF;--gr:77,163,255;--tf:var(--display);--bf:var(--text);position:absolute;left:20px;top:20px;font-family:var(--text);color:#E8ECF2;
   background:linear-gradient(135deg,rgba(17,19,24,.95),rgba(8,9,12,.95));border:1px solid rgba(var(--gr),.38);
   box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 16px -3px rgba(var(--gr),.5),0 8px 16px -8px rgba(0,0,0,.85);
   transition:opacity .25s ease,transform .25s ease,border-color .8s,box-shadow .8s;display:flex;align-items:center;overflow:hidden}
@@ -129,7 +140,7 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
 .np .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .5s}
 .np .art .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--g);font:700 44px var(--display)}
 .np .txt{flex:1;min-width:0;display:flex;flex-direction:column}
-.np .eye{display:flex;align-items:center;gap:10px;color:var(--g);font:700 13px var(--text);letter-spacing:3px;text-transform:uppercase;transition:color .8s}
+.np .eye{display:flex;align-items:center;gap:10px;color:var(--g);font:700 13px var(--bf);letter-spacing:3px;text-transform:uppercase;transition:color .8s}
 .np .eq{display:inline-flex;align-items:flex-end;gap:3px;height:14px}
 .np .eq i{width:3px;height:100%;background:var(--g);border-radius:2px;transform-origin:bottom;animation:eq 1s ease-in-out infinite;transition:background .8s}
 .np .eq i:nth-child(2){animation-delay:-.35s}.np .eq i:nth-child(3){animation-delay:-.7s}.np .eq i:nth-child(4){animation-delay:-.15s}
@@ -139,15 +150,37 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
 .np .mq span{display:inline-block;will-change:transform}
 .np .mq.run span{animation:mq var(--dur,10s) ease-in-out infinite}
 @keyframes mq{0%,18%{transform:translateX(0)}50%,68%{transform:translateX(var(--dx))}100%{transform:translateX(0)}}
-.np .t{font:700 30px/1.15 var(--display);letter-spacing:-.3px;color:#F2F5F9}
-.np .ar{font:500 21px/1.2 var(--text);color:#AEB6C4;margin-top:4px}
-.np .pr{display:flex;align-items:center;gap:12px;font:700 14px var(--text);color:#C3CAD5;font-variant-numeric:tabular-nums}
+.np .t{font:700 30px/1.15 var(--tf);letter-spacing:-.3px;color:#F2F5F9}
+.np .ar{font:500 21px/1.2 var(--bf);color:#AEB6C4;margin-top:4px}
+.np .pr{display:flex;align-items:center;gap:12px;font:700 14px var(--bf);color:#C3CAD5;font-variant-numeric:tabular-nums}
 .np .trk{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
 .np .trk b{display:block;height:100%;width:0;border-radius:99px;background:var(--g);box-shadow:0 0 12px rgba(var(--gr),.8);transition:background .8s}
 .np .swap{transition:opacity .25s,transform .25s}
 .np.chg .swap{opacity:0;transform:translateY(6px)}
 .np.noart .art{display:none}
 .np.noprog .pr,.np.noprog .trk{display:none}
+.np .al{font:500 17px/1.2 var(--bf);color:#8A94A6;margin-top:3px;display:none}
+.np.withal .al{display:block}
+.np.noeye .eye{display:none}
+.np.noby .ar{display:none}
+.np.notm .pr span{display:none}
+.np.cut .mq span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.np.pb-thick .trk{height:10px}
+.np.kn .trk{overflow:visible}
+.np.kn .trk b{position:relative}
+.np.kn .trk b:after{content:"";position:absolute;right:-7px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#fff;box-shadow:0 0 10px rgba(var(--gr),.9)}
+.np.kn.pb-thick .trk b:after{right:-9px;width:18px;height:18px;margin-top:-9px}
+/* backgrounds */
+.np .bgl{position:absolute;inset:-40px;z-index:0;display:none;pointer-events:none}
+.np .bgl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(26px) saturate(1.5) brightness(.48);transition:opacity .6s}
+.np>*:not(.bgl){position:relative;z-index:1}
+.np.b-blur{background:#0B0C0F}
+.np.b-blur .bgl{display:block}
+.np.b-blur .ar{color:#D3D9E2}.np.b-blur .al{color:#AEB6C4}
+.np.b-none{background:none;border-color:transparent;box-shadow:none}
+.np.b-none .t,.np.b-none .ar,.np.b-none .al,.np.b-none .pr,.np.b-none .eye{text-shadow:0 2px 6px rgba(0,0,0,.95),0 0 2px rgba(0,0,0,.95)}
+.np.b-none .art{box-shadow:0 6px 18px rgba(0,0,0,.6)}
+.np.b-none .trk{background:rgba(0,0,0,.45);box-shadow:0 0 0 1px rgba(255,255,255,.12)}
 /* card */
 .np.l-card{width:640px;height:180px;border-radius:24px;padding:18px;gap:22px}
 .np.l-card .art{width:144px;height:144px;border-radius:16px}
@@ -160,11 +193,21 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
 .np.l-bar .eye{display:none}
 .np.l-bar .t{font-size:22px}
 .np.l-bar .ar{font-size:16px;margin-top:2px}
+.np.l-bar .txt{position:static}
 .np.l-bar .pr{position:absolute;left:0;right:0;bottom:0;gap:0}
 .np.l-bar .pr span{display:none}
 .np.l-bar .trk{height:3px;border-radius:0;background:rgba(255,255,255,.06)}
 .np.l-bar .trk b{border-radius:0}
 .np.l-bar .eqx{display:inline-flex;margin-left:auto;flex:0 0 auto}
+/* tile (vertical) */
+.np.l-tile{width:360px;flex-direction:column;align-items:stretch;border-radius:26px;padding:20px;gap:16px}
+.np.l-tile .art{width:320px;height:320px;border-radius:18px}
+.np.l-tile .eye{margin-bottom:8px}
+.np.l-tile .t{font-size:28px}
+.np.l-tile .ar{font-size:19px}
+.np.l-tile .pr{margin-top:14px}
+.np.l-bar .al,.np.l-min .al{display:none!important}
+.np.l-bar .trk b:after{display:none}
 /* minimal */
 .np.l-min{height:48px;max-width:560px;border-radius:999px;padding:0 22px 0 18px;gap:12px;width:auto}
 .np.l-min .art,.np.l-min .pr,.np.l-min .eye>span:not(.eq){display:none}
@@ -179,25 +222,68 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
 .np .msg{display:none}
 .np.err .txt{display:none}.np.err .msg{display:block;font:600 20px/1.4 var(--text);color:#E8ECF2;padding:0 10px}
 .np.err .msg b{color:var(--g)}
-.np.err .art,.np.err .eqx{display:none}
+.np.err .art,.np.err .eqx,.np.err .bgl{display:none}
+.np.l-tile.err{width:360px}
+/* ---------- control dock ---------- */
+#dock{display:none}
+html.dk,html.dk body{background:#0B0C0F!important;margin:0}
+html.dk .site{display:none}
+html.dk #dock{display:block}
+.dk{padding:12px;display:flex;flex-direction:column;gap:12px;font:14px var(--text);color:var(--fg);max-width:520px;margin:0 auto}
+.dk-top{display:flex;gap:12px;align-items:center;min-width:0}
+.dk-art{width:64px;height:64px;border-radius:10px;background:#14171d;flex:0 0 auto;overflow:hidden;display:grid;place-items:center;color:var(--acc);font:700 26px var(--display)}
+.dk-art img{width:100%;height:100%;object-fit:cover;display:block;grid-area:1/1}
+.dk-art span{grid-area:1/1}
+.dk-txt{min-width:0;flex:1}
+.dk-t{font:700 16px/1.3 var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#F2F5F9}
+.dk-b{font-size:13px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-pr{display:flex;align-items:center;gap:8px;font:600 11px var(--text);color:var(--mute);font-variant-numeric:tabular-nums}
+.dk-trk{flex:1;height:16px;display:flex;align-items:center;cursor:pointer}
+.dk-trk i{display:block;width:100%;height:4px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden}
+.dk-trk:hover i{height:6px}
+.dk-trk b{display:block;height:100%;width:0;background:var(--acc)}
+.dk-btns{display:flex;justify-content:center;align-items:center;gap:16px}
+.dk-btns button{width:40px;height:40px;border-radius:50%;border:1px solid var(--edge2);background:var(--tile2);color:var(--fg);display:grid;place-items:center;cursor:pointer;padding:0}
+.dk-btns button:hover{border-color:var(--acc)}
+.dk-btns button.big{width:52px;height:52px;background:var(--acc);color:#000;border:0}
+.dk-btns button.big:hover{background:#8CC4FF}
+.dk-btns svg{width:18px;height:18px;fill:currentColor}
+.dk-btns .big svg{width:22px;height:22px}
+.dk-vol{display:flex;align-items:center;gap:10px;color:var(--mute)}
+.dk-vol svg{width:16px;height:16px;fill:currentColor;flex:0 0 auto}
+.dk-vol input{flex:1;min-width:0;accent-color:var(--acc)}
+.dk-vol span{font:600 11px var(--text);min-width:2.4em;text-align:right;font-variant-numeric:tabular-nums}
+.dk-dev{font-size:11px;color:var(--mute);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk-msg{font-size:13px;line-height:1.4;color:var(--warn);text-align:center}
+.dk.lost .dk-btns button,.dk.lost .dk-vol{opacity:.35;pointer-events:none}
 </style>
 </head>
 <body>
 <div id="ovr"><div id="np" class="np l-card off">
+  <div class="bgl"><img id="b1" alt=""><img id="b2" alt="" style="opacity:0"></div>
   <div class="art"><div class="ph">&#9835;</div><img id="a1" alt=""><img id="a2" alt="" style="opacity:0"></div>
   <div class="txt">
     <div class="eye"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Now playing</span></div>
-    <div class="swap"><div class="mq t"><span id="t">&nbsp;</span></div><div class="mq ar"><span id="ar">&nbsp;</span></div></div>
+    <div class="swap"><div class="mq t"><span id="t">&nbsp;</span></div><div class="mq ar"><span id="ar">&nbsp;</span></div><div class="mq al"><span id="al">&nbsp;</span></div></div>
     <div class="pr"><span id="c">0:00</span><div class="trk"><b id="f"></b></div><span id="d">0:00</span></div>
   </div>
   <span class="eq eqx" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
   <div class="msg">Now Playing lost its Spotify link.<br>Reconnect at <b>itscra1g.github.io/now-playing</b></div>
 </div></div>
 
+<div id="dock"><div class="dk" id="dk">
+  <div class="dk-top"><div class="dk-art"><span>&#9835;</span><img id="dA" alt="" hidden></div><div class="dk-txt"><div class="dk-t" id="dT">Connecting to Spotify…</div><div class="dk-b" id="dB">&nbsp;</div></div></div>
+  <div class="dk-pr"><span id="dC">0:00</span><div class="dk-trk" id="dTrk" title="Jump to here"><i><b id="dF"></b></i></div><span id="dD">0:00</span></div>
+  <div class="dk-btns"><button type="button" id="dPrev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M6 5h2.2v14H6zM9.5 12 19 5v14z"/></svg></button><button type="button" id="dPlay" class="big" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M7 4.5v15L19.5 12z"/></svg></button><button type="button" id="dNext" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M15.8 5H18v14h-2.2zM5 5l9.5 7L5 19z"/></svg></button></div>
+  <div class="dk-vol" id="dVolRow"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4zM16 8.5a5 5 0 0 1 0 7l-1.4-1.4a3 3 0 0 0 0-4.2zM18.5 6a8.5 8.5 0 0 1 0 12l-1.4-1.4a6.5 6.5 0 0 0 0-9.2z"/></svg><input type="range" id="dVol" min="0" max="100" value="50" aria-label="Volume"><span id="dVolN">50%</span></div>
+  <div class="dk-dev" id="dDev"></div>
+  <div class="dk-msg" id="dMsg" hidden></div>
+</div></div>
+
 <div class="site">
 <header class="bar"><div class="wrap">
   <a class="brand" href="../"><img src="img/logo.png" alt="">Now Playing</a>
-  <nav><a href="#make">Spotify app</a><a href="#connect">Connect</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <nav><a href="#make">Spotify app</a><a href="#connect">Connect</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#dock-setup">Dock</a><a href="#help">Help</a></nav>
   <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
 </div></header>
 
@@ -206,8 +292,8 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
     <div>
       <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
       <h1>Show what's playing on Spotify, on stream.</h1>
-      <p class="lead">Album art, a live progress bar and your own glow colour. Long titles scroll, it fades out when you pause, and it runs in a browser source with nothing to install.</p>
-      <div class="chips"><span class="chip">3 layouts</span><span class="chip">7 glow colours</span><span class="chip">Match album art</span><span class="chip">Podcasts too</span></div>
+      <p class="lead">Album art, a live progress bar and your own glow colour, in four layouts. Pop it up when a new song starts, blur the cover behind it, and play, pause or skip from a dock in OBS. Nothing to install.</p>
+      <div class="chips"><span class="chip">4 layouts</span><span class="chip">Blurred cover background</span><span class="chip">Match album art</span><span class="chip">Pop up on new song</span><span class="chip">Control dock</span></div>
     </div>
     <div class="stage" id="heroStage"><span class="tag">Preview</span><iframe id="heroFrame" title="Overlay preview" tabindex="-1"></iframe></div>
   </div>
@@ -241,15 +327,35 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
     <div class="sec-head"><span class="num">3</span><h2>Style it</h2></div>
     <div class="style-grid">
       <div class="ctl">
-        <div><div class="lbl">Layout</div><div class="seg" id="layoutSeg">
-          <button data-v="card" aria-pressed="true">Card</button><button data-v="bar" aria-pressed="false">Bar</button><button data-v="min" aria-pressed="false">Minimal</button>
+        <div><div class="lbl">Layout</div><div class="seg" data-k="l">
+          <button data-v="card">Card</button><button data-v="bar">Bar</button><button data-v="min">Minimal</button><button data-v="tile">Tall</button>
+        </div></div>
+        <div><div class="lbl">Background</div><div class="seg" data-k="b">
+          <button data-v="solid">Solid</button><button data-v="blur">Blurred cover</button><button data-v="none">None</button>
         </div></div>
         <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
-        <div><div class="lbl">Show</div><div class="tog">
-          <label><input type="checkbox" id="optArt" checked>Album art</label>
-          <label><input type="checkbox" id="optProg" checked>Progress bar</label>
-          <label><input type="checkbox" id="optHide" checked>Hide when music is paused</label>
+        <div><div class="lbl">Show</div><div class="tog two">
+          <label><input type="checkbox" data-k="a">Album art</label>
+          <label><input type="checkbox" data-k="e">“Now playing”</label>
+          <label><input type="checkbox" data-k="by">Artist</label>
+          <label><input type="checkbox" data-k="al">Album name</label>
+          <label><input type="checkbox" data-k="p">Progress bar</label>
+          <label><input type="checkbox" data-k="tm">Song times</label>
         </div></div>
+        <div><div class="lbl">When to show it</div><div class="seg" data-k="h">
+          <button data-v="0">Always</button><button data-v="1">While playing</button><button data-v="2">Pop up on new song</button>
+        </div>
+        <div class="sub" id="popRow"><span>Stays up for</span><input type="range" id="popS" min="3" max="30" step="1"><b id="popN">8s</b></div></div>
+        <div><div class="lbl">Long titles</div><div class="seg" data-k="sc">
+          <button data-v="1">Scroll</button><button data-v="0">Cut off</button>
+        </div></div>
+        <div><div class="lbl">Progress bar</div><div class="seg" data-k="pb">
+          <button data-v="thin">Thin</button><button data-v="thick">Thick</button>
+        </div>
+        <div class="tog" style="margin-top:10px"><label><input type="checkbox" data-k="kn">Dot on the end</label></div></div>
+        <div><div class="lbl">Font</div><select id="fontSel" aria-label="Font">
+          <option value="sg">Space Grotesk</option><option value="in">Inter</option><option value="pp">Poppins</option><option value="an">Anton</option><option value="bb">Bebas Neue</option><option value="mo">JetBrains Mono</option>
+        </select></div>
       </div>
       <div class="prev">
         <div class="stage"><span class="tag" id="prevTag">Preview · demo song</span><iframe id="prevFrame" title="Overlay preview" tabindex="-1"></iframe></div>
@@ -272,6 +378,28 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
         <li>Press OK and play a song.</li>
       </ol>
       <p>Changed the style? Copy the new link and paste it over the old one in the browser source.</p>
+      <p class="cap">Want to place it before you've any music on? <button class="btn ghost" id="testBtn" type="button" style="padding:6px 10px;font-size:13px">Copy test link</button> It plays two made-up songs on a loop. Put your real link back once it's in place.</p>
+    </div>
+  </section>
+
+  <section id="dock-setup">
+    <div class="sec-head"><span class="num">5</span><h2>Add the control dock</h2></div>
+    <div class="dock-grid">
+      <div>
+        <p>Play, pause and skip without leaving OBS. The dock shows what's playing, lets you click the bar to jump around the song, and has a volume slider.</p>
+        <div class="row"><button class="btn" id="dockBtn" type="button">Make dock link</button><span class="status" id="dockStatus">No dock link yet</span></div>
+        <p class="cap" style="margin-top:10px">Spotify asks you again, this time to allow play, pause and skip. The dock gets its own sign-in, so your overlay link carries on as it is.</p>
+        <div id="dkReady" hidden>
+          <div class="copy"><input id="dkUrl" readonly aria-label="Dock link" type="password"><button class="btn ghost" id="dkShow" type="button">Show</button><button class="btn" data-copy="dkUrl" type="button">Copy</button></div>
+          <div class="note warn"><div><b>Keep this one private too.</b> Anyone with it could pause or skip your music.</div></div>
+          <ol class="steps">
+            <li>In OBS, open the <strong>Docks</strong> menu and pick <strong>Custom Browser Docks</strong>.</li>
+            <li>Call it <em>Spotify</em>, paste the link into <strong>URL</strong> and press <strong>Apply</strong>.</li>
+            <li>Drag the dock wherever you like. It works at any size.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="dkprev"><div class="tb">Spotify · preview</div><iframe id="dkFrame" title="Dock preview" tabindex="-1"></iframe></div>
     </div>
   </section>
 
@@ -283,6 +411,8 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
       <tr><td>Spotify says the <strong>user isn't registered</strong></td><td>You logged in with a different Spotify account from the one that owns the app. Log in with the owner, or add the other account under <strong>User Management</strong> in the app.</td></tr>
       <tr><td>Nothing shows in OBS</td><td>Play a song: it stays hidden while nothing is playing, and while paused if you ticked that. Check the browser source size matches step 4.</td></tr>
       <tr><td>It says <strong>lost its Spotify link</strong></td><td>Come back here, connect again (it's one click), and paste the new link into your browser source.</td></tr>
+      <tr><td>The dock says <strong>Spotify isn't open anywhere</strong></td><td>Open Spotify on your PC (or phone) and play something once. After that the dock can take over.</td></tr>
+      <tr><td>The dock buttons say Spotify <strong>won't allow</strong> it</td><td>Make a new dock link in step 5 and paste it over the old one in Custom Browser Docks.</td></tr>
       <tr><td>The glow doesn't match the album art</td><td>Some covers won't share their colours with the browser. It falls back to Pilot blue for those.</td></tr>
     </table></div>
   </section>
@@ -295,7 +425,9 @@ html.ov #ovr{display:block;position:fixed;left:0;top:0;transform-origin:0 0}
 (function(){
 "use strict";
 var GLOWS=[["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"],["art","Match album art"]];
-var SIZES={card:[680,220],bar:[720,120],min:[600,88]};
+var SIZES={card:[680,220],bar:[720,120],min:[600,88],tile:[400,580]};
+var FONTS={sg:["var(--display)","var(--text)",""],in:["Inter,sans-serif","var(--text)",""],pp:["Poppins,sans-serif","Poppins,sans-serif","Poppins:wght@500;700"],an:["Anton,Impact,sans-serif","var(--text)","Anton"],bb:["'Bebas Neue',Impact,sans-serif","var(--text)","Bebas+Neue"],mo:["'JetBrains Mono',monospace","'JetBrains Mono',monospace","JetBrains+Mono:wght@500;700"]};
+var VER="?v=2";
 var ACC="https://accounts.spotify.com",API="https://api.spotify.com/v1";
 var BASE=location.origin+location.pathname;
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return null}}
@@ -304,24 +436,29 @@ function hx2rgb(h){h=h.replace("#","");return parseInt(h.slice(0,2),16)+","+pars
 function hp(){return new URLSearchParams(location.hash.slice(1))}
 
 if(document.documentElement.className==="ov"){overlay();return}
+if(document.documentElement.className==="dk"){dock();return}
 setup();
 
 /* =================== OVERLAY =================== */
 function overlay(){
   var np=document.getElementById("np"),ovr=document.getElementById("ovr");
   var $=function(id){return document.getElementById(id)};
-  var cfg,at=null,exp=0,timer=null,tick=null,cur=null,base=0,baseAt=0,dur=0,playing=false,hideT=null,fails=0,errShown=false,artOn=1,lastArt="";
+  var cfg,at=null,exp=0,timer=null,tick=null,cur=null,base=0,baseAt=0,dur=0,playing=false,hideT=null,popT=null,fails=0,errShown=false,artOn=1,lastArt="",fontsOn={};
   function read(){
     var p=hp();
-    cfg={cid:p.get("c")||"",l:SIZES[p.get("l")]?p.get("l"):"card",g:(p.get("g")||"4DA3FF").replace("#",""),a:p.get("a")!=="0",pr:p.get("p")!=="0",h:p.get("h")!=="0",rt:p.get("rt")||"",at:p.get("at")||"",demo:p.get("demo")==="1"};
-    np.className="np l-"+cfg.l+(cfg.a?"":" noart")+(cfg.pr?"":" noprog")+(np.classList.contains("off")?" off":"");
+    var hv=p.get("h");
+    cfg={cid:p.get("c")||"",l:SIZES[p.get("l")]?p.get("l"):"card",g:(p.get("g")||"4DA3FF").replace("#",""),a:p.get("a")!=="0",pr:p.get("p")!=="0",h:hv==="0"?0:hv==="2"?2:1,rt:p.get("rt")||"",at:p.get("at")||"",demo:p.get("demo")==="1",
+      e:p.get("e")!=="0",by:p.get("by")!=="0",al:p.get("al")==="1",tm:p.get("tm")!=="0",b:/^(blur|none)$/.test(p.get("b"))?p.get("b"):"solid",sc:p.get("sc")!=="0",pb:p.get("pb")==="thick"?"thick":"thin",kn:p.get("kn")==="1",f:FONTS[p.get("f")]?p.get("f"):"sg",ps:Math.max(3,Math.min(30,parseInt(p.get("ps"),10)||8))};
+    np.className="np l-"+cfg.l+" b-"+cfg.b+" pb-"+cfg.pb+(cfg.a?"":" noart")+(cfg.pr?"":" noprog")+(cfg.e?"":" noeye")+(cfg.by?"":" noby")+(cfg.al?" withal":"")+(cfg.tm?"":" notm")+(cfg.sc?"":" cut")+(cfg.kn?" kn":"")+(np.classList.contains("off")?" off":"")+(np.classList.contains("paused")?" paused":"");
+    var F=FONTS[cfg.f];np.style.setProperty("--tf",F[0]);np.style.setProperty("--bf",F[1]);
+    if(F[2]&&!fontsOn[F[2]]){fontsOn[F[2]]=1;var lk=document.createElement("link");lk.rel="stylesheet";lk.href="https://fonts.googleapis.com/css2?family="+F[2]+"&display=swap";lk.onload=function(){setTimeout(marq,300);if(document.fonts)document.fonts.ready.then(marq)};document.head.appendChild(lk)}
     if(cfg.g!=="art")glow(cfg.g);else glow("4DA3FF");
     fit();
   }
   function glow(hex){np.style.setProperty("--g","#"+hex);np.style.setProperty("--gr",hx2rgb(hex))}
   function fit(){var s=SIZES[cfg.l];var k=Math.min(innerWidth/s[0],innerHeight/s[1]);ovr.style.transform="scale("+k+")";ovr.style.width=s[0]+"px";ovr.style.height=s[1]+"px"}
   addEventListener("resize",function(){fit();marq()});
-  addEventListener("hashchange",function(){var was=cfg.demo,wat=cfg.at;read();if(cfg.demo!==was||cfg.at!==wat){start()}else if(cur){paint(cur,true)}});
+  addEventListener("hashchange",function(){var was=cfg.demo,wat=cfg.at,wh=cfg.h,wps=cfg.ps;read();if(cfg.demo!==was||cfg.at!==wat||cfg.h!==wh||cfg.ps!==wps){start()}else if(cur){lastArt="";paint(cur,true)}});
 
   function show(on){
     clearTimeout(hideT);
@@ -334,19 +471,21 @@ function overlay(){
     $("f").style.width=(dur?p/dur*100:0)+"%";$("c").textContent=fmt(p);$("d").textContent=fmt(dur);
   }
   function marq(){
-    ["t","ar"].forEach(function(id){
+    ["t","ar","al"].forEach(function(id){
       var sp=$(id),box=sp.parentNode;box.classList.remove("run");
       var over=sp.scrollWidth-box.clientWidth;
-      if(over>4&&cfg.l!=="min"){box.style.setProperty("--dx",(-over-8)+"px");box.style.setProperty("--dur",Math.max(8,over/22+6)+"s");box.classList.add("run")}
+      if(over>4&&cfg.l!=="min"&&cfg.sc){box.style.setProperty("--dx",(-over-8)+"px");box.style.setProperty("--dur",Math.max(8,over/22+6)+"s");box.classList.add("run")}
     });
   }
   function setArt(url){
     if(url===lastArt)return;lastArt=url;
-    var a1=$("a1"),a2=$("a2");var front=artOn?a1:a2,back=artOn?a2:a1;
-    if(!url){front.style.opacity=0;back.style.opacity=0;if(cfg.g==="art")glow("4DA3FF");return}
+    var a1=$("a1"),a2=$("a2"),b1=$("b1"),b2=$("b2");var front=artOn?[a1,b1]:[a2,b2],back=artOn?[a2,b2]:[a1,b1];
+    function op(arr,v){arr[0].style.opacity=v;arr[1].style.opacity=v}
+    function swap(){back[0].src=url;back[1].src=url;op(back,1);op(front,0);artOn=!artOn}
+    if(!url){op(front,0);op(back,0);if(cfg.g==="art")glow("4DA3FF");return}
     var im=new Image();im.crossOrigin="anonymous";
-    im.onload=function(){back.src=url;back.style.opacity=1;front.style.opacity=0;artOn=!artOn;if(cfg.g==="art")artGlow(im)};
-    im.onerror=function(){var j=new Image();j.onload=function(){back.src=url;back.style.opacity=1;front.style.opacity=0;artOn=!artOn};j.src=url;if(cfg.g==="art")glow("4DA3FF")};
+    im.onload=function(){swap();if(cfg.g==="art")artGlow(im)};
+    im.onerror=function(){var j=new Image();j.onload=swap;j.src=url;if(cfg.g==="art")glow("4DA3FF")};
     im.src=url;
   }
   function artGlow(im){
@@ -370,12 +509,13 @@ function overlay(){
     if(changed){
       np.classList.add("chg");
       setTimeout(function(){
-        $("t").textContent=it.title||"Unknown";$("ar").textContent=it.by||"";
+        $("t").textContent=it.title||"Unknown";$("ar").textContent=it.by||"";$("al").textContent=it.album||"";
         np.classList.remove("chg");marq();
       },had&&!force?250:0);
-      if(cfg.a)setArt(it.art||"");
+      if(cfg.a||cfg.b==="blur")setArt(it.art||"");
     }
     prog();
+    return changed;
   }
   function state(p){
     np.classList.remove("err");errShown=false;
@@ -384,10 +524,15 @@ function overlay(){
     var imgs=ep?(it.images||(it.show&&it.show.images)||[]):((it.album&&it.album.images)||[]);
     var art=imgs.length?(imgs.find?imgs.find(function(x){return x.width&&x.width<=320})||imgs[0]:imgs[0]).url:"";
     var by=ep?(it.show&&it.show.name)||"":(it.artists||[]).map(function(a){return a.name}).join(", ");
-    playing=!!p.is_playing;base=p.progress_ms||0;baseAt=Date.now();
+    var alb=ep?"":(it.album&&it.album.name)||"";
+    var was=playing;playing=!!p.is_playing;base=p.progress_ms||0;baseAt=Date.now();
     np.classList.toggle("paused",!playing);
-    paint({id:it.id||it.uri||it.name,title:it.name,by:by,art:art,dur:it.duration_ms||0});
-    if(playing||!cfg.h)show(true);else show(false);
+    var changed=paint({id:it.id||it.uri||it.name,title:it.name,by:by,album:alb,art:art,dur:it.duration_ms||0});
+    if(cfg.h===2){
+      if(!playing){clearTimeout(popT);show(false)}
+      else if(changed||!was){show(true);clearTimeout(popT);popT=setTimeout(function(){show(false)},cfg.ps*1000)}
+    }
+    else if(playing||cfg.h===0)show(true);else show(false);
   }
   function lost(){if(errShown)return;errShown=true;np.classList.add("err");np.classList.remove("off");setTimeout(function(){if(errShown)np.classList.add("off")},20000)}
 
@@ -415,18 +560,18 @@ function overlay(){
     finally{if(!cfg.demo){clearTimeout(timer);timer=setTimeout(poll,next)}}
   }
   var DEMO=[
-    {id:"d1",name:"Signal Fires",by:"The Late Shift",c:["#1d4ed8","#38bdf8"],d:214000},
-    {id:"d2",name:"A Really Quite Long Song Title That Scrolls Along",by:"Neon Arcade, Pilot Light",c:["#7c3aed","#f472b6"],d:187000}
+    {id:"d1",name:"Signal Fires",by:"The Late Shift",al:"Night Bus Home",c:["#1d4ed8","#38bdf8"],d:214000},
+    {id:"d2",name:"A Really Quite Long Song Title That Scrolls Along",by:"Neon Arcade, Pilot Light",al:"Overtime",c:["#7c3aed","#f472b6"],d:187000}
   ];
   function demoArt(c){return "data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c[0]+'"/><stop offset="1" stop-color="'+c[1]+'"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><circle cx="50" cy="50" r="26" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3"/><circle cx="50" cy="50" r="5" fill="#fff" fill-opacity=".8"/></svg>')}
   var demoI=0,demoT=null;
   function demoMode(){
     clearTimeout(timer);clearInterval(demoT);
-    function put(){var d=DEMO[demoI%DEMO.length];state({is_playing:true,progress_ms:d.d*.38,item:{id:d.id,name:d.name,duration_ms:d.d,artists:d.by.split(", ").map(function(n){return{name:n}}),album:{images:[{url:demoArt(d.c),width:300}]}}})}
-    put();demoT=setInterval(function(){demoI++;put()},9000);
+    function put(){var d=DEMO[demoI%DEMO.length];state({is_playing:true,progress_ms:d.d*.38,item:{id:d.id,name:d.name,duration_ms:d.d,artists:d.by.split(", ").map(function(n){return{name:n}}),album:{name:d.al,images:[{url:demoArt(d.c),width:300}]}}})}
+    put();demoT=setInterval(function(){demoI++;put()},cfg.h===2?Math.max(9000,(cfg.ps+3)*1000):9000);
   }
   function start(){
-    clearTimeout(timer);clearInterval(demoT);cur=null;lastArt="";at=null;
+    clearTimeout(timer);clearInterval(demoT);clearTimeout(popT);cur=null;lastArt="";at=null;playing=false;
     if(cfg.demo)return demoMode();
     if(!cfg.cid||(!cfg.rt&&!cfg.at&&!ls("np_rt_"+cfg.cid))){lost();return}
     poll();
@@ -437,13 +582,105 @@ function overlay(){
   start();
 }
 
+
+/* =================== CONTROL DOCK =================== */
+function dock(){
+  var $=function(id){return document.getElementById(id)};
+  var p=hp(),cid=p.get("c")||"",rtL=p.get("rt")||"",demo=p.get("demo")==="1";
+  var K="np_drt_"+cid,at=null,exp=0,timer=null,base=0,baseAt=0,dur=0,playing=false,fails=0,isLost=false,volBusy=0,volT=null,lastArt="";
+  var PLAY='<svg viewBox="0 0 24 24"><path d="M7 4.5v15L19.5 12z"/></svg>',PAUSE='<svg viewBox="0 0 24 24"><path d="M6 4.5h4.5v15H6zm7.5 0H18v15h-4.5z"/></svg>';
+  function fmt(ms){ms=Math.max(0,ms|0);var s=Math.floor(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+  function msg(t){var m=$("dMsg");m.textContent=t||"";m.hidden=!t}
+  function pos(){var x=playing?base+(Date.now()-baseAt):base;return dur?Math.min(x,dur):x}
+  function prog(){var x=pos();$("dF").style.width=(dur?x/dur*100:0)+"%";$("dC").textContent=fmt(x);$("dD").textContent=fmt(dur)}
+  function btn(){$("dPlay").innerHTML=playing?PAUSE:PLAY;$("dPlay").setAttribute("aria-label",playing?"Pause":"Play")}
+  function art(u){if(u===lastArt)return;lastArt=u;var i=$("dA");if(!u){i.hidden=true;return}i.onload=function(){i.hidden=false};i.src=u}
+  function paint(s){
+    if(!s||!s.item){playing=!!(s&&s.is_playing);dur=0;base=0;$("dT").textContent="Nothing playing";$("dB").textContent=s&&s.device?"Press play to start":"Spotify isn't open anywhere";art("");btn();prog();dev(s);return}
+    var it=s.item,ep=it.type==="episode";
+    var imgs=ep?(it.images||(it.show&&it.show.images)||[]):((it.album&&it.album.images)||[]);
+    var a=imgs.length?(imgs.find(function(x){return x.width&&x.width<=320})||imgs[0]).url:"";
+    $("dT").textContent=it.name||"Unknown";
+    $("dB").textContent=ep?(it.show&&it.show.name)||"":(it.artists||[]).map(function(x){return x.name}).join(", ");
+    art(a);playing=!!s.is_playing;base=s.progress_ms||0;baseAt=Date.now();dur=it.duration_ms||0;btn();prog();dev(s);
+  }
+  function dev(s){
+    var d=s&&s.device;$("dDev").textContent=d&&d.name?"Playing on "+d.name:"";
+    var row=$("dVolRow");row.hidden=!(d&&d.supports_volume!==false&&d.volume_percent!=null);
+    if(!row.hidden&&!volBusy&&Date.now()>volT){$("dVol").value=d.volume_percent;$("dVolN").textContent=d.volume_percent+"%"}
+  }
+  function lost(){isLost=true;$("dk").classList.add("lost");msg("This dock lost its Spotify link. Make a new dock link at itscra1g.github.io/now-playing and paste it over the old one.")}
+  async function refresh(){
+    var cands=[],s=ls(K);if(s)cands.push(s);if(rtL&&rtL!==s)cands.push(rtL);
+    for(var i=0;i<cands.length;i++){
+      var r;try{r=await fetch(ACC+"/api/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({grant_type:"refresh_token",refresh_token:cands[i],client_id:cid})})}catch(e){return null}
+      if(r.ok){var j=await r.json();at=j.access_token;exp=Date.now()+(j.expires_in||3600)*1000-60e3;ls(K,j.refresh_token||cands[i]);return true}
+      if(r.status>=500)return null;
+    }
+    return false;
+  }
+  async function api(method,path,retry){
+    if(!at||Date.now()>exp){var ok=await refresh();if(ok===false)throw{lost:1};if(ok===null)throw{net:1}}
+    var r=await fetch(API+path,{method:method,headers:{Authorization:"Bearer "+at}});
+    if(r.status===401&&!retry){at=null;return api(method,path,true)}
+    return r;
+  }
+  async function poll(){
+    var next=1500;
+    try{
+      var r=await api("GET","/me/player?additional_types=episode");
+      if(r.status===204){paint(null);fails=0}
+      else if(r.ok){paint(await r.json());fails=0;if(!isLost&&$("dMsg").dataset.net){msg("");delete $("dMsg").dataset.net}}
+      else if(r.status===429){next=Math.max(5,+r.headers.get("Retry-After")||30)*1000}
+      else{fails++;next=Math.min(60000,3000*fails)}
+    }catch(e){
+      if(e&&e.lost){lost();return}
+      fails++;next=Math.min(60000,3000*fails);msg("Can't reach Spotify right now. Trying again…");$("dMsg").dataset.net=1;
+    }
+    finally{if(!isLost){clearTimeout(timer);timer=setTimeout(poll,document.hidden?Math.max(next,5000):next)}}
+  }
+  async function act(method,path){
+    if(demo)return;
+    try{
+      var r=await api(method,path);
+      if(r.ok||r.status===204||r.status===202){msg("")}
+      else{
+        var j={};try{j=await r.json()}catch(e){}
+        var why=(j.error&&(j.error.reason||j.error.message))||"";
+        if(r.status===404)msg("Spotify isn't open anywhere. Open Spotify and play something once, then try again.");
+        else if(/premium/i.test(why))msg("Spotify only allows controls on Premium accounts.");
+        else if(/scope/i.test(why)||r.status===401)msg("This dock link can't control Spotify. Make a new dock link on the Now Playing page.");
+        else if(r.status===429)msg("Spotify says slow down. Give it a few seconds.");
+        else msg("Spotify won't allow that right now.");
+      }
+    }catch(e){if(e&&e.lost)lost();else msg("Couldn't reach Spotify. Check your connection.")}
+    clearTimeout(timer);timer=setTimeout(poll,400);
+  }
+  $("dPlay").addEventListener("click",function(){var go=!playing;base=pos();baseAt=Date.now();playing=go;btn();act("PUT","/me/player/"+(go?"play":"pause"))});
+  $("dNext").addEventListener("click",function(){if(demo){demoI++;demoPut();return}act("POST","/me/player/next")});
+  $("dPrev").addEventListener("click",function(){if(demo){demoI=(demoI+DEMO.length-1)%DEMO.length;demoPut();return}act("POST","/me/player/previous")});
+  $("dTrk").addEventListener("click",function(e){if(!dur)return;var b=this.getBoundingClientRect();var f=Math.max(0,Math.min(1,(e.clientX-b.left)/b.width));base=Math.round(f*dur);baseAt=Date.now();prog();act("PUT","/me/player/seek?position_ms="+base)});
+  var vol=$("dVol");
+  vol.addEventListener("input",function(){volBusy=1;$("dVolN").textContent=vol.value+"%"});
+  vol.addEventListener("change",function(){volBusy=0;volT=Date.now()+2500;act("PUT","/me/player/volume?volume_percent="+vol.value)});
+  setInterval(prog,500);
+  var DEMO=[["Signal Fires","The Late Shift",214000,["#1d4ed8","#38bdf8"]],["A Really Quite Long Song Title That Scrolls Along","Neon Arcade, Pilot Light",187000,["#7c3aed","#f472b6"]]],demoI=0;
+  function demoArt(c){return "data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+c[0]+'"/><stop offset="1" stop-color="'+c[1]+'"/></linearGradient></defs><rect width="100" height="100" fill="url(#g)"/><circle cx="50" cy="50" r="26" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3"/><circle cx="50" cy="50" r="5" fill="#fff" fill-opacity=".8"/></svg>')}
+  function demoPut(){var d=DEMO[demoI%DEMO.length];paint({is_playing:true,progress_ms:d[2]*.3,device:{name:"Your PC",volume_percent:+vol.value||64,supports_volume:true},item:{name:d[0],duration_ms:d[2],artists:d[1].split(", ").map(function(n){return{name:n}}),album:{images:[{url:demoArt(d[3]),width:300}]}}})}
+  if(demo){vol.value=64;demoPut();return}
+  if(!cid||(!rtL&&!ls(K))){lost();return}
+  document.addEventListener("visibilitychange",function(){if(!document.hidden&&!isLost){clearTimeout(timer);poll()}});
+  poll();
+}
+
 /* =================== SETUP =================== */
 function setup(){
   var $=function(id){return document.getElementById(id)};
-  var S={l:"card",g:"4DA3FF",a:1,p:1,h:1};
+  var S={l:"card",g:"4DA3FF",a:1,p:1,h:1,e:1,by:1,al:0,tm:1,b:"solid",sc:1,pb:"thin",kn:0,f:"sg",ps:8};
   try{var sv=JSON.parse(ls("np_style")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
   var tok=null;try{tok=JSON.parse(ss("np_tok")||"null")}catch(e){}
   if(tok&&Date.now()>tok.exp)tok=null;
+  var dtok=null;try{dtok=JSON.parse(ss("np_dtok")||"null")}catch(e){}
   $("redir").value=BASE;
   $("cid").value=ls("np_cid")||"";
 
@@ -462,26 +699,39 @@ function setup(){
   var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
   var nm=document.createElement("span");nm.className="name";sw.appendChild(nm);
   sw.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.g=b.dataset.v;sync()});
-  $("layoutSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;S.l=b.dataset.v;sync()});
-  [["optArt","a"],["optProg","p"],["optHide","h"]].forEach(function(x){$(x[0]).addEventListener("change",function(){S[x[1]]=this.checked?1:0;sync()})});
+  document.querySelectorAll(".ctl .seg[data-k]").forEach(function(sg){sg.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var k=sg.dataset.k,v=b.dataset.v;S[k]=/^(h|sc)$/.test(k)?+v:v;sync()})});
+  document.querySelectorAll(".ctl input[type=checkbox][data-k]").forEach(function(c){c.addEventListener("change",function(){S[c.dataset.k]=c.checked?1:0;sync()})});
+  $("popS").addEventListener("input",function(){S.ps=+this.value;$("popN").textContent=S.ps+"s"});
+  $("popS").addEventListener("change",function(){S.ps=+this.value;sync()});
+  $("fontSel").addEventListener("change",function(){S.f=this.value;sync()});
+  $("dkShow").addEventListener("click",function(){var i=$("dkUrl");var h=i.type==="password";i.type=h?"text":"password";this.textContent=h?"Hide":"Show"});
+  $("testBtn").addEventListener("click",function(){var b=this,u=BASE+VER+"#"+hash({demo:"1"}),done=function(){var o=b.textContent;b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(done,function(){b.textContent="Copy failed"});else b.textContent="Copy failed"});
 
-  function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(extra.c)p.set("c",extra.c);p.set("l",S.l);p.set("g",S.g);if(!S.a)p.set("a","0");if(!S.p)p.set("p","0");if(!S.h)p.set("h","0");for(var k in extra)if(k!=="c")p.set(k,extra[k]);return p.toString()}
-  function frame(el,h){var u=BASE+"#"+h;var sz=SIZES[S.l];el.style.setProperty("--ar",sz[0]+"/"+sz[1]);if(!el.dataset.on){el.src=u;el.dataset.on=1}else el.contentWindow.location.replace(u)}
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(extra.c)p.set("c",extra.c);p.set("l",S.l);p.set("g",S.g);
+    if(!S.a)p.set("a","0");if(!S.p)p.set("p","0");if(S.h!==1)p.set("h",String(S.h));if(S.h===2)p.set("ps",String(S.ps));
+    if(!S.e)p.set("e","0");if(!S.by)p.set("by","0");if(S.al)p.set("al","1");if(!S.tm)p.set("tm","0");if(S.b!=="solid")p.set("b",S.b);
+    if(!S.sc)p.set("sc","0");if(S.pb!=="thin")p.set("pb",S.pb);if(S.kn)p.set("kn","1");if(S.f!=="sg")p.set("f",S.f);
+    for(var k in extra)if(k!=="c")p.set(k,extra[k]);return p.toString()}
+  function frame(el,h){var u=BASE+"#"+h;var sz=SIZES[S.l];el.style.setProperty("--ar",sz[0]+"/"+sz[1]);el.style.width=S.l==="tile"&&el.id==="prevFrame"?"31%":"";if(!el.dataset.on){el.src=u;el.dataset.on=1}else el.contentWindow.location.replace(u)}
   function sync(){
     ls("np_style",JSON.stringify(S));
-    $("layoutSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.l)});
+    document.querySelectorAll(".ctl .seg[data-k]").forEach(function(sg){var k=sg.dataset.k;sg.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.v)===String(S[k]))})});
+    document.querySelectorAll(".ctl input[type=checkbox][data-k]").forEach(function(c){c.checked=!!S[c.dataset.k]});
+    $("popRow").hidden=S.h!==2;$("popS").value=S.ps;$("popN").textContent=S.ps+"s";$("fontSel").value=S.f;
     sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
     var isC=!GLOWS.some(function(g){return g[0]===S.g});cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
     nm.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
-    $("optArt").checked=!!S.a;$("optProg").checked=!!S.p;$("optHide").checked=!!S.h;
     var live=tok&&Date.now()<tok.exp;
-    frame($("prevFrame"),hash(live?{c:tok.cid,at:tok.at,h:"0"}:{demo:"1"}));
+    frame($("prevFrame"),hash(live?{c:tok.cid,at:tok.at,h:S.h===1?"0":String(S.h)}:{demo:"1"}));
     $("prevTag").textContent=live?"Preview · your Spotify":"Preview · demo song";
     $("prevCap").textContent=live?"Showing what's playing on your Spotify now. Nothing playing? It shows when you press play.":"Connect Spotify to preview it with your own music.";
     var sz=SIZES[S.l];$("obsSize").textContent=sz[0]+" × "+sz[1];
-    if(tok&&tok.rt){$("obsReady").hidden=false;$("obsLocked").hidden=true;$("obsUrl").value=BASE+"#"+hash({c:tok.cid,rt:tok.rt})}
+    if(tok&&tok.rt){$("obsReady").hidden=false;$("obsLocked").hidden=true;$("obsUrl").value=BASE+VER+"#"+hash({c:tok.cid,rt:tok.rt})}
     else{$("obsReady").hidden=true;$("obsLocked").hidden=false}
+    if(dtok&&dtok.rt){$("dkReady").hidden=false;$("dkUrl").value=BASE+VER+"#dock=1&c="+dtok.cid+"&rt="+encodeURIComponent(dtok.rt)}
   }
+  function dstatus(t,c){var s=$("dockStatus");s.textContent=t;s.className="status"+(c?" "+c:"")}
   function status(t,c){var s=$("connStatus");s.textContent=t;s.className="status"+(c?" "+c:"")}
 
   function rnd(n){var a=new Uint8Array(n);crypto.getRandomValues(a);var c="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~",s="";a.forEach(function(b){s+=c[b%c.length]});return s}
@@ -489,16 +739,26 @@ function setup(){
   $("connectBtn").addEventListener("click",async function(){
     var cid=$("cid").value.trim();
     if(!/^[0-9a-f]{32}$/i.test(cid)){status("That doesn't look like a Client ID. It's 32 letters and numbers.","bad");$("cid").focus();return}
-    ls("np_cid",cid);var v=rnd(64),st=rnd(16);ls("np_cv",v);ls("np_st",st);
+    ls("np_cid",cid);var v=rnd(64),st=rnd(16);ls("np_cv",v);ls("np_st",st);ls("np_mode","ov");
     var u=new URL(ACC+"/authorize");
     u.search=new URLSearchParams({client_id:cid,response_type:"code",redirect_uri:BASE,scope:"user-read-currently-playing user-read-playback-state",code_challenge_method:"S256",code_challenge:await chal(v),state:st}).toString();
+    location.href=u.toString();
+  });
+  $("dockBtn").addEventListener("click",async function(){
+    var cid=(tok&&tok.cid)||ls("np_cid")||$("cid").value.trim();
+    if(!/^[0-9a-f]{32}$/i.test(cid)){dstatus("Paste your Client ID in step 2 first.","bad");$("cid").focus();return}
+    ls("np_cid",cid);var v=rnd(64),st=rnd(16);ls("np_cv",v);ls("np_st",st);ls("np_mode","dock");
+    var u=new URL(ACC+"/authorize");
+    u.search=new URLSearchParams({client_id:cid,response_type:"code",redirect_uri:BASE,scope:"user-read-currently-playing user-read-playback-state user-modify-playback-state",code_challenge_method:"S256",code_challenge:await chal(v),state:st}).toString();
     location.href=u.toString();
   });
 
   async function back(){
     var q=new URLSearchParams(location.search);
     if(!q.has("code")&&!q.has("error"))return false;
-    history.replaceState(null,"",BASE+"#style");
+    var isDock=ls("np_mode")==="dock";ls("np_mode",null);
+    history.replaceState(null,"",BASE+(isDock?"#dock-setup":"#style"));
+    if(isDock)return dockBack(q);
     if(q.get("error")){status(q.get("error")==="access_denied"?"You said no on Spotify's page. Press Connect to try again.":"Spotify said: "+q.get("error"),"bad");return true}
     if(q.get("state")!==ls("np_st")){status("That sign-in didn't match. Press Connect to try again.","bad");return true}
     var cid=ls("np_cid");status("Connecting…");
@@ -514,10 +774,25 @@ function setup(){
     }catch(e){status("Couldn't reach Spotify. Check your connection and try again.","bad")}
     return true;
   }
+  async function dockBack(q){
+    if(q.get("error")){dstatus(q.get("error")==="access_denied"?"You said no on Spotify's page. Press Make dock link to try again.":"Spotify said: "+q.get("error"),"bad");return "dock"}
+    if(q.get("state")!==ls("np_st")){dstatus("That sign-in didn't match. Press Make dock link to try again.","bad");return "dock"}
+    var cid=ls("np_cid");dstatus("Connecting…");
+    try{
+      var r=await fetch(ACC+"/api/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({client_id:cid,grant_type:"authorization_code",code:q.get("code"),redirect_uri:BASE,code_verifier:ls("np_cv")||""})});
+      var j=await r.json();
+      if(!r.ok||!j.refresh_token){dstatus("Spotify wouldn't connect"+(j.error_description?": "+j.error_description:"")+".","bad");return "dock"}
+      dtok={cid:cid,rt:j.refresh_token};ss("np_dtok",JSON.stringify(dtok));ls("np_cv",null);ls("np_st",null);
+      dstatus("Dock link ready","ok");
+    }catch(e){dstatus("Couldn't reach Spotify. Check your connection and try again.","bad")}
+    return "dock";
+  }
   if(tok)status("Connected","ok");
+  if(dtok&&dtok.rt)dstatus("Dock link ready","ok");
+  $("dkFrame").src=BASE+"#dock=1&demo=1";
   frame($("heroFrame"),"ov=1&demo=1&l=card&g=4DA3FF");
   $("heroFrame").style.setProperty("--ar","680/220");
-  back().then(function(did){sync();if(did&&tok)setTimeout(function(){$("style").scrollIntoView()},50)});
+  back().then(function(did){sync();if(did==="dock")setTimeout(function(){$("dock-setup").scrollIntoView()},50);else if(did&&tok)setTimeout(function(){$("style").scrollIntoView()},50)});
 }
 })();
 </script>
