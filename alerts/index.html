@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alerts: Twitch and Kick alerts in one OBS overlay</title>
-<meta name="description" content="Free OBS alerts by itsCRA1G for Twitch and Kick together: follows, subs, gifts, cheers, Kicks and raids, through Streamer.bot.">
+<meta name="description" content="Free OBS alerts by itsCRA1G for Twitch and Kick together: follows, subs, gifts, cheers, Kicks, raids and watch streaks, through Streamer.bot.">
 <meta property="og:title" content="Alerts: Twitch and Kick alerts in one overlay">
 <meta property="og:description" content="Follows, subs, gifts, cheers, Kicks and raids from Twitch and Kick. Free, by itsCRA1G.">
 <meta property="og:type" content="website">
@@ -196,8 +196,8 @@ K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;
   <div>
     <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
     <h1>Twitch and Kick alerts, in one place.</h1>
-    <p class="lead">Follows, subs, resubs, gifted subs, cheers, Kicks and raids from both platforms, one after another in a single alert box, each marked with where it came from.</p>
-    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">8 alert types</span><span class="chip">Your own wording</span><span class="chip">Built-in sounds</span><span class="chip">Gift bombs grouped</span><span class="chip">No Streamer.bot action needed</span></div>
+    <p class="lead">Follows, subs, resubs, gifted subs, cheers, Kicks, raids and Twitch watch streaks, one after another in a single alert box, each marked with where it came from.</p>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">9 alert types</span><span class="chip">Your own wording</span><span class="chip">Built-in sounds</span><span class="chip">Gift bombs grouped</span><span class="chip">No Streamer.bot action needed</span></div>
   <p class="sbnew" style="margin:16px 0 0;font-size:14.5px;color:var(--mute,#8A94A6)">New to Streamer.bot? <a href="../streamerbot/">Set it up first with the Streamer.bot Starter guide</a> (about 20 minutes).</p>
   </div>
   <div class="stage"><iframe id="heroFrame" title="Alert preview" tabindex="-1"></iframe></div>
@@ -225,9 +225,9 @@ K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;
 
   <section id="alerts">
     <div class="sec-head"><span class="num">2</span><h2>Pick your alerts and wording</h2></div>
-    <p>Untick any you don't want. The line above the viewer's name is yours to change: use <code>{amount}</code> for the number of subs, bits, Kicks or raiders, <code>{months}</code> for months subscribed and <code>{to}</code> for who got a gifted sub.</p>
+    <p>Untick any you don't want. The line above the viewer's name is yours to change: use <code>{amount}</code> for the number of subs, bits, Kicks, raiders or streams in a streak, <code>{months}</code> for months subscribed and <code>{to}</code> for who got a gifted sub.</p>
     <div class="al-list" id="alList"></div>
-    <p class="hint">Gift bombs show as one alert, not one for every sub in them.</p>
+    <p class="hint">Gift bombs show as one alert, not one for every sub in them. Watch streaks only show when a viewer chooses to share theirs in chat, and they need Streamer.bot (logging in with Twitch only can't see them).</p>
     <details id="imBox"><summary>Your own image or GIF instead of the icon</summary>
       <p class="hint">Paste a link to a .gif, .png or .webp for any alert type. Leave it empty to keep the normal icon. Use a link that starts with https and won't expire, such as one from Imgur, Giphy or your own site. Discord links stop working after a while.</p>
       <div class="lbl" style="margin-top:6px">Image size</div><div class="seg" id="imSzSeg"><button data-v="s" aria-pressed="true">Icon size, cropped to fit</button><button data-v="l" aria-pressed="false">Large, whole image</button></div>
@@ -253,7 +253,7 @@ K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;
             <div class="hint">My sound files: Streamer.bot plays them from your PC as each alert appears.</div></div>
           <div id="sfBox" class="sfbox">
             <ol class="steps">
-              <li>Put your sounds in one folder and name them after the alert: <code>follow</code>, <code>sub</code>, <code>resub</code>, <code>gift</code>, <code>bomb</code>, <code>cheer</code>, <code>kicks</code>, <code>raid</code> (.mp3 or .wav). Add <code>all.mp3</code> to play for any alert without its own sound.</li>
+              <li>Put your sounds in one folder and name them after the alert: <code>follow</code>, <code>sub</code>, <code>resub</code>, <code>gift</code>, <code>bomb</code>, <code>cheer</code>, <code>kicks</code>, <code>raid</code>, <code>streak</code> (.mp3 or .wav). Add <code>all.mp3</code> to play for any alert without its own sound.</li>
               <li>In Streamer.bot, press <strong>Import</strong> (top of the window), paste this into <strong>Import String</strong> and press <strong>Import</strong>. It adds an action called <code>Alerts Sound</code> with no triggers.
                 <textarea id="asImp" class="tin code" readonly rows="3" aria-label="Alerts Sound import string" style="margin-top:8px;white-space:pre-wrap;word-break:break-all">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</textarea>
                 <button class="btn ghost" type="button" data-copy="asImp" style="margin-top:8px">Copy import string</button>
@@ -265,7 +265,7 @@ using System.Globalization;
 
 // Alerts Sound: plays a sound file from your PC when the itsCRA1G Alerts overlay shows an alert.
 // The overlay runs this action with alertType, soundFolder and soundVolume. No triggers needed.
-// Name your files after the alert: follow, sub, resub, gift, bomb, cheer, kicks, raid (.mp3 or .wav).
+// Name your files after the alert: follow, sub, resub, gift, bomb, cheer, kicks, raid, streak (.mp3 or .wav).
 // all.mp3 (or all.wav) plays for any alert without its own file.
 public class CPHInline
 {
@@ -383,10 +383,12 @@ var TYPES=[
   ["bomb","Gift bomb","Twitch + Kick","Gifted {amount} subs",""],
   ["cheer","Cheer","Twitch","Cheered {amount} bits","bits"],
   ["kicks","Kicks","Kick","Sent {amount} Kicks","Kicks"],
-  ["raid","Raid","Twitch + Kick","Raiding with {amount} viewers","viewers"]];
+  ["raid","Raid","Twitch + Kick","Raiding with {amount} viewers","viewers"],
+  ["streak","Watch streak","Twitch","Watched {amount} streams in a row","streams"]];
+var NOTW=["kicks","streak"]; // not available when logged in with Twitch only
 var DEF={};TYPES.forEach(function(t){DEF[t[0]]=t[3]});
-var MINK={cheer:"mb",kicks:"mk",raid:"mr"};
-var BASE=location.origin+location.pathname,OLINK=BASE+"?v=5";
+var MINK={cheer:"mb",kicks:"mk",raid:"mr",streak:"mw"};
+var BASE=location.origin+location.pathname,OLINK=BASE+"?v=6";
 var TW_CID="zknz506nc6j1bzvv8uihyn1j84fz9z",TW_SCOPES="moderator:read:followers channel:read:subscriptions bits:read";
 var TW_SVG='<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>';
 var KK_SVG='<svg viewBox="0 0 24 24"><path d="M1.5 1.5h7.2v4.8h2.4V3.9h2.4V1.5h9v7.2h-2.4v2.4h-2.4v1.8h2.4v2.4h2.4v7.2h-9v-2.4h-2.4v-2.4H8.7v4.8H1.5z"/></svg>';
@@ -398,10 +400,12 @@ var ICON={
   bomb:'<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-1.5-3.5-5.5-4.5-5.5-2S10 9 12 9zm0 0c1.5-3.5 5.5-4.5 5.5-2S14 9 12 9z"/>',
   cheer:'<path d="M12 2.5l7 7.5-7 11.5L5 10z"/><path d="M5 10h14M9 10l3 11.5L15 10M9 10l3-7.5 3 7.5"/>',
   kicks:'<circle cx="12" cy="12" r="8.5"/><path d="M9.5 7.5v9M14.5 7.5L10 12l4.5 4.5"/>',
-  raid:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.2c2.6.2 4.5 2.4 4.5 5.3"/>'};
+  raid:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.2c2.6.2 4.5 2.4 4.5 5.3"/>',
+  streak:'<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.1 0-3.4 2.4-5.4 3.6-8.4.9 1.6 1.6 2.6 2.9 3.3.2-2.7 1.3-5.2 3.4-7.3.2 3.4 4.1 6.1 4.1 11.4C19.5 18.3 16 21 12 21z"/><path d="M12 21c-1.7 0-2.9-1.2-2.9-2.9 0-1.9 1.6-2.8 2.4-4.6 1.2 1.3 3.4 2.4 3.4 4.6 0 1.7-1.2 2.9-2.9 2.9z"/>'};
 var SAMPLE={follow:["twitch","NightOwlTV",{}],sub:["kick","Kezza_Plays",{}],resub:["twitch","Morag",{months:14,msg:"14 months and still not missed a stream"}],
   gift:["kick","Big_Dave",{to:"LateShift"}],bomb:["twitch","ChattyCath",{amount:10}],cheer:["twitch","pixelpete",{amount:500,msg:"that clutch was unreal"}],
-  kicks:["kick","Loco_Lou",{amount:100,msg:"GG [emote:37227:LULW]"}],raid:["kick","SquadUpSam",{amount:42}]};
+  kicks:["kick","Loco_Lou",{amount:100,msg:"GG [emote:37227:LULW]"}],raid:["kick","SquadUpSam",{amount:42}],
+  streak:["twitch","Morag_Mac",{amount:7,msg:"never missing a Corporation meeting"}]};
 function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
 function lum(h){var c=[0,2,4].map(function(i){var v=parseInt(h.slice(i,i+2),16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
@@ -437,7 +441,7 @@ function overlay(){
 
   /* ---- sound: a short chime made in the browser, different per alert ---- */
   var actx=null;
-  var NOTES={follow:[659,880],sub:[523,659,784],resub:[523,784,1047],gift:[587,740,880],bomb:[587,740,880,1175,1480],cheer:[784,988,1319],kicks:[698,880,1047,1397],raid:[392,523,659,784,1047]};
+  var NOTES={follow:[659,880],sub:[523,659,784],resub:[523,784,1047],gift:[587,740,880],bomb:[587,740,880,1175,1480],cheer:[784,988,1319],kicks:[698,880,1047,1397],raid:[392,523,659,784,1047],streak:[440,554,659,880,1109]};
   var sndN=0,sndWait={};
   function chime(type){
     if(!cfg.snd)return;
@@ -520,6 +524,7 @@ function overlay(){
       case "GiftBomb":return {type:"bomb",name:anon(d)?"Anonymous":who(d),amount:num(d.total,d.gifts,d.count,(d.recipients||[]).length),tier:tier(d)};
       case "Cheer":{var bits=num(d.bits,d.message&&d.message.bits);return {type:"cheer",name:anon(d)?"Anonymous":who(d),amount:bits,msg:stripCheer(txt(d),d)}}
       case "Raid":return {type:"raid",name:nm(d.raider)||d.from_broadcaster_user_name||d.fromBroadcasterUserName||who(d),amount:num(d.viewers,d.viewerCount)};
+      case "WatchStreak":return {type:"streak",name:who(d),amount:num(d.streakCount,d.watchStreak,d.streak,d.count),msg:txt(d)};
     }
     return null;
   }
@@ -557,7 +562,7 @@ function overlay(){
   }
   async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
   function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
-  var EVENTS=[["Twitch","Follow"],["Twitch","Sub"],["Twitch","ReSub"],["Twitch","GiftSub"],["Twitch","GiftBomb"],["Twitch","Cheer"],["Twitch","Raid"],
+  var EVENTS=[["Twitch","Follow"],["Twitch","Sub"],["Twitch","ReSub"],["Twitch","GiftSub"],["Twitch","GiftBomb"],["Twitch","Cheer"],["Twitch","Raid"],["Twitch","WatchStreak"],
     ["Kick","Follow"],["Kick","Subscription"],["Kick","Resubscription"],["Kick","GiftSubscription"],["Kick","MassGiftSubscription"],["Kick","KicksGifted"]];
   function subscribe(){
     if(live)return;live=true;
@@ -584,7 +589,7 @@ function overlay(){
   function fit(){box.style.setProperty("--k",Math.min(innerWidth/900,innerHeight/400))}
   fit();addEventListener("resize",fit);
   if(cfg.demo){
-    var order=["follow","bomb","cheer","sub","raid","resub","kicks","gift"],i=0,auto=true;cfg.snd=cfg.snd&&false;
+    var order=["follow","bomb","cheer","sub","raid","resub","kicks","streak","gift"],i=0,auto=true;cfg.snd=cfg.snd&&false;
     var loud=new URLSearchParams(location.hash.slice(1)).get("snd")!=="0";
     window.addEventListener("message",function(e){var d=e.data;if(!d||typeof d.al!=="string"||!SAMPLE[d.al])return;auto=false;cfg.snd=loud;queue=[];clearTimeout(curT);box.innerHTML="";cur=null;busy=false;push(sample(d.al),true)});
     (function loop(){if(auto&&!busy&&!queue.length)push(sample(order[i++%order.length]));setTimeout(loop,700)})();
@@ -745,7 +750,7 @@ function setup(){
   function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(S.mode==="tw"&&TK&&!extra.demo)p.set("tk",TK.tk);p.set("ly",S.ly);p.set("g",S.g);
     if(S.o!==88)p.set("o",String(S.o));if(S.fs!==26)p.set("fs",String(S.fs));if(S.dur!==6)p.set("dur",String(S.dur));
     if(!S.snd)p.set("snd","0");else{if(S.vol!==50)p.set("vol",String(S.vol));for(var tk in S.tv)p.set("tv_"+tk,String(S.tv[tk]));if(S.mode!=="tw"&&S.src==="sb"&&S.sf&&!extra.demo)p.set("sf",S.sf)}if(!S.msg)p.set("msg","0");if(!S.pf)p.set("pf","0");
-    var off=S.off.slice();if(S.mode==="tw"&&off.indexOf("kicks")<0)off.push("kicks");if(off.length)p.set("off",off.join(","));["mb","mk","mr"].forEach(function(k){if(S[k])p.set(k,String(S[k]))});
+    var off=S.off.slice();if(S.mode==="tw")NOTW.forEach(function(k){if(off.indexOf(k)<0)off.push(k)});if(off.length)p.set("off",off.join(","));["mb","mk","mr","mw"].forEach(function(k){if(S[k])p.set(k,String(S[k]))});
     TYPES.forEach(function(t){if(S.t[t[0]])p.set("t_"+t[0],S.t[t[0]]);if(S.im[t[0]])p.set("im_"+t[0],S.im[t[0]])});if(Object.keys(S.im).length&&S.ims==="l")p.set("ims","l");if(S.tb)p.set("tb","1");
     if(S.mode!=="tw"){if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw)}
     for(var k in extra)p.set(k,extra[k]);return p.toString()}
@@ -765,13 +770,13 @@ function setup(){
     var tw=S.mode==="tw";
     $("modeSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.mode)});
     $("modeSb").hidden=tw;$("modeTw").hidden=!tw;$("sbConn").hidden=tw;
-    list.querySelector('.al-row[data-k=kicks]').hidden=tw;
-    tests.querySelectorAll("button").forEach(function(b){if(b.dataset.k==="kicks")b.hidden=tw});
+    NOTW.forEach(function(k){list.querySelector('.al-row[data-k='+k+']').hidden=tw});
+    tests.querySelectorAll("button").forEach(function(b){if(NOTW.indexOf(b.dataset.k)>=0)b.hidden=tw});
     list.querySelectorAll(".al-row small").forEach(function(sm){sm.textContent=tw?(sm.dataset.w==="Kick"?"Kick":"Twitch"):sm.dataset.w});
     twUi();
     $("srcWrap").hidden=tw;$("sfBox").hidden=tw||S.src!=="sb";
     $("srcSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.src)});
-    tvList.querySelectorAll(".tv-row").forEach(function(r){var k=r.dataset.k,v=S.tv[k]==null?100:S.tv[k];r.querySelector("input").value=v;r.querySelector("b").textContent=v+"%";r.hidden=tw&&k==="kicks"});
+    tvList.querySelectorAll(".tv-row").forEach(function(r){var k=r.dataset.k,v=S.tv[k]==null?100:S.tv[k];r.querySelector("input").value=v;r.querySelector("b").textContent=v+"%";r.hidden=tw&&NOTW.indexOf(k)>=0});
     var ob=$("obsUrl"),cb=document.querySelector('[data-copy=obsUrl]');
     if(tw&&!TK){ob.type="text";ob.value="Log in with Twitch in step 1 first";cb.disabled=true}
     else{ob.type=tw?"password":"text";ob.value=OLINK+"#"+hash({});cb.disabled=false}
