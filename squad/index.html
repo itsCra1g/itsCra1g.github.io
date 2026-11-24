@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Squad Picker: pick viewers to play with, from Twitch and Kick chat</title>
+<meta name="description" content="A free squad picker for OBS by itsCRA1G: viewers type !join with their in-game ID, you press Pick, and a slot-machine reveal picks your squad fairly. Twitch and Kick.">
+<meta property="og:title" content="Squad Picker: pick viewers to play with, fairly">
+<meta property="og:description" content="Viewers type !join with their in-game ID and a slot-machine reveal picks your squad. Twitch and Kick. Free, by itsCRA1G.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="itsCRA1G">
+<meta property="og:url" content="https://itscra1g.github.io/squad/">
+<meta property="og:image" content="https://itscra1g.github.io/squad/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";else if(/(^#|&)dock=1(&|$)/.test(location.hash))document.documentElement.className="dk";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14);
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
+  radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.18),transparent 60%),
+  radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.14),transparent 60%),
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:4/3;max-width:100%}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 17px var(--display);color:var(--fg);margin:22px 0 8px}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+textarea.code{display:block;width:100%;max-width:46em;font:12.5px/1.45 var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px;resize:vertical;white-space:pre;overflow:auto}
+textarea.imp{white-space:pre-wrap;word-break:break-all}
+.grid2{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.sticky{position:sticky;top:84px}
+@media (max-width:900px){.sticky{position:static}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.lbl b{color:var(--fg)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.tog{display:flex;flex-direction:column;gap:10px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--acc);flex:0 0 auto}
+.tin{width:100%;min-width:0;font:15px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+details{max-width:46em}summary{cursor:pointer;font-weight:600;color:var(--fg);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 100px;gap:8px;margin-top:10px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.tests{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tests button{font:600 13px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:999px;padding:7px 12px;cursor:pointer}
+.tests button:hover{border-color:var(--acc)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+td code{white-space:nowrap}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+.luck{display:flex;gap:10px;flex-wrap:wrap}
+.luck label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--mute)}
+.luck select{font:600 14px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:8px 10px}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body,html.dk.ov body{background:transparent!important;overflow:hidden;margin:0;height:100%}
+html.ov .site,html.dk .site{display:none}
+#ovr,#dock{display:none}
+html.ov #ovr{display:block;position:fixed;left:0;top:0;width:640px;transform-origin:0 0;transform:scale(var(--k,1));font-family:var(--text);color:#F2F5F9}
+.sq{--gr:77,163,255;--o:.9;--ink:#000;margin:18px;padding:20px 22px 20px;border-radius:22px;
+  background:linear-gradient(150deg,rgba(20,23,30,var(--o)),rgba(7,8,11,var(--o)));border:1px solid rgba(var(--gr),.4);
+  box-shadow:0 0 34px -10px rgba(var(--gr),.8),0 18px 40px -20px rgba(0,0,0,.7);transition:opacity .45s,transform .45s}
+.sq.in{animation:sqIn .55s cubic-bezier(.2,1.2,.4,1)}
+.sq.bye{opacity:0;transform:translateY(-14px) scale(.98)}
+@keyframes sqIn{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.sq .top{display:flex;align-items:center;gap:10px}
+.sq .tag{font:800 13px/1 var(--text);letter-spacing:.16em;color:var(--ink);background:rgb(var(--gr));border-radius:7px;padding:6px 9px}
+.sq .st{display:inline-flex;align-items:center;gap:7px;font:700 13px/1 var(--text);letter-spacing:.12em;color:#AEB6C4}
+.sq .st i{width:9px;height:9px;border-radius:50%;background:#59606C}
+.sq .st.open{color:#fff}.sq .st.open i{background:#3DDC97;box-shadow:0 0 10px #3DDC97;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.sq .cnt{margin-left:auto;font:700 20px var(--display);color:#fff;font-variant-numeric:tabular-nums}
+.sq .cnt small{font:600 13px var(--text);color:#AEB6C4;margin-left:5px}
+.sq .how{font:700 27px/1.2 var(--display);color:#fff;margin:14px 0 4px;overflow-wrap:anywhere}
+.sq .how b{color:rgb(var(--gr))}
+.sq .sub{font:500 15px var(--text);color:#AEB6C4;margin:0 0 4px}
+.sq .pool{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.sq .pool span{display:inline-flex;align-items:center;gap:6px;font:600 15px/1 var(--text);color:#E8ECF2;background:rgba(255,255,255,.07);border-radius:999px;padding:7px 11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sq .pool span.new{animation:chipIn .5s cubic-bezier(.2,1.3,.4,1)}
+@keyframes chipIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.sq .pool span.more{color:#AEB6C4;background:transparent}
+.sq .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}.dot.tw{background:#9146FF}.dot.kk{background:#53FC18}
+.sq .slotw{margin-top:16px}
+.sq .slotl{font:700 12px var(--text);letter-spacing:.16em;color:#AEB6C4;text-transform:uppercase;margin-bottom:7px}
+.sq .slot{position:relative;height:84px;border-radius:16px;background:rgba(0,0,0,.45);border:1px solid rgba(var(--gr),.35);display:grid;place-items:center;overflow:hidden}
+.sq .slot::before,.sq .slot::after{content:"";position:absolute;left:0;right:0;height:22px;z-index:1;pointer-events:none}
+.sq .slot::before{top:0;background:linear-gradient(rgba(0,0,0,.6),transparent)}.sq .slot::after{bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.sq .reel{font:700 42px/1 var(--display);color:#fff;white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.5px}
+.sq .reel.spin{animation:roll .09s linear}
+@keyframes roll{from{transform:translateY(-36px);opacity:.3}to{transform:none;opacity:1}}
+.sq .slot.land{box-shadow:0 0 0 2px rgb(var(--gr)),0 0 34px -2px rgba(var(--gr),.9)}
+.sq .slot.land .reel{color:rgb(var(--gr));animation:landed .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes landed{from{transform:scale(1.25)}to{transform:none}}
+.sq .squad{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+.sq .squad .sl{font:700 12px var(--text);letter-spacing:.16em;color:#AEB6C4;text-transform:uppercase;margin-bottom:-2px}
+.sq .pl{display:flex;align-items:center;gap:12px;padding:9px 12px 9px 9px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(var(--gr),.25)}
+.sq .pl.new{animation:plIn .6s cubic-bezier(.2,1.3,.4,1)}
+@keyframes plIn{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.sq .pl .n{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font:800 16px var(--display);color:var(--ink);background:rgb(var(--gr))}
+.sq .av,.sq .avi{flex:0 0 auto;width:44px;height:44px;border-radius:50%;object-fit:cover;background:#222}
+.sq .avi{display:grid;place-items:center;font:700 20px var(--display);color:#fff}
+.sq .pl .who{flex:1;min-width:0}
+.sq .pl .nm{display:flex;align-items:center;gap:8px;font:700 22px/1.15 var(--display);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sq .pl .id{font:600 15px/1.3 var(--mono);color:rgb(var(--gr));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.sq .pf{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:5px;flex:0 0 auto}
+.sq .pf svg{width:12px;height:12px}.sq .pf.tw{background:#9146FF}.sq .pf.tw svg{fill:#fff}.sq .pf.kk{background:#53FC18}.sq .pf.kk svg{fill:#000}
+@media (prefers-reduced-motion:reduce){.sq.in,.sq .pl.new,.sq .pool span.new,.sq .reel.spin{animation:none}}
+
+/* ---------- dock ---------- */
+html.dk,html.dk body{background:#0B0C0F!important;margin:0}
+html.dk #dock{display:block;padding:12px;font:14px/1.45 var(--text);color:var(--body)}
+.dk .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.dk .stt{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--fg);margin-bottom:10px}
+.dk .stt i{width:9px;height:9px;border-radius:50%;background:#59606C}.dk .stt.open i{background:#3DDC97}
+.dk .stt small{margin-left:auto;font-weight:600;color:var(--mute)}
+.dk button{font:700 13px var(--text);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 11px;cursor:pointer}
+.dk button:hover{border-color:var(--acc)}
+.dk button.go{color:#000;background:var(--acc);border-color:var(--acc)}
+.dk button[aria-pressed=true]{border-color:var(--acc);background:var(--acc-soft)}
+.dk button:disabled{opacity:.4;cursor:default}
+.dk .sz button{min-width:34px;padding:8px 0}
+.dk h4{font:700 11px var(--text);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:14px 0 6px}
+.dk ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.dk li{display:flex;align-items:center;gap:7px;background:var(--tile);border:1px solid var(--edge);border-radius:9px;padding:6px 6px 6px 9px}
+.dk li .w{flex:1;min-width:0}
+.dk li .w b{display:block;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk li .w small{display:block;font:12px var(--mono);color:var(--acc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dk li .w em{font-style:normal;font-size:11px;color:var(--mute);margin-left:4px}
+.dk li button{padding:5px 8px;font-size:12px}
+.dk .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.dk .empty{color:var(--mute);font-size:13px}
+.dk .warn{color:#FFB020;font-size:13px;margin-bottom:8px}
+</style>
+<script>/* keep the Streamer.bot link alive: if it stops answering, drop it so the overlay reconnects.
+   Also checks Streamer.bot confirms each event subscription; if it doesn't (e.g. it was still starting up), ask again, then reconnect. */
+(function(){var W=window.WebSocket;if(!W||W.__ka)return;
+function K(u,p){var ws=p?new W(u,p):new W(u);if(String(u).indexOf("ws://")!==0)return ws;
+var last=Date.now(),ping=0,t=null,pend={},osend=ws.send.bind(ws);
+function arm(id){var r=pend[id];if(!r)return;clearTimeout(r.t);r.t=setTimeout(function(){if(!pend[id])return;
+if(ws.readyState===0){arm(id);return}if(ws.readyState!==1)return;
+if(r.n<2){r.n++;try{osend(r.d)}catch(e){}arm(id)}else{try{ws.close()}catch(e){}}},5000)}
+ws.send=function(d){try{var j=JSON.parse(d);if(j&&j.request==="Subscribe"&&j.id){pend[j.id]={d:d,n:0};arm(j.id)}}catch(e){}return osend(d)};
+ws.addEventListener("message",function(e){last=Date.now();try{var j=JSON.parse(e.data);if(j&&j.id&&pend[j.id]){clearTimeout(pend[j.id].t);delete pend[j.id]}}catch(x){}});
+ws.addEventListener("open",function(){last=Date.now();t=setInterval(function(){if(ws.readyState!==1)return;
+if(ping&&last<ping){if(Date.now()-ping>20000){try{ws.close()}catch(e){}}return}
+ping=Date.now();try{osend(JSON.stringify({request:"GetInfo",id:"keepalive"}))}catch(e){}},15000)});
+ws.addEventListener("close",function(){clearInterval(t);for(var k in pend)clearTimeout(pend[k].t);pend={}});return ws}
+K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;window.WebSocket=K})();</script>
+</head>
+<body>
+<div id="ovr"></div>
+<div id="dock"></div>
+
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Squad Picker</a>
+  <nav><a href="#setup">Set up</a><a href="#use">Commands</a><a href="#style">Settings</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free OBS overlay + dock · by itsCRA1G</div>
+    <h1>Pick viewers to play with, fairly.</h1>
+    <p class="lead">Viewers type <code>!join</code> with their in-game ID, you press Pick, and the overlay spins through the names and lands on your squad. People who've already played go to the back, so everyone gets a turn.</p>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">Gamertags with !join</span><span class="chip">Slot-machine reveal</span><span class="chip">Extra luck for subs and VIPs</span><span class="chip">OBS dock</span></div>
+  <p class="sbnew" style="margin:16px 0 0;font-size:14.5px;color:var(--mute,#8A94A6)">Twitch and Kick together need <a href="../streamerbot/">Streamer.bot</a>. Twitch only works without it.</p>
+  </div>
+  <div class="stage"><iframe id="heroFrame" title="Squad Picker preview" tabindex="-1"></iframe></div>
+</div></div>
+
+<main class="wrap">
+  <section id="setup">
+    <div class="sec-head"><span class="num">1</span><h2>Connect it to chat</h2></div>
+    <div class="seg" id="modeSeg" style="margin-bottom:18px"><button data-v="sb" aria-pressed="true">Streamer.bot: Twitch + Kick</button><button data-v="tw" aria-pressed="false">Twitch only: no Streamer.bot</button></div>
+
+    <div id="sbBox">
+      <p>The overlay reads <code>!join</code> straight from Streamer.bot (1.0 or later), connected to Twitch, Kick or both. A small action posts the picks in chat and links the dock to the overlay.</p>
+      <div id="impBox">
+        <ol class="steps">
+          <li>In Streamer.bot, press <strong>Import</strong> (top of the window), paste this into <strong>Import String</strong> and press <strong>Import</strong>. It adds one action, <code>Squad Picker</code>.
+            <textarea id="sqImp" class="code imp" readonly rows="3" aria-label="Squad Picker import string" style="margin-top:8px"></textarea>
+            <button class="btn ghost" type="button" data-copy="sqImp" style="margin-top:8px">Copy import string</button></li>
+          <li>Open <strong>Servers/Clients → WebSocket Server</strong>, tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Already done this for another overlay here? Then skip it.</li>
+        </ol>
+      </div>
+      <details id="diyBox"><summary>Rather make it yourself?</summary>
+        <ol class="steps" style="margin-top:12px">
+          <li>In Streamer.bot's <strong>Actions</strong> tab, right-click, choose <strong>Add</strong> and name it exactly <code>Squad Picker</code>. It needs no triggers.</li>
+          <li>Right-click in <strong>Sub-Actions</strong>, choose <strong>Core → C# → Execute C# Code</strong>, paste this over what's there, press <strong>Compile</strong>, then <strong>Save and Compile</strong>.
+            <textarea id="sqCode" class="code" readonly rows="6" aria-label="Squad Picker code" style="margin-top:8px"></textarea>
+            <button class="btn ghost" type="button" data-copy="sqCode" style="margin-top:8px">Copy code</button></li>
+          <li>Open <strong>Servers/Clients → WebSocket Server</strong>, tick <strong>Auto Start</strong> and press <strong>Start Server</strong>.</li>
+        </ol>
+      </details>
+    </div>
+
+    <div id="twBox" hidden>
+      <p>No Streamer.bot needed: the overlay reads your Twitch chat directly. Type your Twitch channel name:</p>
+      <input class="tin" id="ch" placeholder="yourchannel" spellcheck="false" autocomplete="off" style="max-width:360px" aria-label="Twitch channel name">
+      <h3>Post the picks in chat (optional)</h3>
+      <p>To have the overlay post who got picked, log in with the Twitch account that streams. It asks only to send chat messages as you.</p>
+      <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" type="button" id="twIn">Log in with Twitch</button><button class="btn ghost" type="button" id="twOut" hidden>Log out</button></div>
+      <p class="hint" id="twState"></p>
+      <div class="note" id="twWarn" hidden>Your login is built into the OBS link in step 4, so <strong>don't share that link or show it on stream</strong>. Twitch logins last about two months; when it runs out, log in again here and paste the new link into OBS.</div>
+    </div>
+  </section>
+
+  <section id="use">
+    <div class="sec-head"><span class="num">2</span><h2>Run it</h2></div>
+    <ol class="steps">
+      <li>Open it with the dock's <strong>Open</strong> button, or type <code>!squad open</code> in chat.</li>
+      <li>Viewers type <code id="jwEx">!join</code> with their in-game ID, like <code id="jwEx2">!join CRA1G#4815162</code>. Typing it again updates their ID.</li>
+      <li>Press <strong>Pick</strong> on the dock (or type <code>!squad pick</code>). The overlay spins and lands on each player, then posts the squad in chat.</li>
+      <li>Someone not turned up? Press <strong>Swap</strong> next to their name to pick someone else in their place.</li>
+    </ol>
+    <div class="tw"><table>
+      <tr><th>Command</th><th>Who</th><th>What it does</th></tr>
+      <tr><td><code id="jwT">!join</code> <code>ID</code></td><td>Anyone</td><td>Joins the list, with their in-game ID if they type one. Only while it's open.</td></tr>
+      <tr><td><code>!leave</code></td><td>Anyone</td><td>Takes them off the list.</td></tr>
+      <tr><td><code>!squad open</code> / <code>!squad close</code></td><td>You and mods</td><td>Opens or closes joining. Closing keeps the list.</td></tr>
+      <tr><td><code>!squad pick</code> / <code>!squad pick 2</code></td><td>You and mods</td><td>Picks a new squad (the dock's size, or the number you type).</td></tr>
+      <tr><td><code>!squad swap name</code></td><td>You and mods</td><td>Swaps one player for someone new.</td></tr>
+      <tr><td><code>!squad remove name</code></td><td>You and mods</td><td>Takes someone off the list.</td></tr>
+      <tr><td><code>!squad clear</code></td><td>You and mods</td><td>Empties the list and the squad.</td></tr>
+      <tr><td><code>!squad reset</code></td><td>You and mods</td><td>Clears everything, including who has already played.</td></tr>
+    </table></div>
+    <p class="hint">The overlay does the picking, so it needs to be open in OBS (it can be hidden in a scene you're not on, as long as <strong>Shutdown source when not visible</strong> is unticked). The list is remembered if OBS restarts.</p>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">3</span><h2>Settings</h2></div>
+    <div class="grid2">
+      <div class="ctl">
+        <div><div class="lbl">Join command</div><div style="display:flex;align-items:center;gap:6px;max-width:240px"><span style="font:600 18px var(--mono);color:var(--fg)">!</span><input class="tin" id="jw" spellcheck="false" autocomplete="off" aria-label="Join command"></div></div>
+        <div><div class="lbl">Fair turns</div><div class="tog"><label><input type="checkbox" id="optNr" checked>People who've already played go to the back</label></div>
+          <div class="hint">Everyone who joined gets a game before anyone gets a second one.</div></div>
+        <div><div class="lbl">Extra luck</div>
+          <div class="luck"><label>Subscribers<select id="lsS"></select></label><label>VIPs<select id="lvS"></select></label><label>Mods<select id="lmS"></select></label></div>
+          <div class="hint">"2 entries" means twice as likely to be picked. Someone with two roles gets the bigger one.</div></div>
+        <div><div class="lbl">Chat messages</div>
+          <div class="tog"><label><input type="checkbox" id="optSay" checked>Post in chat when it opens and when a squad is picked</label></div>
+          <div id="msgBox" style="margin-top:10px">
+            <label class="hint" for="omsg" style="display:block;margin:0 0 4px">When it opens</label><input class="tin" id="omsg" spellcheck="false">
+            <label class="hint" for="pmsg" style="display:block;margin:10px 0 4px">When a squad is picked. <code>{names}</code> becomes the players.</label><input class="tin" id="pmsg" spellcheck="false">
+          </div></div>
+        <div><div class="lbl">On screen</div><div class="tog">
+          <label><input type="checkbox" id="optList" checked>Show who's joined while it's open</label>
+          <label><input type="checkbox" id="optTg" checked>Show players' in-game IDs</label>
+          <label><input type="checkbox" id="optSnd" checked>Spin and landing sounds</label>
+        </div></div>
+        <div id="volBox"><div class="lbl">Sound volume <b id="volV">40%</b></div><input type="range" id="vol" min="5" max="100" step="5" value="40" aria-label="Sound volume"></div>
+        <div><div class="lbl">Accent colour</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Background <b id="opV">90%</b></div><input type="range" id="op" min="0" max="100" step="5" value="90" aria-label="Background opacity"></div>
+        <div><div class="lbl">Squad stays on screen <b id="keepV">until cleared</b></div><input type="range" id="keep" min="0" max="300" step="15" value="0" aria-label="Seconds the squad stays on screen after closing"></div>
+        <div id="ronBox" class="tog"><label><input type="checkbox" id="optRon" checked>Start fresh each time you go live</label></div>
+        <details id="sbConn"><summary>Streamer.bot connection (only if you changed it)</summary>
+          <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
+          <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
+        </details>
+      </div>
+      <div class="sticky">
+        <div class="stage"><iframe id="prevFrame" title="Squad Picker preview" tabindex="-1"></iframe></div>
+        <div class="tests"><button type="button" data-t="open">Open</button><button type="button" data-t="join">Add joiners</button><button type="button" data-t="pick">Pick</button><button type="button" data-t="close">Close</button><button type="button" data-t="clear">Clear</button></div>
+        <p class="hint">The preview uses made-up viewers. The overlay hides itself while joining is closed and there's no squad.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">4</span><h2>Add it to OBS</h2></div>
+    <h3>The overlay</h3>
+    <div class="copy"><input id="obsUrl" readonly aria-label="Overlay link"><button class="btn" data-copy="obsUrl">Copy</button></div>
+    <ol class="steps">
+      <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+      <li>Paste the link into <strong>URL</strong> and set the size to <strong>640 × 760</strong>. Resize it in OBS to make it bigger or smaller.</li>
+      <li>Leave <strong>Shutdown source when not visible</strong> unticked. Using it in more than one scene? Add it to the others with <strong>Paste (Reference)</strong>, so there's only one copy.</li>
+    </ol>
+    <h3>The dock (your controls)</h3>
+    <div class="copy"><input id="dockUrl" readonly aria-label="Dock link"><button class="btn" data-copy="dockUrl">Copy</button></div>
+    <ol class="steps">
+      <li>In OBS, open <strong>Docks → Custom Browser Docks</strong>.</li>
+      <li>Name it <strong>Squad Picker</strong>, paste the link into <strong>URL</strong> and press <strong>Apply</strong>.</li>
+      <li>It shows who's joined and their IDs, with buttons to open, pick, swap and remove. Click an ID to copy it.</li>
+    </ol>
+    <p class="hint">No dock? Everything also works from chat with the <code>!squad</code> commands.</p>
+  </section>
+
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>Nobody can join</td><td>Open it first (dock or <code>!squad open</code>). Check the overlay is in OBS and its source is on.</td></tr>
+      <tr><td>The dock says it can't find the overlay</td><td>The dock talks to the overlay, so the overlay must be loaded in OBS. With Streamer.bot, check the <code>Squad Picker</code> action exists and the WebSocket server is running.</td></tr>
+      <tr><td>Nothing posts in chat</td><td>Streamer.bot: check the <code>Squad Picker</code> action and that Streamer.bot is connected to Twitch/Kick. Twitch only: log in in step 1 and copy the link again.</td></tr>
+      <tr><td>Kick viewers can't join</td><td>Kick needs Streamer.bot mode, connected to Kick.</td></tr>
+      <tr><td>Twitch login says "redirect mismatch"</td><td>Use the page at itscra1g.github.io/squad/ exactly, not a saved copy.</td></tr>
+    </table></div>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot, Twitch or Kick.</div></footer>
+</div>
+
+<script type="text/plain" id="csSrc">
+// Squad Picker for Streamer.bot, free from itscra1g.github.io/squad
+// The overlay does the picking. This action does two small jobs for it:
+//   mode "say":   posts the overlay's message to Twitch and/or Kick chat
+//   mode "relay": passes messages between the overlay and the OBS dock
+// No triggers needed. The overlay starts it through Streamer.bot's WebSocket server.
+using System;
+
+public class CPHInline
+{
+    public bool Execute()
+    {
+        string mode = Arg("mode");
+
+        if (mode == "say")
+        {
+            string text = Arg("text").Replace("\r", " ").Replace("\n", " ").Trim();
+            if (text.Length == 0) return true;
+            if (text.Length > 480) text = text.Substring(0, 480);
+            string to = Arg("to").ToLower();
+            if (to == "" || to.Contains("twitch") || to == "both")
+                try { CPH.SendMessage(text); } catch (Exception) { }
+            if (to == "" || to.Contains("kick") || to == "both")
+                try { CPH.SendKickMessage(text); } catch (Exception) { }
+            return true;
+        }
+
+        if (mode == "relay")
+        {
+            string data = Arg("data").Trim();
+            if (data.StartsWith("{") && data.EndsWith("}") && data.Length < 60000)
+                CPH.WebsocketBroadcastJson("{\"squadPicker\":" + data + "}");
+            return true;
+        }
+
+        return true;
+    }
+
+    private string Arg(string key)
+    {
+        object v;
+        if (args.TryGetValue(key, out v) && v != null) return v.ToString();
+        return "";
+    }
+}
+</script>
+<script>
+(function(){
+"use strict";
+var GLOWS=[["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+var BASE=location.origin+location.pathname;
+var TW_CID="zknz506nc6j1bzvv8uihyn1j84fz9z",TW_SCOPES="user:write:chat";
+var TW_SVG='<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>';
+var KK_SVG='<svg viewBox="0 0 24 24"><path d="M1.5 1.5h7.2v4.8h2.4V3.9h2.4V1.5h9v7.2h-2.4v2.4h-2.4v1.8h2.4v2.4h2.4v7.2h-9v-2.4h-2.4v-2.4H8.7v4.8H1.5z"/></svg>';
+var DEF_OPEN="🎮 Squad Picker is open! Type !{jw} with your in-game ID to get in.";
+var DEF_PICK="🎮 Squad picked: {names}. See you in the lobby!";
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function lum(h){var c=[0,2,4].map(function(i){var v=parseInt(h.slice(i,i+2),16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+function rid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+function el(t,c,txt){var e=document.createElement(t);if(c)e.className=c;if(txt!=null)e.textContent=txt;return e}
+function clean(s,n){return String(s||"").replace(/[\u0000-\u001f\u007f]/g,"").replace(/\s+/g," ").trim().slice(0,n)}
+function num(p,k,d,lo,hi){var v=parseInt(p.get(k),10);return isNaN(v)?d:Math.max(lo,Math.min(hi,v))}
+async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
+function readCfg(p){
+  var g=String(p.get("g")||"4DA3FF").toUpperCase();if(!/^[0-9A-F]{6}$/.test(g))g="4DA3FF";
+  return {mode:p.get("m")==="tw"?"tw":"sb",h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",
+    tk:String(p.get("tk")||"").replace(/[^A-Za-z0-9]/g,""),ch:String(p.get("ch")||"").toLowerCase().replace(/[^a-z0-9_]/g,""),
+    g:g,o:num(p,"o",90,0,100),jw:String(p.get("jw")||"join").toLowerCase().replace(/[^a-z0-9_]/g,"")||"join",
+    ls:num(p,"ls",2,1,5),lv:num(p,"lv",2,1,5),lm:num(p,"lm",1,1,5),nr:p.get("nr")!=="0",tg:p.get("tg")!=="0",list:p.get("list")!=="0",
+    say:p.get("say")!=="0",omsg:p.has("omsg")?clean(p.get("omsg"),300):DEF_OPEN,pmsg:p.has("pmsg")?clean(p.get("pmsg"),300):DEF_PICK,
+    keep:num(p,"keep",0,0,600),snd:p.get("snd")!=="0",vol:num(p,"vol",40,0,100),ron:p.get("ron")!=="0",
+    demo:p.get("demo")==="1",auto:p.get("auto")==="1"};
+}
+
+/* ---- messages between the overlay and the dock: BroadcastChannel, localStorage and (with Streamer.bot) the Squad Picker action ---- */
+function Link(onMsg){
+  var seen={},bc=null,self={sb:null};
+  try{bc=new BroadcastChannel("itscra1g-squad");bc.onmessage=function(e){got(e.data)}}catch(e){}
+  addEventListener("storage",function(e){if(e.key==="sq_msg"&&e.newValue){try{got(JSON.parse(e.newValue))}catch(x){}}});
+  function got(o){if(!o||typeof o!=="object"||!o.id||seen[o.id])return;seen[o.id]=1;onMsg(o)}
+  self.got=got;
+  self.post=function(o){o.id=o.id||rid();seen[o.id]=1;
+    if(bc)try{bc.postMessage(o)}catch(e){}
+    ls("sq_msg",JSON.stringify(o));
+    if(self.sb)self.sb(o);
+  };
+  return self;
+}
+function SB(cfg,events,onEvent,onLive){
+  var ws=null,live=false,self={live:function(){return live}};
+  function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+  self.send=send;
+  self.action=function(args){if(live)send({request:"DoAction",id:"sq-"+rid(),action:{name:"Squad Picker"},args:args})};
+  function subscribe(){if(live)return;live=true;
+    events.forEach(function(e,i){var ev={};ev[e[0]]=[e[1]];send({request:"Subscribe",id:"sq-sub-"+i,events:ev})});
+    if(onLive)onLive();
+  }
+  function connect(){live=false;
+    try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.port+"/")}catch(e){setTimeout(connect,5000);return}
+    var helloT=setTimeout(subscribe,1500);
+    ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.request==="Hello"){clearTimeout(helloT);if(m.authentication&&cfg.pw){var a=m.authentication;var s=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"sq-auth",authentication:await sha(s+a.challenge)})}else subscribe();return}
+      if(m.id==="sq-auth"){subscribe();return}
+      if(m.event&&m.data)onEvent(String(m.event.source||""),String(m.event.type||""),m.data);
+    };
+    ws.onclose=function(){clearTimeout(helloT);live=false;setTimeout(connect,3000)};
+    ws.onerror=function(){try{ws.close()}catch(x){}};
+  }
+  connect();return self;
+}
+
+var H=document.documentElement;
+if(/(^#|&)dock=1(&|$)/.test(location.hash)){H.className="dk";dock();return}
+if(H.className==="ov"){overlay();return}
+setup();
+
+/* ================= overlay: reads chat, does the picking, shows it ================= */
+function overlay(){
+  var box=document.getElementById("ovr"),cfg=readCfg(new URLSearchParams(location.hash.slice(1)));
+  var KEY="sq_state",ST=null,card=null,anim=null,hideT=0,AV={},sb=null,uid="",byeT=0;
+  function fresh(){return {open:false,pool:[],squad:[],played:{},size:3,picking:false,last:0,v:1}}
+  if(!cfg.demo){try{ST=JSON.parse(ls(KEY)||"null")}catch(e){}}
+  if(!ST||!Array.isArray(ST.pool))ST=fresh();ST.picking=false;
+  try{AV=JSON.parse(ls("sq_av")||"{}")}catch(e){}
+  function save(){if(!cfg.demo)ls(KEY,JSON.stringify(ST))}
+  function fit(){box.style.setProperty("--k",innerWidth/640)}
+  addEventListener("resize",fit);fit();
+
+  var link=Link(function(o){if(o.to!=="ov")return;
+    if(o.cmd==="hello"){push();return}
+    command(o.cmd,o.arg,"dock")});
+  function summary(){
+    return {open:ST.open,size:ST.size,picking:ST.picking,mode:cfg.mode,canSay:cfg.say&&(cfg.mode==="sb"||!!cfg.tk),
+      pool:ST.pool.slice(-300).map(function(p){return {k:p.k,src:p.src,name:p.name,tag:p.tag,lk:p.lk,pl:ST.played[p.k]||0}}),
+      squad:ST.squad.map(function(s){return {k:s.k,src:s.src,name:s.name,tag:s.tag}})}
+  }
+  var pushT=0;function push(){clearTimeout(pushT);pushT=setTimeout(function(){link.post({to:"dock",state:summary()})},120)}
+  function changed(){save();render();push()}
+
+  /* ---- chat ---- */
+  function say(text){
+    if(!cfg.say||!text||cfg.demo)return;
+    if(cfg.mode==="sb"){if(sb)sb.action({mode:"say",text:text,to:"both"});return}
+    if(!cfg.tk)return;
+    var go=function(){fetch("https://api.twitch.tv/helix/chat/messages",{method:"POST",headers:{"Authorization":"Bearer "+cfg.tk,"Client-Id":TW_CID,"Content-Type":"application/json"},
+      body:JSON.stringify({broadcaster_id:uid,sender_id:uid,message:text.slice(0,480)})}).catch(function(){})};
+    if(uid)go();else whoAmI().then(function(){if(uid)go()});
+  }
+  function whoAmI(){return fetch("https://id.twitch.tv/oauth2/validate",{headers:{Authorization:"OAuth "+cfg.tk}}).then(function(r){return r.ok?r.json():null}).then(function(v){if(v){uid=v.user_id;if(!cfg.ch)cfg.ch=v.login}}).catch(function(){})}
+  function names(list){var n=list.map(function(s){return "@"+s.name});return n.length<2?n.join(""):n.slice(0,-1).join(", ")+" and "+n[n.length-1]}
+  function find(q){q=String(q||"").replace(/^@/,"").toLowerCase();if(!q)return null;
+    return ST.pool.find(function(p){return p.login===q||p.name.toLowerCase()===q})||ST.squad.find(function(p){return p.login===q||p.name.toLowerCase()===q})||null}
+  function onChat(x){
+    var t=clean(x.text,200);if(t.charAt(0)!=="!")return;
+    var parts=t.split(" "),cmd=parts[0].toLowerCase(),rest=parts.slice(1).join(" ").trim();
+    if(cmd==="!"+cfg.jw){
+      if(!ST.open||!x.login)return;
+      var k=x.src+"|"+x.login,lk=Math.max(1,x.sub?cfg.ls:1,x.vip?cfg.lv:1,x.mod?cfg.lm:1);
+      var p=ST.pool.find(function(q){return q.k===k}),tag=clean(rest,40);
+      if(p){p.name=x.name||p.name;if(tag)p.tag=tag;p.lk=lk}
+      else{if(ST.pool.length>=1000)return;ST.pool.push({k:k,src:x.src,login:x.login,name:clean(x.name||x.login,40),tag:tag,lk:lk,t:Date.now(),fresh:1})}
+      if(x.av&&AV[k]!==x.av){AV[k]=x.av;saveAv()}
+      changed();return;
+    }
+    if(cmd==="!leave"||cmd==="!unjoin"){var i=ST.pool.findIndex(function(q){return q.k===x.src+"|"+x.login});if(i>=0){ST.pool.splice(i,1);changed()}return}
+    if(cmd==="!squad"&&(x.mod||x.host)){var a=(parts[1]||"").toLowerCase();command(a,parts.slice(2).join(" ").trim(),"chat")}
+  }
+  function command(a,arg,from){
+    if(a==="open"){if(!ST.open){ST.open=true;clearTimeout(byeT);changed();say(cfg.omsg.replace(/\{jw\}/g,cfg.jw))}return}
+    if(a==="close"){if(ST.open){ST.open=false;changed();armBye()}return}
+    if(a==="size"){var z=parseInt(arg,10);if(z>=1&&z<=9){ST.size=z;changed()}return}
+    if(a==="pick"){var n=parseInt(arg,10);pick(n>=1&&n<=9?n:ST.size);return}
+    if(a==="swap"||a==="reroll"){var p=from==="dock"?ST.squad.find(function(s){return s.k===arg}):find(arg);if(p)swap(p.k);return}
+    if(a==="remove"){var r=from==="dock"?{k:arg}:find(arg);if(!r)return;
+      ST.pool=ST.pool.filter(function(q){return q.k!==r.k});if(!ST.picking)ST.squad=ST.squad.filter(function(q){return q.k!==r.k});changed();return}
+    if(a==="clear"||a==="reset"){if(ST.picking)stopAnim();ST.pool=[];ST.squad=[];if(a==="reset")ST.played={};changed();armBye();return}
+  }
+
+  /* ---- picking ---- */
+  function choose(n,taken){
+    var out=[];taken=Object.assign({},taken);
+    for(var i=0;i<n;i++){
+      var c=ST.pool.filter(function(p){return !taken[p.k]});if(!c.length)break;
+      if(cfg.nr){var m=Math.min.apply(null,c.map(function(p){return ST.played[p.k]||0}));c=c.filter(function(p){return (ST.played[p.k]||0)===m})}
+      var tot=c.reduce(function(s,p){return s+(p.lk||1)},0),r=Math.random()*tot,w=c[c.length-1];
+      for(var j=0;j<c.length;j++){r-=c[j].lk||1;if(r<0){w=c[j];break}}
+      taken[w.k]=1;out.push(w);
+    }
+    return out;
+  }
+  function entry(p){return {k:p.k,src:p.src,login:p.login,name:p.name,tag:p.tag}}
+  function pick(n){
+    if(ST.picking||!ST.pool.length)return;
+    var win=choose(n,{});if(!win.length)return;
+    clearTimeout(byeT);ST.squad=[];ST.picking=true;ST.last=Date.now();
+    win.forEach(function(w){ST.played[w.k]=(ST.played[w.k]||0)+1});
+    save();render();push();
+    reveal(win.slice(),function(w){freshK=w.k;ST.squad.push(entry(w))},function(){ST.picking=false;changed();say(cfg.pmsg.replace(/\{names\}/g,names(ST.squad)));armBye()});
+  }
+  function swap(k){
+    if(ST.picking)return;var idx=ST.squad.findIndex(function(s){return s.k===k});if(idx<0)return;
+    var taken={};ST.squad.forEach(function(s){taken[s.k]=1});
+    var w=choose(1,taken)[0];if(!w)return;
+    ST.played[w.k]=(ST.played[w.k]||0)+1;ST.picking=true;var gone=ST.squad[idx];ST.squad.splice(idx,1);save();render();push();
+    reveal([w],function(x){freshK=x.k;ST.squad.splice(idx,0,entry(x))},function(){ST.picking=false;changed();
+      say("🎮 Swap: @"+w.name+" is in for @"+gone.name+".");armBye()});
+  }
+  function armBye(){clearTimeout(byeT);if(!ST.open&&ST.squad.length&&cfg.keep>0&&!ST.picking)byeT=setTimeout(function(){ST.squad=[];changed()},cfg.keep*1000)}
+
+  /* ---- the slot machine ---- */
+  var AC=null;
+  function beep(f,d,v){if(!cfg.snd||!cfg.vol)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
+    o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*cfg.vol/100,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+  function ding(){[880,1320].forEach(function(f,i){setTimeout(function(){beep(f,.35,.22)},i*90)})}
+  function stopAnim(){if(anim){clearTimeout(anim.t);anim=null}ST.picking=false}
+  function reveal(list,onLand,onDone){
+    var pool=ST.pool.map(function(p){return p.name});if(!pool.length)pool=list.map(function(w){return w.name});
+    var total=list.length,done=0;
+    anim={t:0};
+    function one(){
+      if(!anim)return;
+      if(!list.length){anim=null;onDone();return}
+      var w=list.shift(),steps=[],ms=45;while(ms<340){steps.push(ms);ms*=1.13}
+      if(pool.length<2)steps=steps.slice(-4);
+      var i=0,lastN="";render();slotLabel(done+1,total);
+      function step(){if(!anim)return;var s=slotEls();
+        if(i<steps.length){var nm;do{nm=pool[Math.floor(Math.random()*pool.length)]}while(pool.length>1&&nm===lastN);lastN=nm;
+          if(s){s.slot.classList.remove("land");s.reel.textContent=nm;s.reel.classList.remove("spin");void s.reel.offsetWidth;s.reel.classList.add("spin")}
+          beep(520+Math.random()*80,.05,.08);anim.t=setTimeout(step,steps[i++]);return}
+        if(s){s.reel.classList.remove("spin");s.reel.textContent=w.name;s.slot.classList.add("land")}
+        ding();
+        anim.t=setTimeout(function(){done++;onLand(w);render(true);anim.t=setTimeout(one,total>1?650:300)},900);
+      }
+      step();
+    }
+    one();
+  }
+  function slotEls(){if(!card)return null;var s=card.querySelector(".slot");return s?{slot:s,reel:s.querySelector(".reel"),lab:card.querySelector(".slotl")}:null}
+  function slotLabel(a,b){var s=slotEls();if(s&&s.lab)s.lab.textContent=b>1?"Picking player "+a+" of "+b:"Picking a player"}
+
+  /* ---- drawing ---- */
+  function saveAv(){try{var k=Object.keys(AV);if(k.length>500)k.slice(0,k.length-500).forEach(function(x){delete AV[x]});localStorage.setItem("sq_av",JSON.stringify(AV))}catch(e){}}
+  function avatar(s){
+    var url=AV[s.k]||"",fall=el("span","avi",(s.name||"?").charAt(0).toUpperCase());
+    fall.style.background=s.src==="kick"?"#2B7A0B":"#5B2DB3";
+    if(url){var i=el("img","av");i.alt="";i.src=url;i.onerror=function(){if(i.parentNode)i.parentNode.replaceChild(fall,i)};return i}
+    if(s.src==="twitch"&&s.login&&!cfg.demo&&AV[s.k]===undefined){AV[s.k]="";
+      fetch("https://decapi.me/twitch/avatar/"+encodeURIComponent(s.login)).then(function(r){return r.ok?r.text():""}).then(function(t){
+        t=String(t||"").trim();if(!/^https:\/\//.test(t))return;AV[s.k]=t;saveAv();render(true)}).catch(function(){})}
+    return fall;
+  }
+  function pf(src){var s=el("span","pf "+(src==="kick"?"kk":"tw"));s.innerHTML=src==="kick"?KK_SVG:TW_SVG;return s}
+  function style(c){c.style.setProperty("--gr",hx2rgb(cfg.g));c.style.setProperty("--ink",lum(cfg.g)>.35?"#000":"#fff");c.style.setProperty("--o",cfg.o/100)}
+  function render(keepSlot){
+    var show=ST.open||ST.squad.length||ST.picking;
+    if(!show){if(card){var c=card;card=null;c.classList.add("bye");setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c)},500)}return}
+    var keepReel=null;if(card&&ST.picking){var s=slotEls();if(s)keepReel={t:s.reel.textContent,land:s.slot.classList.contains("land"),lab:s.lab.textContent}}
+    var nu=!card;if(nu){card=el("div","sq in");box.appendChild(card)}
+    style(card);card.innerHTML="";
+    var top=el("div","top");top.appendChild(el("span","tag","SQUAD PICKER"));
+    var st=el("span","st"+(ST.open?" open":""));st.appendChild(el("i"));st.appendChild(document.createTextNode(ST.open?"OPEN":ST.picking?"PICKING":"CLOSED"));top.appendChild(st);
+    var cnt=el("span","cnt",String(ST.pool.length));cnt.appendChild(el("small",null,ST.pool.length===1?"joined":"joined"));top.appendChild(cnt);
+    card.appendChild(top);
+    if(ST.open&&!ST.picking){
+      var how=el("div","how");how.appendChild(document.createTextNode("Type "));how.appendChild(el("b",null,"!"+cfg.jw));how.appendChild(document.createTextNode(cfg.tg?" + your ID to play":" to play"));card.appendChild(how);
+      if(cfg.list&&ST.pool.length){var pl=el("div","pool"),max=14,list=ST.pool.slice(-max);
+        list.forEach(function(p){var c=el("span",p.fresh?"new":null);c.appendChild(el("i","dot "+(p.src==="kick"?"kk":"tw")));c.appendChild(document.createTextNode(p.name));pl.appendChild(c);delete p.fresh});
+        if(ST.pool.length>max)pl.appendChild(el("span","more","+"+(ST.pool.length-max)+" more"));card.appendChild(pl)}
+      else if(!ST.pool.length)card.appendChild(el("div","sub","Waiting for the first player…"));
+    }
+    if(ST.picking){var sw=el("div","slotw");sw.appendChild(el("div","slotl",keepReel?keepReel.lab:"Picking"));var sl=el("div","slot"+(keepReel&&keepReel.land?" land":""));sl.appendChild(el("div","reel",keepReel?keepReel.t:""));sw.appendChild(sl);card.appendChild(sw)}
+    if(ST.squad.length){var sq=el("div","squad");sq.appendChild(el("div","sl",ST.picking?"Squad so far":"Your squad"));
+      ST.squad.forEach(function(s,i){var r=el("div","pl"+(s.k===freshK?" new":""));
+        r.appendChild(avatar(s));var w=el("div","who"),nm=el("div","nm");nm.appendChild(document.createTextNode(s.name));nm.appendChild(pf(s.src));w.appendChild(nm);
+        if(cfg.tg&&s.tag)w.appendChild(el("div","id",s.tag));r.appendChild(w);r.appendChild(el("span","n",String(i+1)));sq.appendChild(r)});
+      card.appendChild(sq)}
+    freshK="";
+  }
+  var freshK="";
+
+  /* ---- connections ---- */
+  if(cfg.demo)demo();
+  else if(cfg.mode==="sb"){
+    sb=SB(cfg,[["Twitch","ChatMessage"],["Kick","ChatMessage"],["General","Custom"],["Twitch","StreamOnline"],["Kick","StreamOnline"]],function(src,type,d){
+      if(type==="Custom"){var c=d.data&&d.data.squadPicker||d.squadPicker;if(c)link.got(c);return}
+      if(type==="StreamOnline"){if(cfg.ron&&Date.now()-(ST.last||0)>3600000){ST.pool=[];ST.squad=[];ST.played={};ST.open=false;changed()}return}
+      if(type==="ChatMessage"){var s=src.toLowerCase();if(s==="twitch"||s==="kick")onChat(norm(s,d))}
+    },function(){push()});
+    link.sb=function(o){if(o.to==="dock")sb.action({mode:"relay",data:JSON.stringify(o)})};
+  }else{
+    if(cfg.tk)whoAmI().then(function(){irc()});else irc();
+  }
+  function norm(src,d){
+    var m=d.message&&typeof d.message==="object"?d.message:null,u=d.user||d.sender||{};
+    var name=u.name||u.displayName||u.display_name||u.username||(m&&(m.displayName||m.username))||d.displayName||d.userName||d.user_name||"";
+    var login=String(u.login||u.username||u.slug||(m&&m.username)||d.userLogin||name).toLowerCase();
+    var text=typeof d.text==="string"?d.text:m&&typeof m.message==="string"?m.message:typeof d.message==="string"?d.message:typeof d.content==="string"?d.content:"";
+    var b=(u.badges||(m&&m.badges)||(u.identity&&u.identity.badges)||[]).map(function(x){return String(x.name||x.type||x.text||x.setId||"").toLowerCase()}).join(" ");
+    var role=+(u.role||(m&&m.role)||0);
+    var av=String(u.profilePicture||u.profileImageUrl||u.profile_pic||u.avatar||"");if(!/^https:\/\//.test(av))av="";
+    return {src:src,name:name,login:login,text:text,av:av,
+      host:/broadcaster/.test(b)||role===4||!!u.isBroadcaster,mod:/moderator/.test(b)||role===3||!!(u.isModerator||u.moderator),
+      vip:/vip/.test(b)||role===2||!!(u.isVip||u.vip),sub:/subscriber|founder/.test(b)||!!(u.subscribed||u.isSubscribed||u.subscriber||(m&&m.subscriber))};
+  }
+  function irc(){
+    if(!cfg.ch)return;var s;try{s=new WebSocket("wss://irc-ws.chat.twitch.tv:443")}catch(e){setTimeout(irc,5000);return}
+    s.onopen=function(){s.send("CAP REQ :twitch.tv/tags twitch.tv/commands");s.send("PASS SCHMOOPIIE");s.send("NICK justinfan"+(10000+Math.floor(Math.random()*80000)));s.send("JOIN #"+cfg.ch);push()};
+    s.onmessage=function(e){String(e.data).split("\r\n").forEach(function(line){
+      if(!line)return;if(line.indexOf("PING")===0){s.send("PONG :tmi.twitch.tv");return}
+      var m=line.match(/^(?:@(\S+) )?:([a-z0-9_]+)!\S+ PRIVMSG #\S+ :(.*)$/);if(!m)return;
+      var tags={};(m[1]||"").split(";").forEach(function(t){var i=t.indexOf("=");if(i>0)tags[t.slice(0,i)]=t.slice(i+1)});
+      var b=tags.badges||"",txt=m[3];if(/^\u0001ACTION /.test(txt))txt=txt.slice(8,-1);
+      onChat({src:"twitch",login:m[2],name:String(tags["display-name"]||m[2]).replace(/\\s/g," "),text:txt,
+        host:/(^|,)broadcaster\//.test(b),mod:/(^|,)moderator\//.test(b)||tags.mod==="1",vip:/(^|,)vip\//.test(b)||tags.vip==="1",sub:/(^|,)(subscriber|founder)\//.test(b)||tags.subscriber==="1"});
+    })};
+    s.onclose=function(){setTimeout(irc,4000)};s.onerror=function(){try{s.close()}catch(x){}};
+  }
+
+  /* ---- preview ---- */
+  function demo(){
+    var FAKE=[["twitch","NightOwlTV","NightOwl#2231",1,0],["kick","Kezza_Plays","Kezza#99812",0,1],["twitch","Morag","MoragPlays#5521",1,0],["kick","pixelpete","pete#40023",0,0],
+      ["twitch","LateShift","LateShift#7781",0,0],["twitch","ChattyCath","Cath#11420",1,0],["kick","Big_Dave","BigDave#3000",0,0],["twitch","Sniper_Sue","SueSnipes#808",0,1],
+      ["kick","Rook","Rook#12345",0,0],["twitch","AimLabAndy","Andy#6060",0,0],["twitch","TacoTuesday","Taco#2468",1,0],["kick","GrizzlyG","Grizz#1357",0,0]];
+    var fi=0;
+    function join(n){for(var i=0;i<n;i++){var f=FAKE[fi++%FAKE.length];onChat({src:f[0],login:f[1].toLowerCase(),name:f[1],text:"!"+cfg.jw+" "+f[2],sub:!!f[3],vip:!!f[4]})}}
+    addEventListener("message",function(e){var d=e.data||{};
+      if(d.sqHash){var nc=readCfg(new URLSearchParams(d.sqHash));nc.demo=true;nc.auto=cfg.auto;cfg=nc;render();return}
+      var t=d.sq;if(!t)return;
+      if(t==="open")command("open");if(t==="close")command("close");if(t==="clear")command("clear");
+      if(t==="join"){if(!ST.open)command("open");join(3)}
+      if(t==="pick"){if(!ST.pool.length){command("open");join(5)}command("pick",String(Math.min(3,ST.pool.length)))}
+    });
+    if(cfg.auto){
+      var loop=function(){ST=fresh();ST.size=3;command("open");var n=0;
+        var j=setInterval(function(){join(1);if(++n>=7){clearInterval(j);setTimeout(function(){command("close");command("pick","3");setTimeout(loop,9500)},900)}},650)};
+      loop();
+    }else{command("open");join(5)}
+  }
+  render();push();
+}
+
+/* ================= dock: buttons for the streamer ================= */
+function dock(){
+  var cfg=readCfg(new URLSearchParams(location.hash.slice(1))),D=document.getElementById("dock"),state=null,seenAt=0,sb=null;
+  var link=Link(function(o){if(o.to!=="dock"||!o.state)return;state=o.state;seenAt=Date.now();draw()});
+  function cmd(c,a){link.post({to:"ov",cmd:c,arg:a==null?"":String(a)})}
+  if(cfg.mode==="sb"){
+    sb=SB(cfg,[["General","Custom"]],function(src,type,d){if(type==="Custom"){var c=d.data&&d.data.squadPicker||d.squadPicker;if(c)link.got(c)}},function(){cmd("hello")});
+    link.sb=function(o){if(o.to==="ov")sb.action({mode:"relay",data:JSON.stringify(o)})};
+  }
+  cmd("hello");setInterval(function(){if(Date.now()-seenAt>8000)cmd("hello");draw()},5000);
+  function b(txt,cls,fn,dis){var x=el("button",cls||null,txt);x.type="button";if(dis)x.disabled=true;x.addEventListener("click",fn);return x}
+  function copy(t,btn){var o=btn.textContent;var done=function(){btn.textContent="Copied";setTimeout(function(){btn.textContent=o},1200)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){});}
+  function who(p,extra){var li=el("li");var d=el("i","dot");d.style.background=p.src==="kick"?"#53FC18":"#9146FF";li.appendChild(d);
+    var w=el("div","w"),nm=el("b",null,p.name);if(p.pl)nm.appendChild(el("em",null,"played "+p.pl+"×"));if(p.lk>1)nm.appendChild(el("em",null,p.lk+" entries"));w.appendChild(nm);
+    if(p.tag){var s=el("small",null,p.tag);s.title="Click to copy";s.style.cursor="copy";s.addEventListener("click",function(){copy(p.tag,s)});w.appendChild(s)}
+    li.appendChild(w);extra.forEach(function(x){li.appendChild(x)});return li}
+  function draw(){
+    D.innerHTML="";
+    if(!state||Date.now()-seenAt>15000){
+      D.appendChild(el("div","stt","Squad Picker"));
+      D.appendChild(el("div","warn",cfg.mode==="sb"?"Can't find the overlay. Check it's loaded in OBS, the Squad Picker action exists, and Streamer.bot's WebSocket server is running.":"Can't find the overlay. Check it's loaded in OBS."));
+      if(!state)return;
+    }
+    var s=state,st=el("div","stt"+(s.open?" open":""));st.appendChild(el("i"));st.appendChild(document.createTextNode(s.open?"Open":"Closed"));st.appendChild(el("small",null,s.pool.length+" joined"));D.appendChild(st);
+    var r1=el("div","row");r1.appendChild(b(s.open?"Close":"Open",s.open?null:"go",function(){cmd(s.open?"close":"open")}));
+    r1.appendChild(b(s.picking?"Picking…":"Pick "+s.size,"go",function(){cmd("pick",s.size)},s.picking||!s.pool.length));D.appendChild(r1);
+    var r2=el("div","row sz");r2.appendChild(el("span",null,"Squad size"));for(var i=1;i<=4;i++)(function(n){var x=b(String(n),null,function(){cmd("size",n)});x.setAttribute("aria-pressed",n===s.size);r2.appendChild(x)})(i);D.appendChild(r2);
+    D.appendChild(el("h4",null,"Squad"));
+    if(s.squad.length){var u=el("ul");s.squad.forEach(function(p){var full=s.pool.find(function(q){return q.k===p.k})||p;u.appendChild(who({src:p.src,name:p.name,tag:p.tag,pl:0,lk:full.lk},[b("Swap",null,function(){cmd("swap",p.k)},s.picking)]))});D.appendChild(u)}
+    else D.appendChild(el("div","empty","No squad yet."));
+    D.appendChild(el("h4",null,"Joined ("+s.pool.length+")"));
+    if(s.pool.length){var u2=el("ul");s.pool.slice().reverse().forEach(function(p){u2.appendChild(who(p,[b("✕",null,function(){cmd("remove",p.k)})]))});D.appendChild(u2)}
+    else D.appendChild(el("div","empty",s.open?"Nobody yet. Viewers type !"+cfg.jw+" in chat.":"Open it to let viewers join."));
+    var r3=el("div","row");r3.style.marginTop="14px";
+    var clr=b("Clear list",null,function(){if(clr.dataset.sure){cmd("clear")}else{clr.dataset.sure=1;clr.textContent="Sure? Click again";setTimeout(function(){draw()},3000)}});
+    var rst=b("New stream (reset turns)",null,function(){if(rst.dataset.sure){cmd("reset")}else{rst.dataset.sure=1;rst.textContent="Sure? Click again";setTimeout(function(){draw()},3000)}});
+    r3.appendChild(clr);r3.appendChild(rst);D.appendChild(r3);
+    if(s.canSay===false&&s.mode==="tw")D.appendChild(el("div","empty","Picks aren't posted in chat (not logged in on the setup page)."));
+  }
+  draw();
+}
+
+/* ================= setup page ================= */
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={m:"sb",ch:"",g:"4DA3FF",o:90,jw:"join",ls:2,lv:2,lm:1,nr:1,tg:1,list:1,say:1,omsg:DEF_OPEN,pmsg:DEF_PICK,keep:0,snd:1,vol:40,ron:1,h:"127.0.0.1",p:"8080"};
+  try{var sv=JSON.parse(ls("sq_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  $("sqCode").value=document.getElementById("csSrc").textContent.trim();
+  if(!$("sqImp").value.trim()){$("impBox").hidden=true;$("diyBox").open=true;$("diyBox").querySelector("summary").textContent="Make it in Streamer.bot";}
+  // Twitch login (Twitch-only mode, for posting in chat)
+  var TK=null;try{TK=JSON.parse(ls("sq_tk")||"null")}catch(e){}
+  var hp=new URLSearchParams(location.hash.slice(1)),loginMsg="";
+  if(hp.get("access_token")||hp.get("error")){
+    var st="";try{st=sessionStorage.getItem("sq_state")||""}catch(e){}
+    if(hp.get("access_token")&&st&&hp.get("state")===st){TK={tk:hp.get("access_token").replace(/[^A-Za-z0-9]/g,""),login:"",exp:0};S.m="tw"}
+    else if(hp.get("error")){loginMsg="Twitch login was cancelled.";S.m="tw"}
+    else loginMsg="That login didn't match, so it wasn't used. Please try again.";
+    try{sessionStorage.removeItem("sq_state");history.replaceState(null,"",location.pathname+"#setup")}catch(e){}
+  }
+  function saveTk(){if(TK)ls("sq_tk",JSON.stringify(TK));else try{localStorage.removeItem("sq_tk")}catch(e){}}
+  function checkTk(){
+    if(!TK){twUi();return}
+    fetch("https://id.twitch.tv/oauth2/validate",{headers:{Authorization:"OAuth "+TK.tk}}).then(function(r){
+      if(r.status===401){TK=null;saveTk();loginMsg="Your Twitch login has run out. Log in again.";sync();return}
+      return r.ok&&r.json().then(function(v){TK.login=v.login||TK.login;TK.exp=Date.now()+(v.expires_in||0)*1000;saveTk();if(!S.ch&&v.login){S.ch=v.login;$("ch").value=S.ch}sync()});
+    }).catch(function(){});
+    twUi();
+  }
+  function twUi(){
+    var on=!!TK;$("twIn").textContent=on?"Log in again":"Log in with Twitch";$("twOut").hidden=!on;$("twWarn").hidden=!on;
+    $("twState").textContent=on?("Logged in"+(TK.login?" as "+TK.login:"")+(TK.exp?". Works until "+new Date(TK.exp).toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}):"")+"."):loginMsg;
+  }
+  $("twIn").addEventListener("click",function(){
+    var st=Array.from(crypto.getRandomValues(new Uint8Array(16)),function(b){return b.toString(16).padStart(2,"0")}).join("");
+    try{sessionStorage.setItem("sq_state",st)}catch(e){}
+    location.href="https://id.twitch.tv/oauth2/authorize?"+new URLSearchParams({response_type:"token",client_id:TW_CID,redirect_uri:BASE,scope:TW_SCOPES,state:st,force_verify:"true"}).toString();
+  });
+  $("twOut").addEventListener("click",function(){
+    if(TK)fetch("https://id.twitch.tv/oauth2/revoke",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"client_id="+TW_CID+"&token="+TK.tk}).catch(function(){});
+    TK=null;saveTk();loginMsg="Logged out.";sync();
+  });
+  $("modeSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.m=b.dataset.v;sync()}});
+  // luck selects
+  [["lsS","ls"],["lvS","lv"],["lmS","lm"]].forEach(function(x){var s=$(x[0]);for(var i=1;i<=5;i++){var o=el("option",null,i===1?"1 entry":i+" entries");o.value=i;s.appendChild(o)}
+    s.addEventListener("change",function(){S[x[1]]=+s.value;sync()})});
+  // swatches
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
+  var nmL=document.createElement("span");nmL.className="name";sw.appendChild(nmL);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  [["op","o"],["keep","keep"],["vol","vol"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=+this.value;sync()})});
+  [["optNr","nr"],["optTg","tg"],["optList","list"],["optSay","say"],["optSnd","snd"],["optRon","ron"]].forEach(function(x){$(x[0]).addEventListener("change",function(){S[x[1]]=this.checked?1:0;sync()})});
+  $("jw").addEventListener("input",function(){S.jw=this.value.toLowerCase().replace(/[^a-z0-9_]/g,"").slice(0,20);sync()});
+  $("ch").addEventListener("input",function(){S.ch=this.value.toLowerCase().replace(/^.*twitch\.tv\//,"").replace(/[^a-z0-9_]/g,"").slice(0,25);sync()});
+  [["omsg","omsg"],["pmsg","pmsg"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value;sync()})});
+  [["host","h"],["port","p"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value.trim();sync()})});
+  $("pw").addEventListener("input",sync);
+  document.querySelectorAll("[data-t]").forEach(function(b){b.addEventListener("click",function(){var f=$("prevFrame");if(f.contentWindow)f.contentWindow.postMessage({sq:b.dataset.t},"*")})});
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){var e=$(b.dataset.copy),o=b.textContent;
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(e.value).then(done,function(){e.select()});else e.select()})});
+  $("host").value=S.h;$("port").value=S.p;$("jw").value=S.jw;$("ch").value=S.ch;$("omsg").value=S.omsg;$("pmsg").value=S.pmsg;
+  function common(p,demo){
+    if(S.m==="tw"){p.set("m","tw");if(S.ch)p.set("ch",S.ch);if(TK&&!demo)p.set("tk",TK.tk)}
+    else{if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!demo)p.set("pw",pw)}
+    if(S.jw&&S.jw!=="join")p.set("jw",S.jw);
+  }
+  function hash(extra){var p=new URLSearchParams(),demo=!!extra.demo;p.set("ov","1");common(p,demo);p.set("g",S.g);if(S.o!==90)p.set("o",String(S.o));
+    ["ls","lv","lm"].forEach(function(k){var d=k==="lm"?1:2;if(S[k]!==d)p.set(k,String(S[k]))});
+    ["nr","tg","list","say","snd","ron"].forEach(function(k){if(!S[k])p.set(k,"0")});
+    if(S.say){var om=S.omsg.trim(),pm=S.pmsg.trim();if(om!==DEF_OPEN)p.set("omsg",om);if(pm!==DEF_PICK)p.set("pmsg",pm)}
+    if(S.keep)p.set("keep",String(S.keep));if(S.snd&&S.vol!==40)p.set("vol",String(S.vol));
+    for(var k in extra)p.set(k,extra[k]);return p.toString()}
+  function sync(){
+    ls("sq_cfg",JSON.stringify(S));
+    var tw=S.m==="tw";
+    $("modeSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.m)});
+    $("sbBox").hidden=tw;$("twBox").hidden=!tw;$("sbConn").hidden=tw;$("ronBox").hidden=tw;
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nmL.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("op").value=S.o;$("opV").textContent=S.o+"%";$("keep").value=S.keep;$("keepV").textContent=S.keep?(S.keep<60?S.keep+" seconds":(S.keep/60)+" min")+" after closing":"until cleared";
+    $("vol").value=S.vol;$("volV").textContent=S.vol+"%";$("volBox").hidden=!S.snd;$("msgBox").hidden=!S.say;
+    $("lsS").value=S.ls;$("lvS").value=S.lv;$("lmS").value=S.lm;
+    $("optNr").checked=!!S.nr;$("optTg").checked=!!S.tg;$("optList").checked=!!S.list;$("optSay").checked=!!S.say;$("optSnd").checked=!!S.snd;$("optRon").checked=!!S.ron;
+    var jw="!"+(S.jw||"join");$("jwEx").textContent=jw;$("jwEx2").textContent=jw+" CRA1G#4815162";$("jwT").textContent=jw;
+    $("obsUrl").value=tw&&!S.ch?"Type your Twitch channel name in step 1 first":BASE+"#"+hash({});
+    var dp=new URLSearchParams();dp.set("dock","1");common(dp,false);$("dockUrl").value=BASE+"#"+dp.toString();
+    var pf=$("prevFrame");
+    if(pf.dataset.on&&pf.contentWindow)pf.contentWindow.postMessage({sqHash:hash({demo:"1"})},"*");
+    else{pf.src=BASE+"#"+hash({demo:"1"});pf.dataset.on=1}
+    twUi();
+  }
+  $("heroFrame").src=BASE+"#ov=1&demo=1&auto=1&g=4DA3FF&snd=0";
+  sync();checkTk();
+}
+})();
+</script>
+<script src="../follow.js?v=2"></script>
+</body>
+</html>
