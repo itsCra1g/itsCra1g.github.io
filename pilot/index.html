@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pilot: setup guide</title>
+<meta name="description" content="Set up Pilot, the free Stream Deck stream dashboard by itsCRA1G: connect Twitch and OBS, every key explained, Kick with Streamer.bot, and troubleshooting.">
+<meta property="og:title" content="Pilot: your stream's cockpit, on your Stream Deck">
+<meta property="og:description" content="Live viewers, follows, subs, bitrate, ads and stream health on your Stream Deck keys. Free, by itsCRA1G.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="itsCRA1G">
+<meta property="og:url" content="https://itscra1g.github.io/pilot/">
+<meta property="og:image" content="https://itscra1g.github.io/pilot/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --warn:#FFB020;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+img{max-width:100%;display:block}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+/* top bar */
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display);letter-spacing:.2px}
+.brand img{width:34px;height:34px}
+.bar nav{margin-left:auto;margin-right:-12px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.bar nav::-webkit-scrollbar{display:none}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover,.bar nav a.on{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:auto;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}}
+.bar nav + .kofi{margin-left:16px}@media (max-width:860px){.bar nav + .kofi{margin-left:auto}}
+/* hero */
+.hero{padding-block:72px 56px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px;align-items:center}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(40px,6vw,64px)/1.02 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;color:var(--body);max-width:34em;margin:0 0 26px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.deck{background:var(--tile);border:1px solid var(--edge);border-radius:28px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:0 0 0 1px #000,0 30px 80px -30px var(--acc-soft)}
+.keys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.keys img{border-radius:16px;width:100%;height:auto}
+.deck .ov{border-radius:12px;border:1px solid var(--edge)}
+.cap{font-size:12px;color:var(--mute);margin:0}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:44px 32px;gap:32px}}
+/* sections */
+main section{padding-block:56px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 19px var(--display);color:var(--fg);margin:34px 0 10px}
+p{margin:0 0 14px;max-width:46em}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);padding:1px 6px;border-radius:6px;overflow-wrap:anywhere}
+ol,ul{margin:0 0 16px;padding-left:22px;max-width:46em}
+li{margin:6px 0}
+ol.steps{list-style:none;padding:0;counter-reset:s;display:grid;gap:10px}
+ol.steps>li{counter-increment:s;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;margin:0;background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:14px 16px}
+ol.steps>li::before{content:counter(s);width:28px;height:28px;border-radius:14px;background:var(--acc);color:#000;font:700 14px var(--display);display:flex;align-items:center;justify-content:center}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid var(--acc);border-radius:12px;padding:14px 16px;max-width:46em;margin:18px 0}
+.note.warn{border-left-color:var(--warn)}
+.note p:last-child{margin:0}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--edge);border-radius:14px;margin:6px 0 18px;background:var(--tile)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th{font:700 11px var(--text);letter-spacing:1.2px;text-transform:uppercase;color:var(--mute);text-align:left;padding:12px 14px;border-bottom:1px solid var(--edge);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--edge);vertical-align:top;color:var(--body)}
+tr:last-child td{border-bottom:0}
+td:first-child{color:var(--fg);font-weight:600;white-space:nowrap}
+td.addr{white-space:nowrap}
+.copy{margin-left:8px;font:600 12px var(--text);color:var(--acc);background:transparent;border:1px solid var(--edge2);border-radius:6px;padding:3px 8px;cursor:pointer}
+.copy:hover{border-color:var(--acc)}
+/* deck layout grids */
+.grid5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:620px;margin:10px 0 22px}
+.grid5 div{aspect-ratio:1;border-radius:12px;background:var(--tile);border:1px solid var(--edge);display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;font-weight:600;color:var(--body);padding:6px;line-height:1.25}
+.grid5 .g1{border-color:var(--acc);color:var(--fg);box-shadow:inset 0 0 0 1px var(--acc-soft)}
+.grid5 .g2{border-color:#FF7A1A;color:var(--fg)}
+.grid5 .nav{color:var(--mute);border-style:dashed}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--mute);margin:-10px 0 20px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid var(--edge2)}
+.legend .l1::before{border-color:var(--acc)}.legend .l2::before{border-color:#FF7A1A}.legend .l3::before{border-style:dashed}
+@media (max-width:480px){.grid5 div{font-size:10px;border-radius:9px}}
+footer{border-top:1px solid var(--edge);padding-block:40px 60px;color:var(--mute);font-size:13.5px}
+footer .row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin-bottom:18px}
+footer p{max-width:60em}
+.getit{display:inline-block;margin-top:24px;font:700 15px var(--text,Inter,sans-serif);color:#000;background:var(--acc,#4DA3FF);text-decoration:none;padding:12px 18px;border-radius:10px}.getit:hover{color:#000;background:#8CC4FF}
+.getit.soon{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2);cursor:default}
+.getit:not(.soon){cursor:pointer}
+.keytbl td:first-child{display:flex;align-items:center;gap:12px;min-width:200px}
+.keytbl td:first-child img{width:56px;height:56px;border-radius:12px;flex:0 0 auto}
+.code{position:relative;margin:8px 0 18px;max-width:52em}
+.code pre{margin:0;background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:16px;overflow-x:auto;font:13px/1.5 var(--mono);color:var(--fg)}
+.code .copy{position:absolute;top:10px;right:10px;margin:0;background:var(--tile2)}
+.glows{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 10px}
+.glows img{width:96px;height:96px;border-radius:18px}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="img/logo.png" alt="">Pilot</a>
+    <nav aria-label="Guide sections">
+      <a href="#install">Install</a><a href="#connect">Connect</a><a href="#keys">Keys</a><a href="#golive">Go live</a><a href="#kick">Kick</a><a href="#chat">Chat &amp; look</a><a href="#health">Health</a><a href="#help">Help</a>
+    </nav>
+    <a class="kofi" href="https://ko-fi.com/itscra1g" target="_blank" rel="noopener">Tip on Ko-fi</a>
+  </div>
+</header>
+
+<div class="wrap" id="top">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Setup guide · by itsCRA1G</div>
+      <h1>Your stream's cockpit, on your Stream Deck.</h1>
+      <p class="lead">Live viewers, follows, subs, bitrate, ads and stream health on your keys, plus hold-to-go-live and a hold-to-raid picker. Works with Twitch and OBS on its own. Add Streamer.bot for Kick.</p>
+      <div class="chips"><span class="chip">Stream Deck 6.9+</span><span class="chip">Windows 10+ · macOS 12+</span><span class="chip">Twitch + OBS</span><span class="chip">Kick with Streamer.bot</span><span class="chip">Free</span></div>
+      <span class="getit soon" id="getit">Coming soon to the Elgato Marketplace</span>
+    </div>
+    <figure class="deck" style="margin:0">
+      <div class="keys">
+        <img src="img/k-live.png" width="288" height="288" alt="Live key: 2:17 live, hold to end">
+        <img src="img/k-viewers.png" width="288" height="288" alt="Viewers key: 180, Twitch 142 and Kick 38">
+        <img src="img/k-follows.png" width="288" height="288" alt="Follows key: +12 this stream">
+        <img src="img/k-latest_lit.png" width="288" height="288" alt="Latest event key lit up: raid of 23 from Kezza_Plays">
+        <img src="img/k-nextad.png" width="288" height="288" alt="Next ad key: 14:32, tap to snooze">
+        <img src="img/k-health.png" width="288" height="288" alt="Stream health key: OK, 4 checks OK">
+      </div>
+      <p class="cap">Real Pilot keys mid-stream. Keys stay calm until something happens, then glow for a few seconds.</p>
+    </figure>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section id="need">
+  <div class="sec-head"><span class="num">00</span><h2>What you need</h2></div>
+  <ul>
+    <li><strong>A Stream Deck</strong> (any model, or Stream Deck Mobile) with the Stream Deck app <strong>6.9 or newer</strong>, on Windows 10+ or macOS 12+.</li>
+    <li><strong>OBS Studio 28 or newer</strong>. Its WebSocket server is built in, so there's nothing extra to install.</li>
+    <li><strong>A Twitch account.</strong> You log in once from the key settings.</li>
+    <li><strong>Optional: Streamer.bot</strong>, if you also stream to Kick and want Kick viewers, events and chat on your keys.</li>
+  </ul>
+</section>
+
+<section id="install">
+  <div class="sec-head"><span class="num">01</span><h2>Install Pilot and add keys</h2></div>
+  <ol class="steps">
+    <li><div>Install <strong>Pilot</strong> from the Elgato Marketplace (inside the Stream Deck app, or on the web). If you were sent a <code>.streamDeckPlugin</code> file, double-click it instead.</div></li>
+    <li><div>In the Stream Deck app, find the <strong>Pilot</strong> category in the actions list on the right.</div></li>
+    <li><div>Drag the keys you want onto your deck. A good start: <strong>Live / uptime</strong>, <strong>Viewers</strong>, <strong>Follows</strong>, <strong>Latest event</strong>, <strong>Next ad</strong> and <strong>Stream health</strong>.</div></li>
+    <li><div>Click any Pilot key to open its settings. The <strong>Setup</strong> checklist at the top is the same on every key, so you only connect things once.</div></li>
+  </ol>
+</section>
+
+<section id="connect">
+  <div class="sec-head"><span class="num">02</span><h2>Connect Twitch and OBS</h2></div>
+  <h3 style="margin-top:0">1 · Twitch</h3>
+  <ol class="steps">
+    <li><div>In any Pilot key's settings, press <strong>Connect Twitch</strong>. Twitch's activation page opens in your browser.</div></li>
+    <li><div>Type in the <strong>code</strong> shown in the key settings, then approve Pilot on Twitch.</div></li>
+    <li><div>The Twitch step turns green with your channel name. That's it: viewers, follows, subs, cheers, raids, ads and chat all come straight from Twitch.</div></li>
+  </ol>
+  <div class="note"><p>Pilot logs in with Twitch's official device login. Your password never goes near Pilot, and the login stays on your PC. <strong>Disconnect</strong> in the settings logs it out.</p></div>
+
+  <h3>2 · OBS</h3>
+  <ol class="steps">
+    <li><div>In OBS: <strong>Tools → WebSocket Server Settings</strong>, tick <strong>Enable WebSocket server</strong>.</div></li>
+    <li><div>Click <strong>Show Connect Info</strong> and copy the <strong>Server Password</strong>.</div></li>
+    <li><div>Paste it into <strong>Password</strong> under step 2 in Pilot's settings. Leave the address as <code>127.0.0.1:4455</code> unless you've changed the port in OBS.</div></li>
+    <li><div>The OBS step turns green. If it says <strong>Wrong password</strong>, copy it again from OBS.</div></li>
+  </ol>
+  <p>OBS gives Pilot your stream status, uptime, bitrate, dropped frames and mic, and lets the Live key start and end the stream.</p>
+
+  <h3>3 · Streamer.bot (optional)</h3>
+  <p>Only needed for Kick. Leave it <strong>Off</strong> if you only stream to Twitch. See <a href="#kick">Kick with Streamer.bot</a>.</p>
+</section>
+
+<section id="keys">
+  <div class="sec-head"><span class="num">03</span><h2>Your keys</h2></div>
+  <p>Thirteen keys, each its own action in the Pilot category. Counts for follows, subs, peak and chat start fresh each time OBS starts streaming. A restart within 5 minutes (a dropped stream) carries on as the same stream.</p>
+  <div class="tbl"><table class="keytbl">
+    <thead><tr><th>Key</th><th>Shows</th><th>Press</th></tr></thead>
+    <tbody>
+      <tr><td><img src="img/k-live.png" alt="">Live / uptime</td><td>How long you've been live, with a red light when you're on air.</td><td><strong>Hold 2 s</strong> to go live or end the stream (a ring fills). <strong>Tap</strong> to post your uptime in chat.</td></tr>
+      <tr><td><img src="img/k-viewers.png" alt="">Viewers</td><td>Viewers right now. Pick <strong>Twitch + Kick together</strong>, <strong>Twitch only</strong> or <strong>Kick only</strong> in the key's settings.</td><td>Refreshes.</td></tr>
+      <tr><td><img src="img/k-peak.png" alt="">Peak viewers</td><td>The most viewers at once this stream, and when it happened.</td><td>Refreshes.</td></tr>
+      <tr><td><img src="img/k-follows.png" alt="">Follows</td><td>New followers this stream. Glows with the name when one lands.</td><td>Refreshes.</td></tr>
+      <tr><td><img src="img/k-subgoal.png" alt="">Subs</td><td>Subs this stream, or progress to a <strong>Sub goal</strong> if you set one in the key's settings.</td><td>Refreshes.</td></tr>
+      <tr><td><img src="img/k-latest.png" alt="">Latest event</td><td>The newest follow, sub, gift, cheer, raid (or Kicks, with Streamer.bot).</td><td><strong>Tap</strong> to thank them in chat.</td></tr>
+      <tr><td><img src="img/k-chat.png" alt="">Chat speed</td><td>Messages per minute, with the last 8 minutes as a line.</td><td>Refreshes.</td></tr>
+      <tr><td><img src="img/k-bitrate.png" alt="">Bitrate</td><td>Your stream bitrate from OBS. Amber when it wobbles, red when it drops.</td><td>Refreshes.</td></tr>
+      <tr><td><img src="img/k-dropped.png" alt="">Dropped frames</td><td>Dropped frames from OBS. Amber at 1%, red at 5%.</td><td>Refreshes.</td></tr>
+      <tr><td><img src="img/k-nextad.png" alt="">Next ad</td><td>Time to your next Twitch ad. Turns amber in the last 2 minutes.</td><td><strong>Tap</strong> to snooze the ad (if Twitch has snoozes left).</td></tr>
+      <tr><td><img src="img/k-raid.png" alt="">Raid</td><td>How many channels you follow are live.</td><td><strong>Press</strong> to fill your deck with live channels. <strong>Tap</strong> one to open their channel, <strong>hold 1 s</strong> to raid it. Twitch's 90-second countdown shows on the key; press Raid again to cancel or close.</td></tr>
+      <tr><td><img src="img/k-health.png" alt="">Stream health</td><td>One key that watches OBS, your mic, bitrate, frames and your platforms.</td><td><strong>Press</strong> to see every check across your deck. Press again to close.</td></tr>
+      <tr><td><img src="img/k-counter.png" alt="">Counter</td><td>A count of anything: wins, deaths, hydration. Name it in the key's settings.</td><td><strong>Tap</strong> +1, <strong>hold</strong> −1. Reset it yourself, or each stream.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="golive">
+  <div class="sec-head"><span class="num">04</span><h2>Going live with the Live key</h2></div>
+  <p><strong>Hold the Live key for 2 seconds</strong> to start streaming in OBS. Hold it again while live to end the stream. The hold stops you going live by accident.</p>
+  <p>Want your starting scene, intro or alerts to kick off too? In the Live key's settings, type the name of a Streamer.bot action into <strong>On go-live, run</strong>. Pilot runs it once OBS says the stream is properly live.</p>
+  <div class="note warn"><p><strong>Don't put a “Start Streaming” step in that action.</strong> Pilot has already started the stream. Asking OBS to start again while it's still connecting can crash it, especially with the Multiple RTMP outputs plugin. Keep that plugin up to date too.</p></div>
+</section>
+
+<section id="kick">
+  <div class="sec-head"><span class="num">05</span><h2>Kick with Streamer.bot <span style="color:var(--mute);font-weight:500">(optional)</span></h2></div>
+  <p>Kick doesn't offer a login Pilot can use on its own, so Pilot gets Kick through Streamer.bot. With it you get Kick viewers on the Viewers and Peak keys, Kick follows, subs and gifts on the event keys, Kick in Stream health, and Pilot's chat lines in Kick chat.</p>
+  <ol class="steps">
+    <li><div>In Streamer.bot: <strong>Servers/Clients → WebSocket Server</strong>. Tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Connect your Kick account in Streamer.bot if you haven't.</div></li>
+    <li><div>In Pilot's settings, step 3: set <strong>Use it for</strong> to <strong>Kick (viewers, events, chat)</strong>. Leave the address as <code>127.0.0.1:8080</code> unless you've changed it.</div></li>
+    <li><div>Make the <strong>Pilot Kick</strong> action below, for Kick viewers and live status.</div></li>
+    <li><div>Make the <strong>Pilot Kick Chat</strong> action below, for chat lines in Kick.</div></li>
+  </ol>
+
+  <h3>Pilot Kick</h3>
+  <p>Create an action named <code>Pilot Kick</code>. Add a sub-action <strong>Core → C# → Execute C# Code</strong>, paste this in, and press <strong>Save and Compile</strong>. Then add three triggers to the action: <strong>Kick → Channel → Viewer Count Update</strong>, <strong>Kick → Stream Online</strong> and <strong>Kick → Stream Offline</strong>.</p>
+  <div class="code"><button class="copy" type="button">Copy</button><pre id="cs-kick">using System;
+
+// Streamer.bot action &quot;Pilot Kick&quot; (Execute Code)
+// Add these three triggers to this one action:
+//   Kick &gt; Channel &gt; Viewer Count Update
+//   Kick &gt; Stream Online
+//   Kick &gt; Stream Offline
+// Sends Kick&#x27;s viewer count and live status to Pilot (Viewers, Peak, Stream health).
+public class CPHInline
+{
+    public bool Execute()
+    {
+        if (args.ContainsKey(&quot;viewerCount&quot;))
+        {
+            long n;
+            if (long.TryParse(args[&quot;viewerCount&quot;].ToString(), out n))
+                CPH.WebsocketBroadcastJson(&quot;{\&quot;pilot\&quot;:\&quot;kick\&quot;,\&quot;viewers\&quot;:&quot; + n + &quot;}&quot;);
+            return true;
+        }
+        string trigger = args.ContainsKey(&quot;triggerName&quot;) &amp;&amp; args[&quot;triggerName&quot;] != null ? args[&quot;triggerName&quot;].ToString().ToLower() : &quot;&quot;;
+        string status = trigger.Contains(&quot;offline&quot;) || trigger.Contains(&quot;end&quot;) ? &quot;offline&quot; : &quot;online&quot;;
+        CPH.WebsocketBroadcastJson(&quot;{\&quot;pilot\&quot;:\&quot;kick\&quot;,\&quot;status\&quot;:\&quot;&quot; + status + &quot;\&quot;}&quot;);
+        return true;
+    }
+}</pre></div>
+
+  <h3>Pilot Kick Chat</h3>
+  <p>Create an action named exactly <code>Pilot Kick Chat</code> with the same kind of sub-action and this code. It needs no trigger: Pilot runs it.</p>
+  <div class="code"><button class="copy" type="button">Copy</button><pre id="cs-chat">using System;
+
+// Streamer.bot action &quot;Pilot Kick Chat&quot; (Execute Code). No trigger needed: Pilot runs it.
+// Posts Pilot&#x27;s chat lines (uptime, thank-you, raid) in Kick chat. Twitch chat is sent by Pilot directly.
+public class CPHInline
+{
+    public bool Execute()
+    {
+        if (!args.ContainsKey(&quot;message&quot;) || args[&quot;message&quot;] == null) return true;
+        string message = args[&quot;message&quot;].ToString();
+        if (message.Length &gt; 0) CPH.SendKickMessage(message);
+        return true;
+    }
+}</pre></div>
+  <div class="note"><p>Twitch events that come through Streamer.bot are ignored while Twitch is connected directly, so nothing gets counted twice.</p></div>
+</section>
+
+<section id="chat">
+  <div class="sec-head"><span class="num">06</span><h2>Chat lines and the look</h2></div>
+  <p>Under <strong>Chat lines</strong> in any key's settings, write what Pilot posts. They go to Twitch, and to Kick too if you set up Pilot Kick Chat.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Line</th><th>When</th><th>Fill-ins</th></tr></thead>
+    <tbody>
+      <tr><td>Uptime</td><td>Tap the Live key</td><td><code>{time}</code> how long you've been live</td></tr>
+      <tr><td>Thank-you</td><td>Tap the Latest event key</td><td><code>{user}</code> who did it</td></tr>
+      <tr><td>Raid</td><td>When a raid starts from the Raid key</td><td><code>{name}</code> and <code>{login}</code> of the channel you raid</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Send a test message</strong> checks chat works without waiting for a real moment.</p>
+  <p><strong>Key glow</strong> sets the colour every Pilot key lights up in: Pilot blue, Signal green, Violet, Neon pink, Lime or White.</p>
+  <div class="glows">
+    <img src="img/k-latest_lit.png" alt="Pilot blue"><img src="img/g-green.png" alt="Signal green"><img src="img/g-violet.png" alt="Violet"><img src="img/g-pink.png" alt="Neon pink"><img src="img/g-lime.png" alt="Lime">
+  </div>
+</section>
+
+<section id="health">
+  <div class="sec-head"><span class="num">07</span><h2>Stream health</h2></div>
+  <p>The Stream health key keeps an eye on the things that quietly ruin a stream, and goes amber or red with the problem's name when one needs you:</p>
+  <ul>
+    <li><strong>OBS</strong> connected and streaming</li>
+    <li><strong>Twitch</strong> live (and <strong>Kick</strong>, with Streamer.bot)</li>
+    <li><strong>Mic</strong> muted for 30 seconds, or silent for 2 minutes, while you're live</li>
+    <li><strong>Bitrate</strong> dropping, and <strong>dropped frames</strong></li>
+  </ul>
+  <p>For the mic check, type your mic's name exactly as it appears in OBS's Audio Mixer into <strong>Mic source</strong> in the key's settings. Press the key to see every check laid out across your deck.</p>
+</section>
+
+<section id="help">
+  <div class="sec-head"><span class="num">08</span><h2>Troubleshooting</h2></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Problem</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Keys show dashes</td><td>Something isn't connected yet. Open any key's settings and check the Setup steps are green.</td></tr>
+      <tr><td>Twitch shows “events off”</td><td>You're logged in, but Twitch's live events haven't connected. Pilot keeps retrying; press <strong>Reconnect</strong> if it stays like that.</td></tr>
+      <tr><td>OBS “Wrong password”</td><td>Copy the password again from OBS → Tools → WebSocket Server Settings → Show Connect Info.</td></tr>
+      <tr><td>Live key does nothing</td><td>It needs OBS connected, and a full 2-second hold. Watch for the ring.</td></tr>
+      <tr><td>OBS crashes when going live</td><td>Remove any Start Streaming step from your “On go-live, run” action, and update the Multiple RTMP outputs plugin.</td></tr>
+      <tr><td>No Kick viewers</td><td>Check Streamer.bot's WebSocket server is running, Pilot's step 3 is set to Kick, and the <strong>Pilot Kick</strong> action has all three triggers.</td></tr>
+      <tr><td>Chat lines don't post</td><td>Press <strong>Send a test message</strong>. For Kick, the action must be named exactly <code>Pilot Kick Chat</code>.</td></tr>
+      <tr><td>Next ad says NONE</td><td>Twitch hasn't scheduled an ad. Affiliates and Partners with ads turned on see a countdown.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Still stuck? Pilot keeps a log at <code>%APPDATA%\Pilot\pilot.log</code> on Windows (<code>~/Library/Application Support/Pilot/pilot.log</code> on Mac). Send it with your question.</p>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <a class="brand" href="#top"><img src="img/logo.png" alt="">Pilot</a>
+      <span>Free, made by itsCRA1G · <a href="https://ko-fi.com/itscra1g" target="_blank" rel="noopener">Say thanks on Ko-fi</a> · <a href="../">More free tools</a></span>
+    </div>
+    <p>Pilot is an independent tool. It is not affiliated with or endorsed by Twitch, Kick, OBS Project, Streamer.bot or Elgato.</p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll(".copy").forEach(function(b){b.addEventListener("click",function(){var pre=b.parentNode.querySelector("pre"),t=pre.textContent;
+ var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy"},1500)};
+ var sel=function(){var r=document.createRange();r.selectNodeContents(pre);var s=getSelection();s.removeAllRanges();s.addRange(r)};
+ try{navigator.clipboard.writeText(t).then(done,sel)}catch(e){sel()}})});
+var links=[].slice.call(document.querySelectorAll(".bar nav a"));
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)})})},{rootMargin:"-40% 0px -55% 0px"});
+document.querySelectorAll("main section").forEach(function(s){io.observe(s)});
+</script>
+<script src="../follow.js?v=2"></script>
+</body>
+</html>
