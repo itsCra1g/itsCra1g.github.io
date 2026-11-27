@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Webcam Looks: free OBS LUTs for your webcam</title>
+<meta name="description" content="Free webcam LUTs for OBS by itsCRA1G: eight colour looks you can try on a screenshot of your own camera before you download. Runs in your browser.">
+<meta property="og:title" content="Webcam Looks: free OBS LUTs for your camera">
+<meta property="og:description" content="Eight free webcam looks for OBS. Try them on your own camera first, then download. Free, by itsCRA1G.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="itsCRA1G">
+<meta property="og:url" content="https://itscra1g.github.io/looks/">
+<meta property="og:image" content="https://itscra1g.github.io/looks/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14); --ok:#3DDC97; --bad:#FF6B6B;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:56px 36px}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px;max-width:16em}
+.lead{font-size:19px;max-width:38em;margin:0 0 20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+main section{padding-block:40px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+h3{font:700 18px var(--display);color:var(--fg);margin:0}
+p{margin:0 0 14px;max-width:46em}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}.btn:disabled{opacity:.4;cursor:default}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:200px;border:2px dashed var(--edge2);border-radius:20px;background:var(--tile);text-align:center;padding:28px;cursor:pointer;transition:border-color .2s,background .2s}
+.drop:hover,.drop.over{border-color:var(--acc);background:#0d1118}
+.drop b{font:700 22px var(--display);color:var(--fg)}
+.drop span{font-size:14px;color:var(--mute)}
+.drop input{display:none}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px;margin-top:22px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.tog{display:flex;flex-direction:column;gap:9px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input{width:18px;height:18px;accent-color:var(--acc);flex:0 0 auto}
+.tog small{color:var(--mute);font-size:13px;margin-left:4px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 6px}
+.items{display:flex;flex-direction:column;gap:18px}
+.item{background:var(--tile);border:1px solid var(--edge);border-radius:18px;padding:18px}
+.ihead{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:14px}
+.ihead input{font:600 15px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge2);border-radius:9px;padding:8px 10px;min-width:0;width:220px}
+.ihead .src{font-size:13px;color:var(--mute)}
+.ihead .rm{margin-left:auto}
+.warn{font-size:13px;color:#FFB020;width:100%}
+.busy{margin:0 0 10px;color:var(--acc)}
+.outs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.out{background:var(--tile2);border:1px solid var(--edge);border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;min-width:0}
+.out .pv{width:120px;height:120px;display:grid;place-items:center;border-radius:8px;background:repeating-conic-gradient(#1b1f27 0 25%,#13161c 0 50%) 0 0/16px 16px}
+.out .pv img{image-rendering:auto;max-width:112px;max-height:112px}
+.out .pv.big img{width:112px;height:112px}
+.out b{font:700 13px var(--text);color:var(--fg)}
+.out small{font-size:12px;color:var(--mute)}
+.out small.ok{color:var(--ok)}.out small.bad{color:var(--bad)}
+.out a{font:700 13px var(--text);color:#000;background:var(--acc);border-radius:8px;padding:6px 10px;text-decoration:none}
+.out a:hover{background:#8CC4FF;color:#000}
+.grp{font:700 12px var(--text);letter-spacing:1.4px;text-transform:uppercase;color:var(--mute);margin:14px 0 8px}
+.grp:first-child{margin-top:0}
+/* chat previews */
+.chats{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:14px}
+.chat{border-radius:10px;padding:10px 12px;font:13px/28px Inter,system-ui,sans-serif;min-width:0}
+.chat .t{font:700 10px var(--text);letter-spacing:1.2px;text-transform:uppercase;opacity:.65;line-height:1.2;margin-bottom:4px}
+.chat img{vertical-align:middle}
+.chat .bdg{width:18px;height:18px;margin-right:3px;vertical-align:-4px}
+.chat .em{width:28px;height:28px;margin:0 2px}
+.chat.kk .em{width:32px;height:32px}
+.chat.tw-d{background:#18181b;color:#efeff1}.chat.tw-l{background:#fff;color:#0e0e10}.chat.kk{background:#0b0e0f;color:#fff}.chat.dc{background:#313338;color:#dbdee1}
+.chat.dc .em{width:22px;height:22px}
+.chat .nm{font-weight:700}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;max-width:52em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+.trybar{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;margin:4px 0 18px}
+.drop.small{min-height:96px;padding:16px;gap:4px;border-radius:16px}
+.drop.small b{font-size:17px}
+@media (max-width:760px){.trybar{grid-template-columns:1fr}}
+.viewer{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:22px;align-items:start}
+@media (max-width:900px){.viewer{grid-template-columns:1fr}}
+.stagewrap{position:relative;border-radius:18px;overflow:hidden;background:var(--tile);border:1px solid var(--edge);touch-action:pan-y;user-select:none}
+.stagewrap canvas{display:block;width:100%;height:auto}
+.split{position:absolute;inset:0;cursor:ew-resize}
+.split i{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 12px rgba(0,0,0,.6);left:var(--x,50%)}
+.split i::after{content:"";position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.5);
+  background-image:linear-gradient(90deg,transparent 9px,#000 9px 11px,transparent 11px 23px,#000 23px 25px,transparent 25px)}
+.split span{position:absolute;top:12px;font:700 11px var(--text);letter-spacing:1.4px;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.6);padding:5px 8px;border-radius:6px}
+.split .tagl{left:12px}.split .tagr{right:12px}
+.lookname{position:absolute;left:12px;bottom:12px;font:700 15px var(--display);color:#fff;background:rgba(0,0,0,.6);padding:6px 11px;border-radius:8px;pointer-events:none}
+.ctrls{display:flex;flex-direction:column;gap:22px}
+.ctrls input[type=range]{width:100%;accent-color:var(--acc)}
+.lbl span{color:var(--fg);margin-left:6px;letter-spacing:0}
+.dl{display:flex;flex-direction:column;gap:10px}
+.looks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+.look{all:unset;box-sizing:border-box;cursor:pointer;background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.look:hover{border-color:var(--edge2)}
+.look:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.look[aria-selected=true]{border-color:var(--acc);background:var(--acc-soft)}
+.look canvas{width:100%;height:auto;border-radius:8px;display:block;background:#111}
+.look b{font:700 14px var(--display);color:var(--fg);padding:0 4px}
+.look small{font-size:12px;color:var(--mute);padding:0 4px 2px;line-height:1.35}
+.steps{margin:0 0 14px;padding-left:22px;max-width:46em;display:flex;flex-direction:column;gap:8px}
+.steps li::marker{color:var(--acc);font-weight:700}
+@media (max-width:700px){.looks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Webcam Looks</a>
+  <nav><a href="#try">Try them</a><a href="#which">Which one?</a><a href="#obs">Add to OBS</a><a href="#tips">Tips</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
+
+<div class="wrap"><div class="hero">
+  <div class="eyebrow">Free tool · by itsCRA1G</div>
+  <h1>Make your webcam look like a camera.</h1>
+  <p class="lead">Eight free colour looks (LUTs) for the webcam in OBS. Try them on a screenshot of your own camera first, set the strength, then download the one you like. Your screenshot stays on your computer.</p>
+  <div class="chips"><span class="chip">8 looks</span><span class="chip">Try on your own camera</span><span class="chip">Before / after</span><span class="chip">.cube files for OBS</span><span class="chip">Download as a zip</span></div>
+</div></div>
+
+<main class="wrap">
+  <section id="try">
+    <div class="sec-head"><span class="num">1</span><h2>Try them on your camera</h2></div>
+    <p>In OBS, right-click your webcam source and pick <strong>Screenshot (Source)</strong>, then drop the picture here. Or try the looks on the sample first.</p>
+    <div class="trybar">
+      <label class="drop small" id="drop"><b>Drop a webcam screenshot here, or click to choose</b><span>PNG or JPG · stays in your browser</span><input type="file" id="file" accept="image/png,image/jpeg,image/webp"></label>
+      <div class="seg" id="sampleSeg"><button data-v="room" aria-pressed="true">Sample room</button><button data-v="card" aria-pressed="false">Test card</button><button data-v="mine" aria-pressed="false" hidden id="mineBtn">Your screenshot</button></div>
+    </div>
+
+    <div class="viewer">
+      <div class="stagewrap" id="stageWrap">
+        <canvas id="view" width="1280" height="720" aria-label="Preview of the selected look"></canvas>
+        <div class="split" id="split" hidden><i></i><span class="tagl">Before</span><span class="tagr">After</span></div>
+        <div class="lookname" id="lookName"></div>
+      </div>
+      <div class="ctrls">
+        <div><div class="lbl">Strength <span id="amtVal">60%</span></div>
+          <input type="range" id="amt" min="0" max="100" value="60" aria-label="Strength">
+          <div class="hint">This is the <strong>Amount</strong> slider in OBS's Apply LUT filter. Most webcams look best between 40% and 70%.</div></div>
+        <div><div class="lbl">Compare</div>
+          <div class="seg" id="cmpSeg"><button data-v="off" aria-pressed="true">After only</button><button data-v="split" aria-pressed="false">Before / after</button></div>
+          <div class="hint">Drag the line on the picture to compare.</div></div>
+        <div class="dl">
+          <button class="btn" id="dlOne">Download this look (.cube)</button>
+          <button class="btn ghost" id="dlAll">Download all 8 (.zip)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="looks" id="looks" role="listbox" aria-label="Looks"></div>
+  </section>
+
+  <section id="which">
+    <div class="sec-head"><span class="num">2</span><h2>Which one?</h2></div>
+    <div class="tw"><table>
+      <tr><th>If your camera looks…</th><th>Try</th><th>What it does</th></tr>
+      <tr><td>Fine, just a bit flat</td><td><strong>Clean</strong></td><td>A little more contrast and colour. The safe everyday one.</td></tr>
+      <tr><td>Blue or cold (daylight, white LEDs, monitor light)</td><td><strong>Warm Fix</strong></td><td>Warms skin back up and takes the blue out.</td></tr>
+      <tr><td>Orange or yellow (ordinary bulbs, warm lamps)</td><td><strong>Cool Fix</strong></td><td>Pulls the orange out so skin looks natural.</td></tr>
+      <tr><td>Dark or murky (dim room, cheap webcam)</td><td><strong>Bright Room</strong></td><td>Lifts the face and shadows without blowing out the bright bits.</td></tr>
+      <tr><td>Fine, and you want a style</td><td><strong>Pilot</strong></td><td>Cool blue shadows, natural skin, crisp. Suits blue and RGB setups.</td></tr>
+      <tr><td></td><td><strong>Corporation</strong></td><td>Moody: deeper shadows, calmer colour, a hint of green. After-hours office.</td></tr>
+      <tr><td></td><td><strong>Film</strong></td><td>Soft faded blacks and warm highlights. Cosy, just chatting.</td></tr>
+      <tr><td></td><td><strong>Mono</strong></td><td>Black and white with punch. Great for a BRB cam or a dramatic moment.</td></tr>
+    </table></div>
+    <p class="hint">A LUT can't add light that isn't there. If your face is dark, a lamp in front of you does more than any look.</p>
+  </section>
+
+  <section id="obs">
+    <div class="sec-head"><span class="num">3</span><h2>Add it to OBS</h2></div>
+    <ol class="steps">
+      <li><strong>Save the file somewhere it'll stay</strong>, like a <code>LUTs</code> folder next to your overlays. If you move it later, OBS loses it.</li>
+      <li>In OBS, right-click your <strong>webcam source</strong> → <strong>Filters</strong>.</li>
+      <li>Under <strong>Effect Filters</strong>, click <strong>+</strong> → <strong>Apply LUT</strong>, and name it after the look.</li>
+      <li>Next to <strong>Path</strong>, click <strong>Browse</strong> and pick the <code>.cube</code> file.</li>
+      <li>Set <strong>Amount</strong> to match the strength you liked here (60% here = <code>0.60</code> in OBS).</li>
+      <li>If you also use Chroma Key, background removal or Sharpen, keep the LUT <strong>after</strong> the background filters and <strong>before</strong> Sharpen. Drag filters to reorder them.</li>
+    </ol>
+    <p>Put the filter on the <strong>webcam source</strong>, not the whole scene, so your overlays and game keep their own colours.</p>
+  </section>
+
+  <section id="tips">
+    <div class="sec-head"><span class="num">4</span><h2>Tips</h2></div>
+    <p><strong>Turn off auto white balance on your camera.</strong> Otherwise the camera keeps shifting colour while the LUT stays the same. In OBS: double-click the webcam → <strong>Configure Video</strong>, and untick Auto next to White Balance (the box varies by camera). Logitech and Elgato cameras also have their own app for this.</p>
+    <p><strong>Fix the lighting first, then add the look.</strong> One soft light in front of you, slightly above eye level, beats every filter. Turn off overhead lights that give you shadows under the eyes.</p>
+    <p><strong>Check your skin, not the background.</strong> If you look orange or grey, lower the strength or try the Fix looks instead of a style.</p>
+    <p><strong>Same look on every scene.</strong> One copy of your webcam with the filter, then Paste (Reference) it into your other scenes, so the look is set once.</p>
+    <p class="hint">The looks are standard 33-point <code>.cube</code> LUTs, so they also work in DaVinci Resolve, Premiere, CapCut and most video editors.</p>
+  </section>
+</main>
+
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with OBS Project.</div></footer>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var N=33;
+
+/* ---------- colour helpers (values 0..1, sRGB) ---------- */
+function cl(x){return x<0?0:x>1?1:x}
+function lin(x){return Math.pow(x,2.2)}
+function gam(x){return Math.pow(x<0?0:x,1/2.2)}
+function luma(c){return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function sig(x,a){if(a<=0)return x;var f=function(v){return 1/(1+Math.exp(-a*(v-.5)))},y0=f(0),y1=f(1);return (f(x)-y0)/(y1-y0)}
+// white balance in linear light, keeping brightness. t>0 warmer, m>0 more magenta
+function wb(c,t,m){var r=lin(c[0]),g=lin(c[1]),b=lin(c[2]),y=.2126*r+.7152*g+.0722*b;
+  r*=1+.16*t;b*=1-.16*t;g*=1-.07*m+.02*t;var y2=.2126*r+.7152*g+.0722*b,k=y2>1e-6?y/y2:1;
+  return [gam(r*k),gam(g*k),gam(b*k)]}
+// tone: gamma (>1 brightens mids), contrast (S-curve strength), lift (raise shadows)
+function tone(c,o){return c.map(function(x){
+  if(o.gamma)x=Math.pow(x,1/o.gamma);
+  if(o.lift)x=x+o.lift*Math.pow(1-x,2);
+  if(o.con)x=x+(sig(x,6)-x)*o.con;
+  return cl(x)})}
+function sat(c,s,vib){var y=luma(c),mx=Math.max(c[0],c[1],c[2]),mn=Math.min(c[0],c[1],c[2]),s0=mx-mn;
+  var f=s*(1+(vib||0)*(1-s0));return c.map(function(x){return cl(y+(x-y)*f)})}
+// add a colour to the shadows / highlights
+function split(c,sh,sa,hi,ha){var y=cl(luma(c)),ws=Math.pow(1-y,2)*sa,wh=y*y*ha;
+  return c.map(function(x,i){return cl(x+(sh[i]-.5)*ws+(hi[i]-.5)*wh)})}
+function matte(c,lo,hi){return c.map(function(x){return lo+x*(hi-lo)})}
+function hue(c){var r=c[0],g=c[1],b=c[2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;if(d<1e-6)return [0,0];
+  var h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360;return [h,d]}
+// how "skin-like" a colour is (orange hues, not grey)
+function skin(c){var hs=hue(c),dh=(hs[0]>180?hs[0]-360:hs[0])-24;return Math.exp(-dh*dh/(2*16*16))*Math.min(1,hs[1]*6)}
+function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
+
+/* ---------- the looks ---------- */
+var LOOKS=[
+ {id:"clean",name:"Clean",file:"Clean",blurb:"A bit more contrast and colour.",
+  fn:function(c){c=wb(c,.08,0);c=tone(c,{con:.28});return sat(c,1.06,.2)}},
+ {id:"warm",name:"Warm Fix",file:"Warm-Fix",blurb:"For blue or cold cameras.",
+  fn:function(c){c=wb(c,.75,.12);c=tone(c,{con:.15});return sat(c,1.04,.1)}},
+ {id:"cool",name:"Cool Fix",file:"Cool-Fix",blurb:"For orange or yellow cameras.",
+  fn:function(c){c=wb(c,-.75,-.05);c=tone(c,{con:.15});return sat(c,.94,.15)}},
+ {id:"bright",name:"Bright Room",file:"Bright-Room",blurb:"Lifts a dim or murky room.",
+  fn:function(c){c=tone(c,{gamma:1.32,lift:.05,con:.12});c=wb(c,.12,0);return sat(c,1.08,.1)}},
+ {id:"pilot",name:"Pilot",file:"Pilot",blurb:"Cool blue shadows, natural skin.",
+  fn:function(c){var o=c;c=tone(c,{con:.35});c=split(c,[.25,.5,.9],.15,[.62,.52,.42],.08);c=sat(c,.98,.1);
+   return mix(c,sat(tone(o,{con:.35}),1.02,0),skin(o)*.55)}},
+ {id:"corp",name:"Corporation",file:"Corporation",blurb:"Moody, calm colour, a hint of green.",
+  fn:function(c){var o=c;c=tone(c,{gamma:.95,con:.6});c=sat(c,.82,0);c=split(c,[.38,.7,.42],.16,[.6,.54,.44],.06);
+   c=matte(c,.025,.985);return mix(c,matte(sat(tone(o,{gamma:.95,con:.6}),.9,0),.025,.985),skin(o)*.4)}},
+ {id:"film",name:"Film",file:"Film",blurb:"Soft faded blacks, warm highlights.",
+  fn:function(c){c=tone(c,{con:.3});c=sat(c,.9,0);c=split(c,[.4,.5,.6],.1,[.64,.52,.38],.1);return matte(c,.07,.96)}},
+ {id:"mono",name:"Mono",file:"Mono",blurb:"Black and white with punch.",
+  fn:function(c){var y=cl(.34*c[0]+.56*c[1]+.10*c[2]);y=sig(y,6)*.45+y*.55;y=Math.pow(y,1.04);return [y,y,y]}}
+];
+var CACHE={};
+function lut(look){if(CACHE[look.id])return CACHE[look.id];var t=new Float32Array(N*N*N*3),i=0,d=N-1;
+  for(var b=0;b<N;b++)for(var g=0;g<N;g++)for(var r=0;r<N;r++){var o=look.fn([r/d,g/d,b/d]);t[i++]=cl(o[0]);t[i++]=cl(o[1]);t[i++]=cl(o[2])}
+  return CACHE[look.id]=t}
+function cube(look){var t=lut(look),out=['TITLE "itsCRA1G '+look.name+'"','# Webcam Looks by itsCRA1G · itscra1g.github.io/looks','LUT_3D_SIZE '+N,''];
+  for(var i=0;i<t.length;i+=3)out.push(t[i].toFixed(5)+" "+t[i+1].toFixed(5)+" "+t[i+2].toFixed(5));
+  return out.join("\n")+"\n"}
+// apply a LUT to image data (trilinear, like OBS)
+function grade(src,look){var t=lut(look),s=src.data,o=new ImageData(src.width,src.height),d=o.data,M=N-1,k=M/255,NN=N*N;
+  for(var p=0;p<s.length;p+=4){var fr=s[p]*k,fg=s[p+1]*k,fb=s[p+2]*k,r0=fr|0,g0=fg|0,b0=fb|0;if(r0>=M)r0=M-1;if(g0>=M)g0=M-1;if(b0>=M)b0=M-1;
+    var dr=fr-r0,dg=fg-g0,db=fb-b0,i000=((b0*NN)+g0*N+r0)*3,i100=i000+3,i010=i000+N*3,i110=i010+3,i001=i000+NN*3,i101=i001+3,i011=i001+N*3,i111=i011+3;
+    for(var c=0;c<3;c++){var a=t[i000+c]+(t[i100+c]-t[i000+c])*dr,b=t[i010+c]+(t[i110+c]-t[i010+c])*dr,e=t[i001+c]+(t[i101+c]-t[i001+c])*dr,f=t[i011+c]+(t[i111+c]-t[i011+c])*dr;
+      var x=a+(b-a)*dg,y=e+(f-e)*dg;d[p+c]=(x+(y-x)*db)*255+.5}
+    d[p+3]=s[p+3]}
+  return o}
+
+/* ---------- sample pictures ---------- */
+var ROOM='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">'+
+'<defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b544d"/><stop offset="1" stop-color="#3a342f"/></linearGradient>'+
+'<radialGradient id="led" cx=".86" cy=".2" r=".55"><stop offset="0" stop-color="#8f5cff" stop-opacity=".75"/><stop offset=".6" stop-color="#5a3fd8" stop-opacity=".18"/><stop offset="1" stop-color="#5a3fd8" stop-opacity="0"/></radialGradient>'+
+'<radialGradient id="win" cx=".12" cy=".3" r=".5"><stop offset="0" stop-color="#ffe2b8" stop-opacity=".55"/><stop offset="1" stop-color="#ffe2b8" stop-opacity="0"/></radialGradient>'+
+'<radialGradient id="face" cx=".42" cy=".4" r=".7"><stop offset="0" stop-color="#e9b996"/><stop offset=".55" stop-color="#d49a76"/><stop offset="1" stop-color="#9c6248"/></radialGradient>'+
+'<linearGradient id="neck" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a5f45"/><stop offset="1" stop-color="#c88c69"/></linearGradient>'+
+'<linearGradient id="hood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f4552"/><stop offset="1" stop-color="#162129"/></linearGradient>'+
+'<linearGradient id="desk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4a33"/><stop offset="1" stop-color="#3b2819"/></linearGradient>'+
+'<linearGradient id="rim" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#7fb8ff" stop-opacity=".55"/><stop offset=".35" stop-color="#7fb8ff" stop-opacity="0"/></linearGradient>'+
+'<radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient></defs>'+
+'<rect width="1280" height="720" fill="url(#w)"/>'+
+'<rect x="70" y="70" width="250" height="330" rx="6" fill="#d9cdb8" opacity=".55"/><rect x="70" y="70" width="250" height="330" fill="url(#win)"/>'+
+'<rect x="190" y="70" width="8" height="330" fill="#4a4038" opacity=".6"/><rect x="70" y="230" width="250" height="8" fill="#4a4038" opacity=".6"/>'+
+'<rect x="900" y="150" width="300" height="12" fill="#2a2420"/>'+
+'<rect x="925" y="96" width="22" height="54" fill="#c0392b"/><rect x="950" y="104" width="18" height="46" fill="#e2b13c"/><rect x="971" y="92" width="26" height="58" fill="#2c6fb5"/><rect x="1000" y="110" width="16" height="40" fill="#e8e2d4"/>'+
+'<path d="M1110 150 q-8 -40 -30 -62 q30 6 34 40 q6 -40 36 -50 q-20 30 -18 72z" fill="#3f8a3e"/><rect x="1090" y="140" width="48" height="12" rx="3" fill="#b5653b"/>'+
+'<rect x="0" y="0" width="1280" height="720" fill="url(#led)"/>'+
+'<rect x="0" y="640" width="1280" height="80" fill="url(#desk)"/>'+
+// shoulders / hoodie
+'<path d="M330 720 C 340 560 450 500 640 500 C 830 500 940 560 950 720 Z" fill="url(#hood)"/>'+
+'<path d="M560 505 q80 70 160 0" fill="none" stroke="#0f171d" stroke-width="10" stroke-linecap="round"/>'+
+// neck
+'<path d="M585 440 L585 515 Q640 545 695 515 L695 440 Z" fill="url(#neck)"/>'+
+// head
+'<ellipse cx="640" cy="335" rx="118" ry="145" fill="url(#face)"/>'+
+'<ellipse cx="640" cy="335" rx="118" ry="145" fill="url(#rim)"/>'+
+'<ellipse cx="522" cy="350" rx="18" ry="32" fill="#b9805f"/><ellipse cx="758" cy="350" rx="18" ry="32" fill="#c48b6a"/>'+
+// hair
+'<path d="M520 320 C 505 210 570 172 645 175 C 730 178 775 225 760 320 C 748 270 720 245 690 240 C 640 250 590 250 555 262 C 535 275 525 295 520 320 Z" fill="#2b1d16"/>'+
+// brows, eyes, nose, mouth
+'<path d="M570 300 q25 -12 50 -2 M662 298 q25 -10 50 2" stroke="#2b1d16" stroke-width="8" fill="none" stroke-linecap="round"/>'+
+'<ellipse cx="596" cy="330" rx="11" ry="8" fill="#2a1d18"/><ellipse cx="686" cy="330" rx="11" ry="8" fill="#2a1d18"/>'+
+'<circle cx="599" cy="327" r="3" fill="#fff" opacity=".8"/><circle cx="689" cy="327" r="3" fill="#fff" opacity=".8"/>'+
+'<path d="M640 340 q-10 40 -18 52 q14 8 30 2" fill="none" stroke="#9a5f45" stroke-width="5" stroke-linecap="round"/>'+
+'<path d="M600 418 q40 26 82 0" fill="none" stroke="#8e3f35" stroke-width="7" stroke-linecap="round"/>'+
+// headset
+'<path d="M505 330 C 505 170 775 170 775 330" fill="none" stroke="#1b1d22" stroke-width="18"/>'+
+'<rect x="488" y="300" width="42" height="92" rx="20" fill="#1b1d22"/><rect x="750" y="300" width="42" height="92" rx="20" fill="#1b1d22"/>'+
+'<rect x="756" y="318" width="6" height="56" rx="3" fill="#4DA3FF"/>'+
+// mic arm + mic
+'<path d="M1180 720 L1080 560 L920 520" fill="none" stroke="#202227" stroke-width="12" stroke-linecap="round"/>'+
+'<rect x="850" y="470" width="80" height="120" rx="38" fill="#2a2d33" transform="rotate(-20 890 530)"/>'+
+'<rect x="0" y="0" width="1280" height="720" fill="url(#vig)"/></svg>';
+function drawCard(cv){var x=cv.getContext("2d"),W=1280,H=720;cv.width=W;cv.height=H;
+  var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,"#1a1c21");g.addColorStop(1,"#0c0d10");x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.fillStyle="#E8ECF2";x.font="700 28px 'Space Grotesk',Inter,sans-serif";x.fillText("Webcam Looks · test card",60,72);
+  x.font="600 15px Inter,sans-serif";x.fillStyle="#8A94A6";x.fillText("SKIN TONES",60,122);x.fillText("COLOUR CHECKER",60,300);x.fillText("GREY STEPS",760,300);x.fillText("GRADIENTS",60,592);
+  var sk=["#fbe0c9","#f1c3a2","#e0ac8a","#c98d68","#a86d4c","#8a5639","#6a3f2a","#4a2c1f"];
+  sk.forEach(function(c,i){var cx=110+i*140,cy=190;var rg=x.createRadialGradient(cx-18,cy-20,6,cx,cy,58);rg.addColorStop(0,shade(c,1.12,24));rg.addColorStop(.3,c);rg.addColorStop(1,shade(c,.72));x.fillStyle=rg;x.beginPath();x.arc(cx,cy,54,0,7);x.fill()});
+  var cc=[[115,82,68],[194,150,130],[98,122,157],[87,108,67],[133,128,177],[103,189,170],[214,126,44],[80,91,166],[193,90,99],[94,60,108],[157,188,64],[224,163,46],[56,61,150],[70,148,73],[175,54,60],[231,199,31],[187,86,149],[8,133,161],[243,243,242],[200,200,200],[160,160,160],[122,122,121],[85,85,85],[52,52,52]];
+  cc.forEach(function(c,i){x.fillStyle="rgb("+c+")";x.beginPath();x.roundRect(60+(i%6)*104,316+((i/6)|0)*62,94,54,8);x.fill()});
+  for(var i=0;i<11;i++){var v=Math.round(i*25.5);x.fillStyle="rgb("+v+","+v+","+v+")";x.fillRect(760+i*42,316,42,238)}
+  var hg=x.createLinearGradient(60,0,1220,0);["#ff3b3b","#ffb000","#e8ff3b","#3bff6a","#3be8ff","#3b6aff","#b03bff","#ff3b9d"].forEach(function(c,i,a){hg.addColorStop(i/(a.length-1),c)});
+  x.fillStyle=hg;x.fillRect(60,608,1160,40);var bw=x.createLinearGradient(60,0,1220,0);bw.addColorStop(0,"#000");bw.addColorStop(1,"#fff");x.fillStyle=bw;x.fillRect(60,654,1160,30)}
+function shade(h,k,add){var n=parseInt(h.slice(1),16),f=function(v){return Math.min(255,v*k+(add||0))|0};return "rgb("+[f(n>>16),f((n>>8)&255),f(n&255)]+")"}
+
+/* ---------- state + rendering ---------- */
+var view=$("view"),vx=view.getContext("2d",{willReadFrequently:true});
+var S={look:LOOKS[0],amt:.6,cmp:false,x:.5,src:null,graded:{},mine:null,sample:"room"};
+try{var st=JSON.parse(localStorage.getItem("looks_s")||"{}");if(st.look)S.look=LOOKS.find(function(l){return l.id===st.look})||S.look;if(st.amt!=null)S.amt=st.amt}catch(e){}
+function save(){try{localStorage.setItem("looks_s",JSON.stringify({look:S.look.id,amt:S.amt}))}catch(e){}}
+function toData(img,maxW){var w=img.naturalWidth||img.width,h=img.naturalHeight||img.height,k=Math.min(1,maxW/w);
+  var c=document.createElement("canvas");c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));var x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0,c.width,c.height);return x.getImageData(0,0,c.width,c.height)}
+function setSource(img){S.src=toData(img,1280);S.graded={};view.width=S.src.width;view.height=S.src.height;thumbs(img);render()}
+function render(){var src=S.src;if(!src)return;var g=S.graded[S.look.id]||(S.graded[S.look.id]=grade(src,S.look));
+  var out=new ImageData(src.width,src.height),a=S.amt,s=src.data,d=g.data,o=out.data;
+  for(var i=0;i<s.length;i+=4){o[i]=s[i]+(d[i]-s[i])*a;o[i+1]=s[i+1]+(d[i+1]-s[i+1])*a;o[i+2]=s[i+2]+(d[i+2]-s[i+2])*a;o[i+3]=255}
+  vx.putImageData(out,0,0);
+  if(S.cmp){var w=Math.round(src.width*S.x);if(w>0)vx.putImageData(src,0,0,0,0,w,src.height)}
+  $("split").hidden=!S.cmp;$("split").style.setProperty("--x",(S.x*100)+"%");
+  $("lookName").textContent=S.look.name+" · "+Math.round(S.amt*100)+"%";
+  $("amtVal").textContent=Math.round(S.amt*100)+"%";$("amt").value=Math.round(S.amt*100);
+  [].forEach.call(document.querySelectorAll(".look"),function(b){b.setAttribute("aria-selected",b.dataset.id===S.look.id)})}
+function thumbs(img){var small=toData(img,320);LOOKS.forEach(function(l){var cv=document.querySelector('.look[data-id="'+l.id+'"] canvas');if(!cv)return;
+  cv.width=small.width;cv.height=small.height;var g=grade(small,l),o=new ImageData(small.width,small.height),a=Math.max(S.amt,.6);
+  for(var i=0;i<o.data.length;i+=4){o.data[i]=small.data[i]+(g.data[i]-small.data[i])*a;o.data[i+1]=small.data[i+1]+(g.data[i+1]-small.data[i+1])*a;o.data[i+2]=small.data[i+2]+(g.data[i+2]-small.data[i+2])*a;o.data[i+3]=255}
+  cv.getContext("2d").putImageData(o,0,0)})}
+// look buttons
+LOOKS.forEach(function(l){var b=document.createElement("button");b.className="look";b.dataset.id=l.id;b.setAttribute("role","option");
+  b.innerHTML='<canvas width="320" height="180"></canvas><b></b><small></small>';b.querySelector("b").textContent=l.name;b.querySelector("small").textContent=l.blurb;
+  b.addEventListener("click",function(){S.look=l;save();render()});$("looks").appendChild(b)});
+$("looks").addEventListener("keydown",function(e){if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;var i=LOOKS.indexOf(S.look)+(e.key==="ArrowRight"?1:-1);i=(i+LOOKS.length)%LOOKS.length;S.look=LOOKS[i];save();render();document.querySelector('.look[data-id="'+S.look.id+'"]').focus();e.preventDefault()});
+$("amt").addEventListener("input",function(){S.amt=this.value/100;render()});$("amt").addEventListener("change",save);
+function seg(id,fn){var el=$(id);el.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;[].forEach.call(el.children,function(x){x.setAttribute("aria-pressed",x===b)});fn(b.dataset.v)})}
+seg("cmpSeg",function(v){S.cmp=v==="split";render()});
+seg("sampleSeg",function(v){S.sample=v;load()});
+// compare drag
+(function(){var w=$("stageWrap"),on=false;function at(e){var r=w.getBoundingClientRect();S.x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width));render()}
+  $("split").addEventListener("pointerdown",function(e){on=true;this.setPointerCapture(e.pointerId);at(e)});
+  $("split").addEventListener("pointermove",function(e){if(on)at(e)});
+  $("split").addEventListener("pointerup",function(){on=false});$("split").addEventListener("pointercancel",function(){on=false})})();
+// sources
+function load(){if(S.sample==="mine"&&S.mine)return setSource(S.mine);
+  if(S.sample==="card"){var c=document.createElement("canvas");drawCard(c);return setSource(c)}
+  var img=new Image();img.onload=function(){setSource(img)};img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(ROOM)}
+function useFile(f){if(!f||!/^image\//.test(f.type))return;var img=new Image(),u=URL.createObjectURL(f);
+  img.onload=function(){S.mine=img;S.sample="mine";$("mineBtn").hidden=false;[].forEach.call($("sampleSeg").children,function(x){x.setAttribute("aria-pressed",x.dataset.v==="mine")});setSource(img)};img.src=u}
+$("file").addEventListener("change",function(){useFile(this.files[0]);this.value=""});
+var dz=$("drop");["dragenter","dragover"].forEach(function(t){dz.addEventListener(t,function(e){e.preventDefault();dz.classList.add("over")})});
+["dragleave","drop"].forEach(function(t){dz.addEventListener(t,function(e){e.preventDefault();dz.classList.remove("over")})});
+dz.addEventListener("drop",function(e){useFile(e.dataTransfer.files[0])});
+document.addEventListener("paste",function(e){var it=[].find.call(e.clipboardData&&e.clipboardData.items||[],function(i){return /^image\//.test(i.type)});if(it)useFile(it.getAsFile())});
+
+/* ---------- downloads ---------- */
+function save1(name,blob){var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000)}
+$("dlOne").addEventListener("click",function(){save1("itsCRA1G-"+S.look.file+".cube",new Blob([cube(S.look)],{type:"text/plain"}))});
+var CRC=(function(){var t=new Uint32Array(256);for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(b){var c=0xFFFFFFFF;for(var i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function zip(files){var parts=[],central=[],off=0,enc=new TextEncoder();
+  function u16(v){return [v&255,(v>>8)&255]}function u32(v){return [v&255,(v>>8)&255,(v>>16)&255,(v>>>24)&255]}
+  files.forEach(function(f){var name=enc.encode(f.path),data=enc.encode(f.text),crc=crc32(data);
+    var head=new Uint8Array([].concat([0x50,0x4b,3,4],u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0)));
+    parts.push(head,name,data);
+    central.push(new Uint8Array([].concat([0x50,0x4b,1,2],u16(20),u16(20),u16(0x0800),u16(0),u16(0),u16(0x21),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off))),name);
+    off+=head.length+name.length+data.length});
+  var csize=central.reduce(function(a,b){return a+b.length},0);
+  var end=new Uint8Array([].concat([0x50,0x4b,5,6],u16(0),u16(0),u16(files.length),u16(files.length),u32(csize),u32(off),u16(0)));
+  return new Blob(parts.concat(central,[end]),{type:"application/zip"})}
+var README="Webcam Looks by itsCRA1G\nhttps://itscra1g.github.io/looks/\n\n"+
+ "ADD ONE TO OBS\n1. Keep these files in a folder that won't move.\n2. Right-click your webcam source > Filters.\n3. Effect Filters > + > Apply LUT.\n4. Browse to the .cube file.\n5. Set Amount to about 0.4 to 0.7.\n\n"+
+ "WHICH ONE?\n"+LOOKS.map(function(l){return "- "+l.name+": "+l.blurb}).join("\n")+
+ "\n\nTip: turn off auto white balance on your camera so it doesn't fight the look.\nFree to use on your stream and in your videos. Please don't sell or re-upload the pack; link to the page instead.\n";
+$("dlAll").addEventListener("click",function(){var f=LOOKS.map(function(l){return {path:"itsCRA1G-Webcam-Looks/itsCRA1G-"+l.file+".cube",text:cube(l)}});
+  f.push({path:"itsCRA1G-Webcam-Looks/README.txt",text:README});save1("itsCRA1G-Webcam-Looks.zip",zip(f))});
+
+window.__looks={LOOKS:LOOKS,cube:cube,lut:lut};
+load();
+})();
+</script>
+<script src="../follow.js?v=2"></script>
+</body>
+</html>
