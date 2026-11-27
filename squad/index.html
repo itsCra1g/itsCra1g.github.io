@@ -695,7 +695,7 @@ function overlay(){
     });
     if(cfg.auto){
       var loop=function(){ST=fresh();ST.size=3;command("open");var n=0;
-        var j=setInterval(function(){join(1);if(++n>=7){clearInterval(j);setTimeout(function(){command("close");command("pick","3");setTimeout(loop,9500)},900)}},650)};
+        var j=setInterval(function(){join(1);if(++n>=7){clearInterval(j);setTimeout(function(){command("pick","3");var w=setInterval(function(){if(!ST.picking){clearInterval(w);command("close");setTimeout(loop,4500)}},250)},900)}},650)};
       loop();
     }else{command("open");join(5)}
   }
