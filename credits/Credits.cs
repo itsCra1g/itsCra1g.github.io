@@ -1,5 +1,6 @@
 // Credits for Streamer.bot, free from itsCRA1G (itscra1g.github.io/credits)
 // Collects everyone who took part this stream, and hands the list to the Credits overlay.
+// v2 (Nov 2026): counts Twitch gift bombs, and keeps the list when the stream drops and comes back.
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,6 +19,7 @@ public class CPHInline
     // ===== Nothing to change below here =====
 
     private const string Var = "credits_";
+    private const string LedgerVar = "credits_bombs";
     private static readonly string[] Lists = { "raids", "subs", "gifts", "tips", "follows", "chat" };
 
     public bool Execute()
@@ -28,10 +30,17 @@ public class CPHInline
 
         string ev = EventName();
         string user = Arg("user", Arg("userName", ""));
-        if (ev.Contains("StreamOnline")) { Reset(); return true; }
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        if (ev.Contains("StreamOffline")) { CPH.SetGlobalVar(Var + "offAt", now, true); return true; }
+        if (ev.Contains("StreamOnline")) { if (NewStream(now)) Reset(); return true; }
         if (user == "" || Ignored(user)) return true;
 
-        if (ev.Contains("GiftBomb")) return true;   // each gift also arrives as its own Gift Sub
+        if (ev.Contains("GiftBomb"))
+        {
+            if (Arg("anonymous", "False").ToLower() == "true") user = "Anonymous";
+            Bump("gifts", user, BombGifts(user, Num("gifts", Num("count"))));
+            return true;
+        }
         if (ev.Contains("MassGift"))
         {
             int added = 0;
@@ -50,7 +59,9 @@ public class CPHInline
             string id = Arg("recipient.userId", Arg("recipientId", Arg("recipientUserName", "")));
             string plat = ev.Contains("Kick") ? "kick:" : "twitch:";
             if (Arg("anonymous", "False").ToLower() == "true") user = "Anonymous";
-            if (id == "" || FirstTime(plat + id)) Bump("gifts", user, 1);
+            if (id != "" && !FirstTime(plat + id)) return true;
+            if (plat == "twitch:" && PartOfBomb(user)) return true;
+            Bump("gifts", user, 1);
             return true;
         }
         if (ev.Contains("ReSub") || ev.Contains("Resub") || ev.Contains("Sub")) { Bump("subs", user, 1); return true; }
@@ -78,6 +89,18 @@ public class CPHInline
             catch (Exception) { }
         }
         return Arg("__source", Arg("triggerName", "")).Replace(" ", "");
+    }
+
+    // A stream that drops and comes back keeps its credits. Only clear the list when you've been
+    // offline for more than 10 minutes (or, without Stream Offline triggers, 3 hours since the last clear).
+    private bool NewStream(long now)
+    {
+        long off = CPH.GetGlobalVar<long>(Var + "offAt", true);
+        long last = CPH.GetGlobalVar<long>(Var + "resetAt", true);
+        bool fresh = off > 0 ? now - off > 10 * 60 : now - last > 3 * 3600;
+        CPH.SetGlobalVar(Var + "offAt", 0L, true);
+        if (fresh) CPH.SetGlobalVar(Var + "resetAt", now, true);
+        return fresh;
     }
 
     // ----- the lists, stored as "name<TAB>number" lines -----
@@ -136,6 +159,60 @@ public class CPHInline
         }
         sb.Append("}}");
         CPH.WebsocketBroadcastJson(sb.ToString());
+    }
+
+    // ----- Twitch gift bombs -----
+    // Some setups get every gift in a bomb as its own Gift Sub as well, others only get the bomb.
+    // Count the bomb once, then skip that many single gifts from the same gifter for the next 2 minutes
+    // (and take off any that arrived just before the bomb), so nothing is lost or counted twice.
+
+    private int BombGifts(string gifter, int gifts)
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var led = LoadLedger(now);
+        long[] e; if (!led.TryGetValue(gifter, out e)) e = new long[] { 0, 0, now };
+        int already = (int)e[0];
+        int add = Math.Max(0, gifts - already);
+        led[gifter] = new long[] { 0, add, now };
+        SaveLedger(led);
+        return add;
+    }
+
+    // True when this single Twitch gift was already counted as part of a bomb.
+    private bool PartOfBomb(string gifter)
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var led = LoadLedger(now);
+        long[] e; if (!led.TryGetValue(gifter, out e)) e = new long[] { 0, 0, now };
+        bool covered = e[1] > 0;
+        if (covered) e[1]--; else e[0]++;
+        e[2] = now;
+        led[gifter] = e;
+        SaveLedger(led);
+        return covered;
+    }
+
+    private Dictionary<string, long[]> LoadLedger(long now)
+    {
+        var d = new Dictionary<string, long[]>(StringComparer.OrdinalIgnoreCase);
+        string raw = CPH.GetGlobalVar<string>(LedgerVar, false) ?? "";
+        foreach (string line in raw.Split('\n'))
+        {
+            string[] p = line.Split('\t');
+            if (p.Length != 4) continue;
+            long a, b, t;
+            if (!long.TryParse(p[1], out a) || !long.TryParse(p[2], out b) || !long.TryParse(p[3], out t)) continue;
+            if (now - t > 120) continue;
+            d[p[0]] = new long[] { a, b, t };
+        }
+        return d;
+    }
+
+    private void SaveLedger(Dictionary<string, long[]> d)
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var kv in d) sb.Append(kv.Key.Replace("\t", " ").Replace("\n", " ")).Append('\t').Append(kv.Value[0]).Append('\t').Append(kv.Value[1]).Append('\t').Append(kv.Value[2]).Append('\n');
+        CPH.SetGlobalVar(LedgerVar, sb.ToString(), false);
     }
 
     // ----- helpers -----

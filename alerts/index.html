@@ -467,7 +467,7 @@ function overlay(){
 
   /* ---- the alert itself ---- */
   function fill(tpl,a){
-    if(a.type==="gift"&&!a.to)tpl=tpl.replace(/\s*(to\s*)?\{to\}/i,"");return tpl.replace(/\{(amount|months|to|name)\}/gi,function(_,k){k=k.toLowerCase();var v=a[k];return v==null||v===""?"":String(v)}).replace(/\s{2,}/g," ").trim()}
+    if(a.type==="gift"&&!a.to)tpl=tpl.replace(/\s*(to\s*)?\{to\}/i,"");if(a.type==="streak"&&!(+a.amount>0)&&/\{amount\}/i.test(tpl))tpl="Shared their watch streak";return tpl.replace(/\{(amount|months|to|name)\}/gi,function(_,k){k=k.toLowerCase();var v=a[k];return v==null||v===""?"":String(v)}).replace(/\s{2,}/g," ").trim()}
   function show(a){
     var pc=a.src==="kick"?"53FC18":"9146FF",g=cfg.g==="platform"?pc:cfg.g.toUpperCase();
     var c=el("div","al");c.style.setProperty("--gr",hx2rgb(g));c.style.setProperty("--o",cfg.o);c.style.setProperty("--ink",lum(g)>.35?"#000":"#fff");c.style.setProperty("--dur",cfg.dur+"s");
@@ -502,6 +502,12 @@ function overlay(){
   /* ---- reading Streamer.bot's events ---- */
   function nm(o){if(!o||typeof o!=="object")return "";return String(o.name||o.displayName||o.display_name||o.userName||o.login||o.username||o.slug||"")}
   function who(d){return nm(d.user)||d.user_name||d.userName||d.displayName||d.display_name||d.username||nm(d.targetUser)||nm(d.follower)||""}
+  // Watch streak length: the event's own number if it has one, else read it from Twitch's
+  // "watched 3 consecutive streams" line.
+  function streakN(d){var n=num(d.streakCount,d.watchStreak,d.streak,d.count,d.value,d.milestone&&d.milestone.value,d.watchStreak&&d.watchStreak.count);if(n)return n;
+    for(var k in d){if(/streak|milestone/i.test(k)&&d[k]&&typeof d[k]==="object"){for(var j in d[k]){var v=parseInt(d[k][j],10);if(/count|value|streak/i.test(j)&&v>0)return v}}}
+    var s=[d.systemMessage,d.system_message,d.systemMsg,typeof d.text==="string"?d.text:""].join(" "),m=s.match(/(\d+)\s*(?:consecutive|streams?\s+in\s+a\s+row)/i)||s.match(/streak\D{0,24}(\d+)/i);
+    return m?parseInt(m[1],10):0}
   function num(){for(var i=0;i<arguments.length;i++){var v=parseInt(arguments[i],10);if(!isNaN(v)&&v>0)return v}return 0}
   function txt(d){var m=d.message&&typeof d.message==="object"?d.message:null;var t=typeof d.text==="string"?d.text:typeof d.message==="string"?d.message:m&&typeof m.message==="string"?m.message:"";return t.slice(0,240)}
   function anon(d){return !!(d.isAnonymous||d.anonymous||d.gifterIsAnonymous)}
@@ -524,7 +530,7 @@ function overlay(){
       case "GiftBomb":return {type:"bomb",name:anon(d)?"Anonymous":who(d),amount:num(d.total,d.gifts,d.count,(d.recipients||[]).length),tier:tier(d)};
       case "Cheer":{var bits=num(d.bits,d.message&&d.message.bits);return {type:"cheer",name:anon(d)?"Anonymous":who(d),amount:bits,msg:stripCheer(txt(d),d)}}
       case "Raid":return {type:"raid",name:nm(d.raider)||d.from_broadcaster_user_name||d.fromBroadcasterUserName||who(d),amount:num(d.viewers,d.viewerCount)};
-      case "WatchStreak":return {type:"streak",name:who(d),amount:num(d.streakCount,d.watchStreak,d.streak,d.count),msg:txt(d)};
+      case "WatchStreak":return {type:"streak",name:who(d),amount:streakN(d),msg:txt(d)};
     }
     return null;
   }

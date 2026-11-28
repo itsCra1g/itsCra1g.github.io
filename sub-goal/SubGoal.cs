@@ -1,5 +1,6 @@
 // Sub Goal for Streamer.bot, free from itsCRA1G (itscra1g.github.io/sub-goal)
 // Counts Twitch and Kick subs for the Sub Goal overlay, and handles the chat commands.
+// v2 (Nov 2026): counts Twitch gift bombs.
 using System;
 using System.Collections.Generic;
 
@@ -23,6 +24,7 @@ public class CPHInline
     private const string VarCount = "subgoal_count";
     private const string VarGoal = "subgoal_goal";
     private const string VarSeen = "subgoal_seen";
+    private const string LedgerVar = "subgoal_bombs";
 
     public bool Execute()
     {
@@ -54,12 +56,23 @@ public class CPHInline
             return true;
         }
 
-        // Twitch gift sub (fires once for every sub in a gift bomb too).
+        // Twitch gift sub.
         if (args.ContainsKey("recipientId") || args.ContainsKey("recipientUserName"))
         {
             string id = Arg("recipientId", Arg("recipientUserName", ""));
             string gifter = Arg("anonymous", "False").ToLower() == "true" ? "Anonymous" : Arg("user", "Someone");
-            if (id == "" || FirstTime("twitch:" + id)) Add(1, gifter, "gift", "twitch");
+            if (id != "" && !FirstTime("twitch:" + id)) return true;
+            if (PartOfBomb(gifter)) return true;
+            Add(1, gifter, "gift", "twitch");
+            return true;
+        }
+
+        // Twitch gift bomb: one event for the whole bomb.
+        if (args.ContainsKey("gifts") || args.ContainsKey("bonusGifts"))
+        {
+            string gifter = Arg("anonymous", "False").ToLower() == "true" ? "Anonymous" : Arg("user", "Someone");
+            int gifts; int.TryParse(Arg("gifts", "0"), out gifts);
+            Add(BombGifts(gifter, gifts), gifter, "gift", "twitch");
             return true;
         }
 
@@ -175,5 +188,59 @@ public class CPHInline
     private static string Esc(string s)
     {
         return (s ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", " ").Replace("\r", " ");
+    }
+
+    // ----- Twitch gift bombs -----
+    // Some setups get every gift in a bomb as its own Gift Sub as well, others only get the bomb.
+    // Count the bomb once, then skip that many single gifts from the same gifter for the next 2 minutes
+    // (and take off any that arrived just before the bomb), so nothing is lost or counted twice.
+
+    private int BombGifts(string gifter, int gifts)
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var led = LoadLedger(now);
+        long[] e; if (!led.TryGetValue(gifter, out e)) e = new long[] { 0, 0, now };
+        int already = (int)e[0];
+        int add = Math.Max(0, gifts - already);
+        led[gifter] = new long[] { 0, add, now };
+        SaveLedger(led);
+        return add;
+    }
+
+    // True when this single Twitch gift was already counted as part of a bomb.
+    private bool PartOfBomb(string gifter)
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var led = LoadLedger(now);
+        long[] e; if (!led.TryGetValue(gifter, out e)) e = new long[] { 0, 0, now };
+        bool covered = e[1] > 0;
+        if (covered) e[1]--; else e[0]++;
+        e[2] = now;
+        led[gifter] = e;
+        SaveLedger(led);
+        return covered;
+    }
+
+    private Dictionary<string, long[]> LoadLedger(long now)
+    {
+        var d = new Dictionary<string, long[]>(StringComparer.OrdinalIgnoreCase);
+        string raw = CPH.GetGlobalVar<string>(LedgerVar, false) ?? "";
+        foreach (string line in raw.Split('\n'))
+        {
+            string[] p = line.Split('\t');
+            if (p.Length != 4) continue;
+            long a, b, t;
+            if (!long.TryParse(p[1], out a) || !long.TryParse(p[2], out b) || !long.TryParse(p[3], out t)) continue;
+            if (now - t > 120) continue;
+            d[p[0]] = new long[] { a, b, t };
+        }
+        return d;
+    }
+
+    private void SaveLedger(Dictionary<string, long[]> d)
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var kv in d) sb.Append(kv.Key.Replace("\t", " ").Replace("\n", " ")).Append('\t').Append(kv.Value[0]).Append('\t').Append(kv.Value[1]).Append('\t').Append(kv.Value[2]).Append('\n');
+        CPH.SetGlobalVar(LedgerVar, sb.ToString(), false);
     }
 }
