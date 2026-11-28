@@ -3,170 +3,796 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>itsCRA1G: free tools for streamers</title>
-<meta name="description" content="Free tools and resources for streamers by itsCRA1G: guides for new streamers, tools, OBS overlays, Streamer.bot actions and Stream Deck plugins.">
-<meta property="og:title" content="itsCRA1G: free tools for streamers">
-<meta property="og:description" content="Guides, tools, OBS overlays, Streamer.bot actions and Stream Deck plugins for streamers. Free.">
+<title>Alerts: Twitch and Kick alerts in one OBS overlay</title>
+<meta name="description" content="Free OBS alerts by itsCRA1G for Twitch and Kick together: follows, subs, gifts, cheers, Kicks, raids and watch streaks, through Streamer.bot.">
+<meta property="og:title" content="Alerts: Twitch and Kick alerts in one overlay">
+<meta property="og:description" content="Follows, subs, gifts, cheers, Kicks and raids from Twitch and Kick. Free, by itsCRA1G.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="itsCRA1G">
-<meta property="og:url" content="https://itscra1g.github.io/">
-<meta property="og:image" content="https://itscra1g.github.io/img/og.png">
+<meta property="og:url" content="https://itscra1g.github.io/alerts/">
+<meta property="og:image" content="https://itscra1g.github.io/alerts/img/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="pilot-logo.png">
+<link rel="icon" href="img/logo.png">
+<script>if(/(^#|&)ov=1(&|$)/.test(location.hash))document.documentElement.className="ov";</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
 <style>
-:root{--bg:#000;--tile:#0B0C0F;--tile2:#111318;--edge:#1C2028;--edge2:#2A303B;--fg:#E8ECF2;--body:#C3CAD5;--mute:#8A94A6;--acc:#4DA3FF;--acc-soft:rgba(77,163,255,.14);color-scheme:dark}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 Inter,system-ui,sans-serif}
-a{color:var(--acc)}
-.wrap{max-width:980px;margin:0 auto;padding:72px max(20px,env(safe-area-inset-right,0px)) 60px max(20px,env(safe-area-inset-left,0px))}
-.eyebrow{font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
-h1{font:700 clamp(36px,6vw,56px)/1.05 "Space Grotesk",Inter,sans-serif;color:var(--fg);margin:10px 0 14px;text-wrap:balance}
-.lead{font-size:18px;max-width:34em;margin:0 0 20px}
-.jump{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
-.jump a{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 12px;border-radius:999px;text-decoration:none}
-.jump a:hover{border-color:var(--acc)}
-section{margin-top:52px}
-.sh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--edge);padding-bottom:10px;margin-bottom:16px}
-h2{font:700 24px "Space Grotesk",Inter,sans-serif;color:var(--fg);margin:0}
-.sh span{font-size:13px;color:var(--mute)}
-.sbhint{margin:-6px 0 16px;font-size:14px;color:var(--mute)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-.card{display:flex;gap:16px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:20px;padding:18px;color:inherit;text-decoration:none;min-width:0}
-a.card:hover{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc-soft),0 20px 50px -30px var(--acc)}
-.card img{width:72px;height:72px;flex:0 0 auto;border-radius:16px}
-.card h3{font:700 20px "Space Grotesk",Inter,sans-serif;color:var(--fg);margin:0 0 2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.card p{margin:0;font-size:14px}
-.badge{font:700 10.5px Inter,sans-serif;letter-spacing:1.2px;text-transform:uppercase;color:var(--acc);background:var(--acc-soft);border-radius:6px;padding:2px 6px}
-.badge.new{color:#000;background:var(--acc)}
-.soon{opacity:.6}
-.empty{background:transparent;border-style:dashed}
-.ico{width:72px;height:72px;flex:0 0 auto;border-radius:16px;background:var(--tile2);border:1px solid var(--edge2);display:grid;place-items:center;font:700 22px "Space Grotesk",sans-serif;color:var(--acc)}
-.start{display:flex;gap:20px;align-items:center;margin-top:28px;padding:22px;border-radius:22px;border:1px solid var(--acc);background:linear-gradient(120deg,rgba(77,163,255,.16),var(--tile) 60%);color:inherit;text-decoration:none;box-shadow:0 20px 60px -35px var(--acc)}
-.start:hover{box-shadow:0 0 0 1px var(--acc),0 24px 70px -30px var(--acc)}
-.start img{width:88px;height:88px;border-radius:18px;flex:0 0 auto}
-.start h2{font-size:30px;margin:6px 0 4px}
-.start p{margin:0;font-size:15px;max-width:40em}
-.start .arr{margin-left:auto;font:700 30px "Space Grotesk",sans-serif;color:var(--acc);padding-left:8px}
-@media (max-width:560px){.start{flex-direction:column;align-items:flex-start}.start .arr{display:none}}
-.tools-bar{margin-top:30px;display:flex;flex-direction:column;gap:12px}
-.find{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.find input{flex:1 1 260px;min-width:0;font:500 15px Inter,sans-serif;color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:12px;padding:11px 14px}
-.find input:focus{outline:none;border-color:var(--acc)}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{font:600 13px Inter,sans-serif;color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:999px;padding:6px 12px;cursor:pointer}
-.chips button[aria-pressed=true]{color:#000;background:var(--acc);border-color:var(--acc)}
-.nores{display:none;margin-top:28px;color:var(--mute)}
-.card .sbt{font:700 10px Inter,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#C9A7FF;background:rgba(169,112,255,.16);border-radius:6px;padding:2px 6px}
-footer{margin-top:56px;font-size:13.5px;color:var(--mute)}
+:root{
+  --bg:#000000; --tile:#0B0C0F; --tile2:#111318; --edge:#1C2028; --edge2:#2A303B;
+  --fg:#E8ECF2; --body:#C3CAD5; --mute:#8A94A6; --acc:#4DA3FF; --acc-soft:rgba(77,163,255,.14);
+  --display:"Space Grotesk",Inter,system-ui,sans-serif; --text:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 var(--text)}
+a{color:var(--acc)}a:hover{color:#8CC4FF}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.bar{position:sticky;top:0;z-index:5;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-decoration:none;font:700 18px var(--display)}
+.brand img{width:34px;height:34px;border-radius:9px}.brand:hover{color:var(--fg)}
+.bar nav{margin-left:auto;display:flex;gap:4px}
+.bar nav a{color:var(--mute);text-decoration:none;font-size:13px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.bar nav a:hover{color:var(--fg);background:var(--tile2)}
+.kofi{flex:0 0 auto;margin-left:16px;font-size:13px;font-weight:700;color:#000;background:var(--acc);text-decoration:none;padding:8px 12px;border-radius:8px}
+.kofi:hover{color:#000;background:#8CC4FF}
+@media (max-width:860px){.bar nav{display:none}.kofi{margin-left:auto}}
+.hero{padding-block:64px 48px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+@media (max-width:860px){.hero{grid-template-columns:1fr;padding-block:40px 28px;gap:28px}}
+.eyebrow{font:700 12px var(--text);letter-spacing:2px;text-transform:uppercase;color:var(--acc)}
+h1{font:700 clamp(38px,5.6vw,60px)/1.03 var(--display);color:var(--fg);margin:12px 0 18px;text-wrap:balance;letter-spacing:-.5px}
+.lead{font-size:19px;max-width:32em;margin:0 0 24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:13px;font-weight:600;color:var(--fg);background:var(--tile);border:1px solid var(--edge);padding:6px 11px;border-radius:999px}
+.stage{position:relative;border-radius:22px;border:1px solid var(--edge);overflow:hidden;background:
+  radial-gradient(120% 80% at 80% 0%,rgba(77,163,255,.18),transparent 60%),
+  radial-gradient(90% 70% at 0% 100%,rgba(181,123,255,.14),transparent 60%),
+  linear-gradient(160deg,#151a24,#07080b);aspect-ratio:9/4;max-width:100%}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
+main section{padding-block:52px;border-top:1px solid var(--edge)}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.num{font:700 14px var(--display);color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:4px 8px;flex:0 0 auto}
+h2{font:700 30px/1.15 var(--display);color:var(--fg);margin:0;text-wrap:balance}
+p{margin:0 0 14px;max-width:46em}
+ol.steps{margin:0 0 18px;padding-left:22px;max-width:46em}.steps li{margin:0 0 9px;padding-left:4px}
+strong{color:var(--fg)}
+code{font:14px var(--mono);color:var(--fg);background:var(--tile2);border:1px solid var(--edge);border-radius:6px;padding:1px 6px}
+.copy{display:flex;gap:8px;align-items:stretch;max-width:46em;margin:10px 0 16px}
+.copy input{flex:1;min-width:0;font:14px var(--mono);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:11px 12px}
+.btn{font:700 14px var(--text);color:#000;background:var(--acc);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#8CC4FF}
+.grid2{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.sticky{position:sticky;top:84px}
+@media (max-width:900px){.sticky{position:static}}
+.ctl{display:flex;flex-direction:column;gap:18px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.lbl b{color:var(--fg)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:600 14px var(--text);color:var(--body);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:9px 13px;cursor:pointer}
+.seg button[aria-pressed=true]{color:var(--fg);border-color:var(--acc);background:var(--acc-soft)}
+.sw{display:flex;gap:8px;flex-wrap:wrap}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 2px #000}
+.sw button[aria-pressed=true]{border-color:var(--fg)}
+.sw .cust{width:34px;height:34px;border-radius:50%;position:relative;cursor:pointer;background:conic-gradient(#FF4D4D,#FFB020,#C6FF00,#3DDC97,#4DA3FF,#B57BFF,#FF6FB5,#FF4D4D);box-shadow:inset 0 0 0 2px #000;border:2px solid transparent;display:inline-block}
+.sw .cust.on{border-color:var(--fg)}.sw .cust span{position:absolute;inset:8px;border-radius:50%;background:var(--cc,#000);box-shadow:0 0 0 2px #000}
+.sw .cust input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw .name{font-size:13px;color:var(--mute);align-self:center;margin-left:4px}
+.tog{display:flex;flex-direction:column;gap:10px}
+.tog label{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--fg);cursor:pointer}
+.tog input,.al-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--acc);flex:0 0 auto}
+.tin{width:100%;min-width:0;font:15px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:10px;padding:10px 12px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+details{max-width:46em}summary{cursor:pointer;font-weight:600;color:var(--fg);font-size:14px}
+.two{display:grid;grid-template-columns:1fr 100px;gap:8px;margin-top:10px}
+.hint{font-size:13px;color:var(--mute);margin-top:6px}
+.tests{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tests button{font:600 13px var(--text);color:var(--fg);background:var(--tile);border:1px solid var(--edge2);border-radius:999px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tests button:hover{border-color:var(--acc)}
+.tests i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.al-list{display:flex;flex-direction:column;gap:10px;max-width:46em}
+.al-row{display:grid;grid-template-columns:auto 130px minmax(0,1fr) 110px;gap:10px;align-items:center;background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:10px 12px}
+.al-row .n{font-weight:700;color:var(--fg);font-size:15px;line-height:1.25}
+.al-row .n small{display:block;font-weight:500;color:var(--mute);font-size:12px}
+.al-row .mn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mute)}
+.al-row .mn input{width:64px;padding:8px}
+.al-row.off .tin,.al-row.off .mn{opacity:.4}
+@media (max-width:640px){.al-row{grid-template-columns:auto minmax(0,1fr)}.al-row .tin,.al-row .mn{grid-column:1/-1}}
+.tw{overflow-x:auto}
+.im-row{display:grid;grid-template-columns:92px 44px minmax(0,1fr);gap:10px;align-items:center;font-size:13px;font-weight:600;color:var(--fg)}
+.im-row i{width:44px;height:44px;border-radius:10px;background:var(--tile2) center/contain no-repeat;border:1px solid var(--edge)}
+#imList.crop .im-row i{background-size:cover;border-radius:12px}
+.tv-row{display:grid;grid-template-columns:92px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:13px;font-weight:600;color:var(--fg)}.tv-row b{color:var(--mute);font-weight:600;text-align:right}
+.sfbox{background:var(--tile);border:1px solid var(--edge);border-radius:14px;padding:14px 14px 4px}.sfbox ol.steps{padding-left:20px;font-size:14.5px}
+textarea.code{display:block;font:12.5px/1.45 var(--mono);resize:vertical;white-space:pre;overflow:auto}
+.login{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:4px 0 12px}
+.btn.tw{background:#9146FF;color:#fff}.btn.tw:hover{background:#A970FF}
+.btn.ghost{background:var(--tile2);color:var(--fg);border:1px solid var(--edge2)}.btn.ghost:hover{background:var(--edge)}
+.note{background:var(--tile);border:1px solid var(--edge);border-left:3px solid #FFB020;border-radius:12px;padding:12px 14px;margin:14px 0;max-width:46em;font-size:15px}
+.copy button[disabled]{opacity:.45;cursor:not-allowed}
+table{border-collapse:collapse;width:100%;max-width:46em;font-size:15px;margin:8px 0 14px}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+footer{border-top:1px solid var(--edge);padding-block:28px 40px;font-size:13.5px;color:var(--mute)}
+
+/* ---------- overlay ---------- */
+html.ov,html.ov body{background:transparent!important;overflow:hidden;margin:0;height:100%}
+html.ov .site{display:none}
+#ovr{display:none}
+html.ov #ovr{display:flex;position:fixed;left:50%;top:50%;width:900px;height:400px;transform:translate(-50%,-50%) scale(var(--k,1));align-items:center;justify-content:center;padding:24px;font-family:var(--text);font-size:var(--fs,26px)}
+html.ov.ly-slide #ovr{justify-content:flex-start}
+.al{--gr:77,163,255;--o:.88;--ink:#000;--dur:6s;position:relative;display:flex;align-items:center;gap:.75em;max-width:100%;min-width:0;
+  padding:.7em 1.3em .7em .7em;border-radius:1em;color:#F2F5F9;
+  background:linear-gradient(135deg,rgba(20,23,30,var(--o)),rgba(7,8,11,var(--o)));
+  border:1px solid rgba(var(--gr),.5);box-shadow:0 0 2.2em -.5em rgba(var(--gr),.85),0 .6em 2em -1em rgba(0,0,0,.6)}
+.al .ic{position:relative;flex:0 0 auto;width:2.7em;height:2.7em;border-radius:.75em;background:rgb(var(--gr));display:grid;place-items:center;box-shadow:0 0 1.4em rgba(var(--gr),.8)}
+.al .ic svg{width:1.45em;height:1.45em;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.al .ic b{position:absolute;right:-.45em;top:-.45em;min-width:1.5em;height:1.5em;padding:0 .35em;border-radius:.75em;background:#fff;color:#000;font:800 .55em/1.5em var(--text);text-align:center;box-shadow:0 0 0 .15em rgba(7,8,11,1)}
+.al .tx{min-width:0;flex:0 1 auto;display:flex;flex-direction:column}
+.al .tt{display:flex;align-items:center;gap:.4em;font:700 .62em/1.3 var(--text);letter-spacing:.12em;text-transform:uppercase;color:rgb(var(--gr))}
+.al .tt>span:not(.pf):not(.tier){min-width:0;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.al .pf{flex:0 0 auto;display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:.35em}
+.al .pf svg{width:1em;height:1em}
+.al .pf.tw{background:#9146FF}.al .pf.tw svg{fill:#fff}.al .pf.kk{background:#53FC18}.al .pf.kk svg{fill:#000}
+.al .tier{flex:0 0 auto;font-size:.9em;letter-spacing:.08em;color:#000;background:rgb(var(--gr));border-radius:.35em;padding:0 .4em}
+.al .nm{font:700 1.45em/1.15 var(--display);color:#fff;white-space:nowrap;overflow:hidden}
+.al .ms{font-size:.68em;line-height:1.35;color:#D3D9E2;margin-top:.25em;max-width:24em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.al .ms .em{height:1.5em;width:auto;vertical-align:-.4em;margin:0 1px}
+.al .tm{position:absolute;left:1em;right:1em;bottom:0;height:2px;border-radius:2px;background:rgb(var(--gr));opacity:.7;transform-origin:left;animation:tm var(--dur) linear forwards}
+@keyframes tm{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.al .ic.img{background:#000;width:2.7em;height:2.7em;border-radius:.75em}
+.al .ic.img>b{z-index:2}
+.al .ic.img>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.al .ic.img.big{background:none;box-shadow:none;width:5.2em;height:5.2em;border-radius:.6em}
+.al .ic.img.big>img{object-fit:contain}
+.ly-pop .al .ic.img:after{display:none}
+/* pop */
+.ly-pop .al{animation:popIn .55s cubic-bezier(.2,1.4,.4,1) both}
+.ly-pop .al .ic:after{content:"";position:absolute;inset:-.2em;border-radius:1em;border:2px solid rgb(var(--gr));animation:ring 1s .15s ease-out both}
+.ly-pop .al.out{animation:popOut .4s ease-in both}
+@keyframes popIn{from{opacity:0;transform:scale(.55) translateY(.6em)}to{opacity:1;transform:none}}
+@keyframes popOut{to{opacity:0;transform:scale(.9) translateY(-.4em)}}
+@keyframes ring{from{opacity:.9;transform:scale(.8)}to{opacity:0;transform:scale(1.9)}}
+/* slide */
+.ly-slide .al{animation:slIn .6s cubic-bezier(.16,1,.3,1) both}
+.ly-slide .al.out{animation:slOut .45s cubic-bezier(.7,0,.84,0) both}
+@keyframes slIn{from{opacity:0;transform:translateX(-110%)}to{opacity:1;transform:none}}
+@keyframes slOut{to{opacity:0;transform:translateX(-110%)}}
+@media (prefers-reduced-motion:reduce){.al,.al.out,.al .ic:after{animation-duration:.01s!important}}
 </style>
+<script>/* keep the Streamer.bot link alive: if it stops answering, drop it so the overlay reconnects.
+   Also checks Streamer.bot confirms each event subscription; if it doesn't (e.g. it was still starting up), ask again, then reconnect. */
+(function(){var W=window.WebSocket;if(!W||W.__ka)return;
+function K(u,p){var ws=p?new W(u,p):new W(u);if(String(u).indexOf("ws://")!==0)return ws;
+var last=Date.now(),ping=0,t=null,pend={},osend=ws.send.bind(ws);
+function arm(id){var r=pend[id];if(!r)return;clearTimeout(r.t);r.t=setTimeout(function(){if(!pend[id])return;
+if(ws.readyState===0){arm(id);return}if(ws.readyState!==1)return;
+if(r.n<2){r.n++;try{osend(r.d)}catch(e){}arm(id)}else{try{ws.close()}catch(e){}}},5000)}
+ws.send=function(d){try{var j=JSON.parse(d);if(j&&j.request==="Subscribe"&&j.id){pend[j.id]={d:d,n:0};arm(j.id)}}catch(e){}return osend(d)};
+ws.addEventListener("message",function(e){last=Date.now();try{var j=JSON.parse(e.data);if(j&&j.id&&pend[j.id]){clearTimeout(pend[j.id].t);delete pend[j.id]}}catch(x){}});
+ws.addEventListener("open",function(){last=Date.now();t=setInterval(function(){if(ws.readyState!==1)return;
+if(ping&&last<ping){if(Date.now()-ping>20000){try{ws.close()}catch(e){}}return}
+ping=Date.now();try{osend(JSON.stringify({request:"GetInfo",id:"keepalive"}))}catch(e){}},15000)});
+ws.addEventListener("close",function(){clearInterval(t);for(var k in pend)clearTimeout(pend[k].t);pend={}});return ws}
+K.prototype=W.prototype;K.CONNECTING=0;K.OPEN=1;K.CLOSING=2;K.CLOSED=3;K.__ka=1;window.WebSocket=K})();</script>
 </head>
 <body>
-<div class="wrap">
-  <div class="eyebrow">itsCRA1G</div>
-  <h1>Free tools for streamers.</h1>
-  <p class="lead">Guides, tools, OBS overlays, Streamer.bot actions and Stream Deck plugins I've built for my own streams, shared for yours. All free.</p>
-  <nav class="jump"><a href="start/">Start here</a><a href="#guides">Guides</a><a href="#tools">Tools</a><a href="#overlays">OBS overlays</a><a href="#sb">Streamer.bot actions</a><a href="#deck">Stream Deck plugins</a></nav>
+<div id="ovr"></div>
 
-  <a class="start" href="start/"><img src="start/img/logo.png?v=1" alt=""><div><span class="badge new">New to streaming?</span><h2>Start here</h2><p>A step-by-step path through everything on this site: get set up, look the part, go live properly, build a community and grow. Tick things off as you go.</p></div><span class="arr">→</span></a>
+<div class="site">
+<header class="bar"><div class="wrap">
+  <a class="brand" href="../"><img src="img/logo.png" alt="">Alerts</a>
+  <nav><a href="#setup">Set up</a><a href="#alerts">Alerts</a><a href="#style">Style</a><a href="#obs">OBS</a><a href="#help">Help</a></nav>
+  <a class="kofi" href="https://ko-fi.com/itscra1g">Support on Ko-fi</a>
+</div></header>
 
-  <div id="follow-hero"></div>
-
-  <div class="tools-bar">
-    <div class="find"><input type="search" id="q" placeholder="Search everything: alerts, Discord, emotes, audio…" aria-label="Search the hub" autocomplete="off">
-      <div class="chips" id="chips" role="group" aria-label="Filter"><button data-f="all" aria-pressed="true">All</button><button data-f="guides">Guides</button><button data-f="tools">Tools</button><button data-f="overlays">Overlays</button><button data-f="sb">Streamer.bot</button><button data-f="deck">Stream Deck</button><button data-f="nosb">No Streamer.bot needed</button></div></div>
+<div class="wrap"><div class="hero">
+  <div>
+    <div class="eyebrow">Free OBS overlay · by itsCRA1G</div>
+    <h1>Twitch and Kick alerts, in one place.</h1>
+    <p class="lead">Follows, subs, resubs, gifted subs, cheers, Kicks, raids and Twitch watch streaks, one after another in a single alert box, each marked with where it came from.</p>
+    <div class="chips"><span class="chip">Twitch + Kick</span><span class="chip">9 alert types</span><span class="chip">Your own wording</span><span class="chip">Built-in sounds</span><span class="chip">Gift bombs grouped</span><span class="chip">No Streamer.bot action needed</span></div>
+  <p class="sbnew" style="margin:16px 0 0;font-size:14.5px;color:var(--mute,#8A94A6)">New to Streamer.bot? <a href="../streamerbot/">Set it up first with the Streamer.bot Starter guide</a> (about 20 minutes).</p>
   </div>
-  <p class="nores" id="nores">Nothing matches that. Try another word, or <a href="#" id="clearq">show everything</a>.</p>
+  <div class="stage"><iframe id="heroFrame" title="Alert preview" tabindex="-1"></iframe></div>
+</div></div>
 
-  <section id="guides">
-    <div class="sh"><h2>Guides</h2><span>For new streams and growing ones</span></div>
-    <div class="grid">
-      <a class="card" href="audio/"><img src="audio/img/logo.png?v=1" alt=""><div><h3>Mic &amp; Audio Guide <span class="badge new">New</span></h3><p>OBS filter settings for your kind of mic, levels that sound right, music off your VODs, and fixes for common problems. Read it →</p></div></a>
-      <a class="card" href="multistream/"><img src="multistream/img/logo.png?v=1" alt=""><div><h3>Multistream Guide <span class="badge new">New</span></h3><p>Go live on Twitch, Kick, YouTube and TikTok at once from OBS: upload planner, each platform's rules, setup and fixes. Read it →</p></div></a>
-      <a class="card" href="brand/"><img src="brand/img/logo.png?v=1" alt=""><div><h3>Brand Guide <span class="badge new">New</span></h3><p>Pick a vibe, colours and fonts, see them on a mock channel, and download a starter avatar, banner and brand sheet. Build yours →</p></div></a>
-      <a class="card" href="discord-starter/"><img src="discord-starter/img/logo.png?v=1" alt=""><div><h3>Discord Starter <span class="badge new">New</span></h3><p>Plan your channels and roles, paste in welcome, rules and go-live messages, and set up safety, sub roles and live posts. Set it up →</p></div></a>
-      <a class="card" href="clips/"><img src="clips/img/logo.png?v=1" alt=""><div><h3>Clips to Shorts <span class="badge new">New</span></h3><p>Turn stream moments into TikToks, Shorts and Reels: a vertical layout helper with exact crops, titles and captions, and a workflow. Read it →</p></div></a>
-      <a class="card" href="scenes-guide/"><img src="scenes-guide/img/logo.png?v=1" alt=""><div><h3>OBS Scenes Guide <span class="badge new">New</span></h3><p>The scenes you need, a builder that lists every source in the right order, the shared overlays trick and black screen fixes. Read it →</p></div></a>
-      <a class="card" href="streamerbot/"><img src="streamerbot/img/logo.png?v=1" alt=""><div><h3>Streamer.bot Starter <span class="badge new">New</span></h3><p>Install Streamer.bot, connect Twitch, Kick and OBS, turn on what overlays need, and find the best official help and videos. Set it up →</p></div></a>
-      <div class="card empty soon"><div class="ico">+</div><div><h3>More on the way</h3><p>Step-by-step guides for setting up and growing your stream.</p></div></div>
+<main class="wrap">
+  <section id="setup">
+    <div class="sec-head"><span class="num">1</span><h2>Connect your alerts</h2></div>
+    <div class="seg" id="modeSeg" style="margin-bottom:18px"><button data-v="sb" aria-pressed="true">Streamer.bot: Twitch + Kick</button><button data-v="tw" aria-pressed="false">Twitch only: no Streamer.bot</button></div>
+    <div id="modeSb">
+      <p>Alerts come straight from <a href="https://streamer.bot" target="_blank" rel="noopener">Streamer.bot</a> (1.0 or later), connected to Twitch, Kick or both. There's no action or code to add.</p>
+      <ol class="steps">
+        <li>In Streamer.bot, open <strong>Servers/Clients → WebSocket Server</strong>.</li>
+        <li>Tick <strong>Auto Start</strong> and press <strong>Start Server</strong>. Leave it on <code>127.0.0.1</code> port <code>8080</code> unless you've changed it.</li>
+      </ol>
+      <p>Already set up for Combined Chat, Sub Goal or Credits? Then you're done.</p>
+    </div>
+    <div id="modeTw" hidden>
+      <p>Only stream on Twitch? Log in with Twitch and the alerts come straight from Twitch, with nothing else to install.</p>
+      <div class="login"><button class="btn tw" id="twIn" type="button">Log in with Twitch</button><span id="twState" class="hint" style="margin:0"></span><button class="btn ghost" id="twOut" type="button" hidden>Log out</button></div>
+      <p class="hint">This lets the overlay read your follows, subs, cheers and raids. It can't post, change or see anything else. Twitch logins like this last about 60 days: when it runs out, the overlay tells you, so come back here, log in again and paste the new link into OBS.</p>
+      <div class="note" id="twWarn" hidden>Your OBS link now has your Twitch login in it. Keep it private: don't share it or show it on stream.</div>
     </div>
   </section>
 
-  <section id="tools">
-    <div class="sh"><h2>Tools</h2><span>Run in your browser</span></div>
-    <div class="grid">
-      <a class="card" href="emotes/"><img src="emotes/img/logo.png?v=2" alt=""><div><h3>Emote Resizer <span class="badge new">New</span></h3><p>Drop in an image and get every Twitch, Kick and Discord emote and badge size, ready to upload. Resize →</p></div></a>
-      <a class="card" href="looks/"><img src="looks/img/logo.png?v=1" alt=""><div><h3>Webcam Looks <span class="badge new">New</span></h3><p>Eight free LUTs for your webcam in OBS. Try them on your own camera first, then download. Try them →</p></div></a>
-      <a class="card" href="obs-settings/"><img src="obs-settings/img/logo.png?v=1" alt=""><div><h3>OBS Settings Helper <span class="badge new">New</span></h3><p>Answer a few questions about your PC, internet and platform and get the encoder, bitrate and resolution to use in OBS. Get yours →</p></div></a>
-      <a class="card" href="panels/"><img src="panels/img/logo.png?v=1" alt=""><div><h3>Panel Maker <span class="badge new">New</span></h3><p>A matching set of Twitch and Kick panels in your colours, with ready-to-edit text to go under each one. Make yours →</p></div></a>
-      <a class="card" href="schedule/"><img src="schedule/img/logo.png?v=1" alt=""><div><h3>Schedule Maker <span class="badge new">New</span></h3><p>A weekly schedule graphic for X, Instagram, TikTok or Discord in your colours, with a second time zone and text to paste. Make yours →</p></div></a>
-      <a class="card" href="media-kit/"><img src="media-kit/img/logo.png?v=1" alt=""><div><h3>Media Kit Maker <span class="badge new">New</span></h3><p>A one-page kit for brands with your stats, platforms, audience and offers, in your colours, plus an outreach email. Make yours →</p></div></a>
-      <div class="card empty soon"><div class="ico">+</div><div><h3>More on the way</h3><p>Handy tools for setting up and growing your stream.</p></div></div>
+  <section id="alerts">
+    <div class="sec-head"><span class="num">2</span><h2>Pick your alerts and wording</h2></div>
+    <p>Untick any you don't want. The line above the viewer's name is yours to change: use <code>{amount}</code> for the number of subs, bits, Kicks, raiders or streams in a streak, <code>{months}</code> for months subscribed and <code>{to}</code> for who got a gifted sub.</p>
+    <div class="al-list" id="alList"></div>
+    <p class="hint">Gift bombs show as one alert, not one for every sub in them. Watch streaks only show when a viewer chooses to share theirs in chat, and they need Streamer.bot (logging in with Twitch only can't see them).</p>
+    <details id="imBox"><summary>Your own image or GIF instead of the icon</summary>
+      <p class="hint">Paste a link to a .gif, .png or .webp for any alert type. Leave it empty to keep the normal icon. Use a link that starts with https and won't expire, such as one from Imgur, Giphy or your own site. Discord links stop working after a while.</p>
+      <div class="lbl" style="margin-top:6px">Image size</div><div class="seg" id="imSzSeg"><button data-v="s" aria-pressed="true">Icon size, cropped to fit</button><button data-v="l" aria-pressed="false">Large, whole image</button></div>
+      <div id="imList" class="ctl" style="gap:10px;margin-top:12px"></div>
+    </details>
+  </section>
+
+  <section id="style">
+    <div class="sec-head"><span class="num">3</span><h2>Style it</h2></div>
+    <div class="grid2">
+      <div class="ctl">
+        <div><div class="lbl">Entrance</div><div class="seg" id="lySeg"><button data-v="pop" aria-pressed="true">Pop</button><button data-v="slide" aria-pressed="false">Slide</button></div>
+          <div class="hint">Pop: bursts in from the middle. Slide: sweeps in from the left.</div></div>
+        <div><div class="lbl">Glow</div><div class="sw" id="glowSw"></div></div>
+        <div><div class="lbl">Background <b id="opV">88%</b></div><input type="range" id="op" min="0" max="100" step="5" value="88" aria-label="Background opacity"></div>
+        <div><div class="lbl">Size <b id="fsV">26</b></div><input type="range" id="fs" min="16" max="44" step="1" value="26" aria-label="Alert size"></div>
+        <div><div class="lbl">Each alert shows for <b id="durV">6 seconds</b></div><input type="range" id="dur" min="3" max="15" step="1" value="6" aria-label="Seconds each alert shows"></div>
+        <div class="tog">
+          <label><input type="checkbox" id="optSnd" checked>Play a sound</label>
+        </div>
+        <div id="sndBox" class="ctl">
+          <div id="srcWrap"><div class="lbl">Sounds</div><div class="seg" id="srcSeg"><button data-v="chime" aria-pressed="true">Built-in chimes</button><button data-v="sb" aria-pressed="false">My sound files</button></div>
+            <div class="hint">My sound files: Streamer.bot plays them from your PC as each alert appears.</div></div>
+          <div id="sfBox" class="sfbox">
+            <ol class="steps">
+              <li>Put your sounds in one folder and name them after the alert: <code>follow</code>, <code>sub</code>, <code>resub</code>, <code>gift</code>, <code>bomb</code>, <code>cheer</code>, <code>kicks</code>, <code>raid</code>, <code>streak</code> (.mp3 or .wav). Add <code>all.mp3</code> to play for any alert without its own sound.</li>
+              <li>In Streamer.bot, press <strong>Import</strong> (top of the window), paste this into <strong>Import String</strong> and press <strong>Import</strong>. It adds an action called <code>Alerts Sound</code> with no triggers.
+                <textarea id="asImp" class="tin code" readonly rows="3" aria-label="Alerts Sound import string" style="margin-top:8px;white-space:pre-wrap;word-break:break-all">U0JBRR+LCAAAAAAABAB9V1tzo0oOft+q/Q+pPK9TXMwkbNV5MCRc7NgzvnFbzwPQHUzcDRwutsmp+e+rBtsxDjOuIoSWuiV9+iTQP//+193dPcWlf//fu3/YAzwmPsXweD8iOC+Lu2VaJej+PyehX5XbNGfiuCzC3Oeji2iP8yJOEybjH7gH7iJAGDTjrDwJr89KF1UyCk+SpCLkLKNxEtOKWpczmZDJfjUa98jv+Ow3ZxSw8r925e4sasQxYobfxABJ/tPj4Bv3xA2G4aM0CJ6kcCByEsf54lvAcfLZuWbb3xWuGii402/Q8+f86+zEiR8QzKyWeYU7kmNIKoS1PKVGXJRpXoPSm0+K32n9wAmKk6hP60+ZahSiPK0ypjHDh7tWqyP3ycGvC8hB3+m5n6CUXrLzRR6mSVjlOU7KPmmZx1EE2WMp+XktKKpg9DVbNxm7Du+KFhdRl1J9Gjl+w+BbiL+YacQPD5vN9WXHEOyh2GymcZinRfpWPsxeVpuNloMThzTffRtuNvsh8FrkRF7ebGgRpjmJgwdEyH33+J+3vgR1idUUNblCziwLaBitRfKBdKv8fuAmt2uvO/Kjfx0VgTDeBjr55jqLLBCGj8/zdKbGT3vzRSs8Z8yFtbIKRKvyntMo1I9b7Ewjd6l8NGuqQn37SEzdqwOBi7At82GszOe1Ivq6VZnGIvWWSoaM2fN693Jc1IoS6FaNjGkUiB4JKZwHZ/m6LIKdbRDDxeTqsPVBa/bvEbXqQNck0xjzQTKNkL7NmL4rNj5HSCCcr572agsp1NeFacz2yJZ2CyoXHqybusb8bf3WvH1gWKW3HEYr+hQhY5x5AiIhnB1Qi4D+7jXiJq/1E8g10FMk2AdneBnY+ICzKGJntvG1dgEfD2wFEMsr2EG2CT6MSShaMTwnvu1xcI8DgWfP74APCeND5Avk3RenTHfr2/Nookpl+MzwMaPXBG1RvKsgJ/tXho9+qAJn9GGq230Yt89I0ITJUjkwfAATyva5tiSBj03+TANlgNceOfPIdxbguywCzk3eWIyhYcWQ/3dTnxWuM/swX2bz5QupYK3y5twEA29MdRSZhsK79Ji5NYtBLswXa+jZMx7p63QyP+sUkDe4q+0Viovat6UEcGI5iX4sFSWkYWrS1jfLIAdvaWavhOlx6WQprQPuuEeCVS9tSXCdcQaxcBN1x3h5ORdyy4UU/GPxCsed55ifZyc3eQf8LMhvsIwudsa1mUxWXV89XWbxEdMAbjx3Zb7tQl60HXAAsFqz86S1rtWhsE7nzjiZqOMbXkFMqvId2XwMca6QQSDeabWgx73rzAG7GR8YCz6k1jig3h7qs0JUA9+0Cl1kwGHwCamKEAiHDHLM7hDn6Pj9nJPmUjIvHqUI4jWfD7L5PMoY75ABNRMrXJhY5Pf6w2i63EXt/1w0ZZhEHV3g05i49iwFzgFnNaiBKeABNdfkbnfGppFBHB8r3eJYbUz0KfO59hwWC9Mf896qYOcyLjO+ZuBf5do8Ad7uA3qUOjnWCQWbn/ldcZEZm9GbcYjM9SID7N6RLtd4KWlYh35mTFPvlPPJctfJH+7E315zXjFfd8e9x6Mt+Jeau6/9zhW0aizOoa4J6x2cDxw+2zC1Q2zGoxx6wj7QF1DL8L86DsHH7HuPPfCXQ86Y9cQa2esbPnO3uH+wnsR6NdguvOVINl+g99D5JUbgF4cdhdzyuMlH06fWDWZBYhWBuvvDOaPYtY8F1MljH/5Nf3/mZFOXeOg3vdzq7GP9Q5XmrB+tBZlvbTHbB+YXvG80buIAZuoBfNIKqKEbvL5w5hSfIrfvpi4+iyY32yu8Lvhc1oKmh585ofTF2fCwiVM142veNvg99/c1m+ciz9kCZwBXA7gdN707Zpi2vRv4ettnqFx7NtSLOkov/VG3hlDnrB4INhYfl36q9vh7w49Q1+DdB/Y1ZYv0qJoLcukyTJaX2oE+Im0Dex1Nanb+vJefDW9eGt5UCwferyL4YTRnduq4sXeDx9u8P39d7Prz1/TPz36ee84uO8fbrVtl79KMuFCP6L2P81rtidPIvHB+RMfwjgwp+mB9H68RQZq3hf5MJnpJMPAR6hzej25mqi6F+9Xe3VW9upWly6uTv+ltvV30gDcXXFk9J6ym//rr/vbjLctxmNIsJrjnM/f0MUr8eln6ed+HcPvN6+/xAhcVKVep5ecxGw7+pNvR6vu6bQeaof/4hASMB4+c8DQYBqI8kAU+HODw6e2b7D8+cvK3L/EccBxtmacwot3KyjpjFmX2+4KDzz71TfQbj3478bT+Jggfmc3r9V+fDz+7gwUhflZgpLPxpZ0gzuLTnrN+O6J1hgzYTimMLt3FAw6KNNzhconz/c1Y8ilUSQwxdoVlTM/6V/Pn57ArDNsVfMzSvMSIzWznGfixRf/rNNtOyAOfZFv/gYf54df/ASS6xn+LDwAA</textarea>
+                <button class="btn ghost" type="button" data-copy="asImp" style="margin-top:8px">Copy import string</button>
+                <details style="margin-top:10px"><summary>Rather make it yourself?</summary>
+                  <p class="hint" style="margin-top:8px">Right-click in <strong>Actions</strong>, choose <strong>Add</strong> and name it exactly <code>Alerts Sound</code> (no triggers). Right-click in its sub-actions, choose <strong>Core → C# → Execute C# Code</strong>, paste this code over what's there, then press <strong>Compile</strong> and <strong>Save and Compile</strong>.</p>
+                  <textarea id="asCode" class="tin code" readonly rows="4" aria-label="Alerts Sound code">using System;
+using System.IO;
+using System.Globalization;
+
+// Alerts Sound: plays a sound file from your PC when the itsCRA1G Alerts overlay shows an alert.
+// The overlay runs this action with alertType, soundFolder and soundVolume. No triggers needed.
+// Name your files after the alert: follow, sub, resub, gift, bomb, cheer, kicks, raid, streak (.mp3 or .wav).
+// all.mp3 (or all.wav) plays for any alert without its own file.
+public class CPHInline
+{
+    public bool Execute()
+    {
+        string type = Arg(&quot;alertType&quot;).Trim().ToLowerInvariant();
+        string folder = Arg(&quot;soundFolder&quot;).Trim().Trim(&#x27;&quot;&#x27;);
+        double vol;
+        if (!double.TryParse(Arg(&quot;soundVolume&quot;), NumberStyles.Float, CultureInfo.InvariantCulture, out vol)) vol = 1;
+        if (vol &lt;= 0) return true;
+        if (vol &gt; 1) vol = 1;
+
+        foreach (char c in type) if (!char.IsLetter(c)) return true;   // plain names only
+        if (folder == &quot;&quot; || !Directory.Exists(folder))
+        {
+            CPH.LogWarn(&quot;Alerts Sound: can&#x27;t find the folder \&quot;&quot; + folder + &quot;\&quot;&quot;);
+            return true;
+        }
+
+        string file = Find(folder, type);
+        if (file == null) file = Find(folder, &quot;all&quot;);
+        if (file == null) return true;
+
+        CPH.PlaySound(file, (float)vol, false);
+        return true;
+    }
+
+    string Find(string folder, string name)
+    {
+        if (name == &quot;&quot;) return null;
+        string[] exts = { &quot;.mp3&quot;, &quot;.wav&quot; };
+        foreach (string ext in exts)
+        {
+            string path = Path.Combine(folder, name + ext);
+            if (File.Exists(path)) return path;
+        }
+        return null;
+    }
+
+    string Arg(string key)
+    {
+        object v;
+        if (args != null &amp;&amp; args.TryGetValue(key, out v) &amp;&amp; v != null) return v.ToString();
+        return &quot;&quot;;
+    }
+}
+</textarea>
+                  <button class="btn ghost" type="button" data-copy="asCode" style="margin-top:8px">Copy code</button>
+                </details></li>
+              <li>Paste the folder's location here. In File Explorer, click the bar at the top of the folder and copy it, e.g. <code>C:\Stream\Alert sounds</code>.
+                <input class="tin" id="sf" placeholder="C:\Stream\Alert sounds" spellcheck="false" aria-label="Sound folder" style="margin-top:8px"></li>
+            </ol>
+            <div class="hint" style="margin-bottom:12px">The preview here plays the built-in chimes. If Streamer.bot can't find the Alerts Sound action, the overlay plays the chime instead.</div>
+          </div>
+          <div id="volBox"><div class="lbl">Overall volume <b id="volV">50%</b></div><input type="range" id="vol" min="5" max="100" step="5" value="50" aria-label="Overall volume"></div>
+          <details><summary>Volume for each alert</summary><div id="tvList" class="ctl" style="gap:10px;margin-top:12px"></div></details>
+        </div>
+        <div class="tog">
+          <label><input type="checkbox" id="optMsg" checked>Show viewers' messages (resubs, cheers, Kicks)</label>
+          <label><input type="checkbox" id="optPf" checked>Twitch / Kick icon on each alert</label>
+          <label><input type="checkbox" id="optTb">Timer bar running down along the bottom</label>
+        </div>
+        <details id="sbConn"><summary>Streamer.bot connection (only if you changed it)</summary>
+          <div class="two"><input class="tin" id="host" value="127.0.0.1" aria-label="Address"><input class="tin" id="port" value="8080" aria-label="Port"></div>
+          <input class="tin" id="pw" type="password" placeholder="WebSocket password, if you set one" style="margin-top:8px" autocomplete="off">
+        </details>
+      </div>
+      <div class="sticky">
+        <div class="stage"><iframe id="prevFrame" title="Alert preview" tabindex="-1" allow="autoplay"></iframe></div>
+        <div class="tests" id="tests"></div>
+        <p class="hint">Press one to try it in the preview, with sound. The preview uses made-up names.</p>
+      </div>
     </div>
   </section>
 
-  <section id="overlays">
-    <div class="sh"><h2>OBS overlays</h2><span>Paste a link into OBS</span></div>
-    <p class="sbhint">Streamer.bot tools need the free Streamer.bot app. New to it? <a href="streamerbot/">Set it up with the Streamer.bot Starter guide</a>.</p>
-    <div class="grid">
-      <a class="card" href="alerts/"><img src="alerts/img/logo.png?v=2" alt=""><div><h3>Alerts <span class="badge new">New</span><span class="badge">Needs Streamer.bot</span></h3><p>Follows, subs, gifts, cheers, Kicks and raids from Twitch and Kick in one alert box, with sounds and your own wording. Set it up →</p></div></a>
-      <a class="card" href="activity/"><img src="activity/img/logo.png?v=1" alt=""><div><h3>Activity Feed <span class="badge new">New</span><span class="badge">Needs Streamer.bot</span></h3><p>Your latest follows, subs, gifts, cheers, Kicks and raids from Twitch and Kick, as a list or a scrolling ticker. Set it up →</p></div></a>
-      <a class="card" href="poll/"><img src="poll/img/logo.png?v=1" alt=""><div><h3>Chat Poll <span class="badge new">New</span><span class="badge">Needs Streamer.bot</span></h3><p>One poll for Twitch and Kick chat together: viewers vote by typing a number, with live results on stream. Set it up →</p></div></a>
-      <a class="card" href="squad/"><img src="squad/img/logo.png?v=1" alt=""><div><h3>Squad Picker <span class="badge new">New</span></h3><p>Viewers type !join with their in-game ID and a slot-machine reveal picks who plays with you, fairly. Twitch, or Twitch and Kick with Streamer.bot. Set it up →</p></div></a>
-      <a class="card" href="sub-goal/"><img src="sub-goal/img/logo.png" alt=""><div><h3>Sub Goal <span class="badge new">New</span><span class="badge">Needs Streamer.bot</span></h3><p>A live sub goal bar for Twitch and Kick together, powered by Streamer.bot, with chat commands. Set it up →</p></div></a>
-      <a class="card" href="goals/"><img src="goals/img/logo.png?v=1" alt=""><div><h3>Goal Bars <span class="badge new">New</span><span class="badge">Needs Streamer.bot</span></h3><p>Follower, bits and Kicks goals for Twitch and Kick together, up to three bars in one overlay. Set it up →</p></div></a>
-      <a class="card" href="socials/"><img src="socials/img/logo.png" alt=""><div><h3>Socials <span class="badge new">New</span></h3><p>Rotate through your Twitch, Kick, YouTube, TikTok, Discord and more, in brand colours or your glow. Set it up →</p></div></a>
-      <a class="card" href="chat/"><img src="chat/img/logo.png?v=2" alt=""><div><h3>Combined Chat <span class="badge new">New</span><span class="badge">Needs Streamer.bot</span></h3><p>Twitch and Kick chat together in one overlay, with emotes, badges and platform icons. Set it up →</p></div></a>
-      <a class="card" href="credits/"><img src="credits/img/logo.png" alt=""><div><h3>Credits <span class="badge new">New</span><span class="badge">Needs Streamer.bot</span></h3><p>Movie-style end credits with everyone who raided, subbed, gifted, cheered, followed and chatted. Set it up →</p></div></a>
-      <a class="card" href="scenes/"><img src="scenes/img/logo.png?v=1" alt=""><div><h3>Scene Pack <span class="badge new">New</span></h3><p>Gameplay, Just Chatting and Waiting scenes with camera frames, a chat panel, your socials and your latest follower and sub. Set them up →</p></div></a>
-      <a class="card" href="screens/"><img src="screens/img/logo.png" alt=""><div><h3>Screens <span class="badge new">New</span></h3><p>Starting Soon, Be Right Back and Stream Ending scenes with countdowns, rotating messages and your socials. Set them up →</p></div></a>
-      <a class="card" href="now-playing/"><img src="now-playing/img/logo.png" alt=""><div><h3>Now Playing</h3><p>Show the song you're playing on Spotify in four layouts, and play, pause or skip from a dock in OBS. Set it up →</p></div></a>
-    </div>
+  <section id="obs">
+    <div class="sec-head"><span class="num">4</span><h2>Add it to OBS</h2></div>
+    <p>Your alerts link, with your choices built in:</p>
+    <div class="copy"><input id="obsUrl" readonly aria-label="OBS link"><button class="btn" data-copy="obsUrl">Copy</button></div>
+    <ol class="steps">
+      <li>In OBS, press <strong>+</strong> under Sources and pick <strong>Browser</strong>.</li>
+      <li>Paste the link into <strong>URL</strong> and set the size to <strong>900 × 400</strong>. Drag it where you want alerts to appear, and resize it to make the alerts bigger or smaller (or use the Size slider).</li>
+      <li>To hear the sounds on stream, tick <strong>Control audio via OBS</strong> in the same window, then press OK.</li>
+    </ol>
+    <p>Changed something? Copy the new link and paste it over the old one.</p>
   </section>
 
-  <section id="sb">
-    <div class="sh"><h2>Streamer.bot actions</h2><span>Paste in and go</span></div>
-    <p class="sbhint">Streamer.bot tools need the free Streamer.bot app. New to it? <a href="streamerbot/">Set it up with the Streamer.bot Starter guide</a>.</p>
-    <div class="grid">
-      <a class="card" href="raid-welcome/"><img src="raid-welcome/img/logo.png?v=1" alt=""><div><h3>Raid Welcome</h3><p>Welcome raiders with a rotating message, post their link and send Twitch's shoutout, automatically. Get it →</p></div></a>
-      <a class="card" href="discord-live/"><img src="discord-live/img/logo.png" alt=""><div><h3>Discord Live <span class="badge new">New</span></h3><p>Post to your Discord when you go live on Twitch or Kick, with your title, game and a preview. Build your post →</p></div></a>
-      <a class="card" href="stream-report/"><img src="stream-report/img/logo.png" alt=""><div><h3>Stream Report <span class="badge new">New</span></h3><p>Post how your stream went to Discord when you go offline: viewers, follows, subs, chat and raids. Build your report →</p></div></a>
-      <a class="card" href="trivia/"><img src="trivia/img/logo.png" alt=""><div><h3>Trivia <span class="badge new">New</span></h3><p>Quick-fire trivia for your chat: first right answer wins, with hints, your own questions and a leaderboard. Get it →</p></div></a>
-      <div class="card empty soon"><div class="ico">+</div><div><h3>More on the way</h3><p>Chat commands and stream automations, ready to paste into Streamer.bot.</p></div></div>
-    </div>
+  <section id="help">
+    <div class="sec-head"><span class="num">?</span><h2>If something's not right</h2></div>
+    <div class="tw"><table>
+      <tr><th>What you see</th><th>What to do</th></tr>
+      <tr><td>No alerts show</td><td>Check Streamer.bot is running, its WebSocket server is started, and it's connected to Twitch or Kick. If you changed the address, port or set a password, enter them in step 3 and copy the link again.</td></tr>
+      <tr><td>Twitch only: "Twitch login expired" shows</td><td>Come back to this page, press <strong>Log in with Twitch</strong> and paste the new link into OBS.</td></tr>
+      <tr><td>Only one platform alerts</td><td>Check Streamer.bot is connected to both Twitch and Kick (Platforms tab).</td></tr>
+      <tr><td>No sound on stream</td><td>Tick <strong>Control audio via OBS</strong> on the browser source and check it isn't muted in the audio mixer.</td></tr>
+      <tr><td>My sound files don't play</td><td>Check the action is named exactly <strong>Alerts Sound</strong> and compiled, the folder location is right (copy the OBS link again after changing it), and the files are named like <code>raid.mp3</code>. You hear the chime if the action can't be found; nothing plays if the folder or file is missing, and Streamer.bot's log says which.</td></tr>
+      <tr><td>Alerts double up with another tool</td><td>Turn that alert type off here, or in the other tool, so only one shows it.</td></tr>
+    </table></div>
   </section>
+</main>
 
-  <section id="deck">
-    <div class="sh"><h2>Stream Deck plugins</h2><span>From the Elgato Marketplace</span></div>
-    <div class="grid">
-      <a class="card" href="camo-grind/"><img src="camo-grind/img/logo.png" alt=""><div><h3>Camo Grind</h3><p>Track your Call of Duty camo grind from your Stream Deck and show it on stream. Now on the Elgato Marketplace. Get it →</p></div></a>
-      <div class="card soon"><img src="pilot-logo.png" alt=""><div><h3>Pilot <span class="badge">Coming soon</span></h3><p>Your stream's cockpit: live stats, alerts and go-live on your Stream Deck.</p></div></div>
-    </div>
-  </section>
-
-  <footer>Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. Not affiliated with Elgato, Activision, Spotify, Streamer.bot, OBS, Twitch, Kick or Discord.</footer>
+<footer><div class="wrap">Free, with tips welcome on <a href="https://ko-fi.com/itscra1g">Ko-fi</a>. More free tools at <a href="../">itscra1g.github.io</a>. Not affiliated with Streamer.bot, Twitch or Kick.</div></footer>
 </div>
+
 <script>
 (function(){
-var NEED=["sub-goal/","goals/","credits/","chat/","activity/","poll/","raid-welcome/","discord-live/","stream-report/","trivia/"];
-var cards=[].slice.call(document.querySelectorAll("section a.card, section div.card"));
-cards.forEach(function(c){var sec=c.closest("section");c.dataset.sec=sec?sec.id:"";var h=c.getAttribute("href")||"";
-  c.dataset.sb=(sec&&sec.id==="sb")||NEED.indexOf(h)>=0?"1":"0";c.dataset.text=c.textContent.toLowerCase();
-  if(c.dataset.sb==="1"&&sec&&sec.id!=="sb"){var h3=c.querySelector("h3");if(h3){var t=document.createElement("span");t.className="sbt";t.textContent="Streamer.bot";h3.appendChild(t)}}});
-var q=document.getElementById("q"),f="all";
-function run(){var term=(q.value||"").trim().toLowerCase(),words=term.split(/\s+/).filter(Boolean),any=false;
-  cards.forEach(function(c){var empty=c.classList.contains("empty")||(c.classList.contains("soon")&&!c.getAttribute("href"));
-    var okF=f==="all"||(f==="nosb"?c.dataset.sb==="0"&&c.dataset.sec!=="sb":c.dataset.sec===f);
-    var okT=words.every(function(w){return c.dataset.text.indexOf(w)>=0});
-    var show=okF&&okT&&!(empty&&(term||f!=="all"));c.style.display=show?"":"none";if(show&&!empty)any=true});
-  document.querySelectorAll("main section, body section").forEach(function(s){if(!s.querySelector(".card"))return;var vis=[].some.call(s.querySelectorAll(".card"),function(c){return c.style.display!=="none"});s.style.display=vis?"":"none"});
-  document.getElementById("nores").style.display=any?"none":"block"}
-q.addEventListener("input",run);
-document.getElementById("chips").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;f=b.dataset.f;this.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b)});run()});
-document.getElementById("clearq").addEventListener("click",function(e){e.preventDefault();q.value="";f="all";document.querySelectorAll("#chips button").forEach(function(x){x.setAttribute("aria-pressed",x.dataset.f==="all")});run();q.focus()});
+"use strict";
+var GLOWS=[["platform","Platform colours"],["4DA3FF","Pilot blue"],["3DDC97","Signal green"],["B57BFF","Violet"],["FF6FB5","Neon pink"],["C6FF00","Lime"],["FFB020","Amber"],["FFFFFF","White"]];
+// key, name, where, default line, minimum label
+var TYPES=[
+  ["follow","Follow","Twitch + Kick","New follower",""],
+  ["sub","Sub","Twitch + Kick","New subscriber",""],
+  ["resub","Resub","Twitch + Kick","Subscribed for {months} months",""],
+  ["gift","Gifted sub","Twitch + Kick","Gifted a sub to {to}",""],
+  ["bomb","Gift bomb","Twitch + Kick","Gifted {amount} subs",""],
+  ["cheer","Cheer","Twitch","Cheered {amount} bits","bits"],
+  ["kicks","Kicks","Kick","Sent {amount} Kicks","Kicks"],
+  ["raid","Raid","Twitch + Kick","Raiding with {amount} viewers","viewers"],
+  ["streak","Watch streak","Twitch","Watched {amount} streams in a row","streams"]];
+var NOTW=["kicks","streak"]; // not available when logged in with Twitch only
+var DEF={};TYPES.forEach(function(t){DEF[t[0]]=t[3]});
+var MINK={cheer:"mb",kicks:"mk",raid:"mr",streak:"mw"};
+var BASE=location.origin+location.pathname,OLINK=BASE+"?v=6";
+var TW_CID="zknz506nc6j1bzvv8uihyn1j84fz9z",TW_SCOPES="moderator:read:followers channel:read:subscriptions bits:read";
+var TW_SVG='<svg viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>';
+var KK_SVG='<svg viewBox="0 0 24 24"><path d="M1.5 1.5h7.2v4.8h2.4V3.9h2.4V1.5h9v7.2h-2.4v2.4h-2.4v1.8h2.4v2.4h2.4v7.2h-9v-2.4h-2.4v-2.4H8.7v4.8H1.5z"/></svg>';
+var ICON={
+  follow:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  sub:'<path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z"/>',
+  resub:'<path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.5"/><path d="M4 20v-4.5h4.5"/>',
+  gift:'<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-1.5-3.5-5.5-4.5-5.5-2S10 9 12 9zm0 0c1.5-3.5 5.5-4.5 5.5-2S14 9 12 9z"/>',
+  bomb:'<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-1.5-3.5-5.5-4.5-5.5-2S10 9 12 9zm0 0c1.5-3.5 5.5-4.5 5.5-2S14 9 12 9z"/>',
+  cheer:'<path d="M12 2.5l7 7.5-7 11.5L5 10z"/><path d="M5 10h14M9 10l3 11.5L15 10M9 10l3-7.5 3 7.5"/>',
+  kicks:'<circle cx="12" cy="12" r="8.5"/><path d="M9.5 7.5v9M14.5 7.5L10 12l4.5 4.5"/>',
+  raid:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.2c2.6.2 4.5 2.4 4.5 5.3"/>',
+  streak:'<path d="M12 21c-3.9 0-6.5-2.6-6.5-6.1 0-3.4 2.4-5.4 3.6-8.4.9 1.6 1.6 2.6 2.9 3.3.2-2.7 1.3-5.2 3.4-7.3.2 3.4 4.1 6.1 4.1 11.4C19.5 18.3 16 21 12 21z"/><path d="M12 21c-1.7 0-2.9-1.2-2.9-2.9 0-1.9 1.6-2.8 2.4-4.6 1.2 1.3 3.4 2.4 3.4 4.6 0 1.7-1.2 2.9-2.9 2.9z"/>'};
+var SAMPLE={follow:["twitch","NightOwlTV",{}],sub:["kick","Kezza_Plays",{}],resub:["twitch","Morag",{months:14,msg:"14 months and still not missed a stream"}],
+  gift:["kick","Big_Dave",{to:"LateShift"}],bomb:["twitch","ChattyCath",{amount:10}],cheer:["twitch","pixelpete",{amount:500,msg:"that clutch was unreal"}],
+  kicks:["kick","Loco_Lou",{amount:100,msg:"GG [emote:37227:LULW]"}],raid:["kick","SquadUpSam",{amount:42}],
+  streak:["twitch","Morag_Mac",{amount:7,msg:"never missing a Corporation meeting"}]};
+function hx2rgb(h){return parseInt(h.slice(0,2),16)+","+parseInt(h.slice(2,4),16)+","+parseInt(h.slice(4,6),16)}
+function lum(h){var c=[0,2,4].map(function(i){var v=parseInt(h.slice(i,i+2),16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+if(document.documentElement.className==="ov"){overlay();return}
+setup();
+
+function overlay(){
+  var box=document.getElementById("ovr"),cur=null,curT=0,cfg,ws=null,live=false,queue=[],busy=false,seen={},kickHold={},kickMute={};
+  function read(){
+    var p=new URLSearchParams(location.hash.slice(1));
+    var g=p.get("g")||"platform";if(g!=="platform"&&!/^[0-9a-fA-F]{6}$/.test(g))g="platform";
+    var o=parseInt(p.get("o"),10);if(isNaN(o))o=88;
+    var vol=parseInt(p.get("vol"),10);if(isNaN(vol))vol=50;
+    cfg={ly:p.get("ly")==="slide"?"slide":"pop",g:g,o:Math.max(0,Math.min(100,o))/100,
+      fs:Math.max(12,Math.min(64,parseInt(p.get("fs"),10)||26)),dur:Math.max(2,Math.min(30,parseInt(p.get("dur"),10)||6)),
+      snd:p.get("snd")!=="0",vol:Math.max(0,Math.min(100,vol))/100,msg:p.get("msg")!=="0",pf:p.get("pf")!=="0",
+      off:(p.get("off")||"").split(","),t:{},min:{},tv:{},im:{},ims:p.get("ims")==="l"?"l":"s",tb:p.get("tb")==="1",sf:p.get("sf")||"",
+      h:p.get("h")||"127.0.0.1",port:p.get("p")||"8080",pw:p.get("pw")||"",demo:p.get("demo")==="1",tk:(p.get("tk")||"").replace(/[^A-Za-z0-9]/g,"")};
+    TYPES.forEach(function(t){var v=p.get("t_"+t[0]);cfg.t[t[0]]=v!=null&&v.trim()?v:t[3]});
+    TYPES.forEach(function(t){var v=parseInt(p.get("tv_"+t[0]),10);cfg.tv[t[0]]=isNaN(v)?1:Math.max(0,Math.min(100,v))/100});
+    TYPES.forEach(function(t){var v=p.get("im_"+t[0]);if(v&&/^https:\/\//i.test(v))cfg.im[t[0]]=v});
+    for(var k in MINK)cfg.min[k]=Math.max(0,parseInt(p.get(MINK[k]),10)||0);
+    document.documentElement.className="ov ly-"+cfg.ly;box.style.setProperty("--fs",cfg.fs+"px");
+  }
+  function el(t,c){var e=document.createElement(t);if(c)e.className=c;return e}
+  function safeUrl(u){return typeof u==="string"&&/^https:\/\//.test(u)?u:""}
+  function emoteImg(url,alt){var i=el("img","em");i.src=url;i.alt=alt||"";return i}
+  function addText(node,t){
+    var re=/\[emote:(\d+):([^\]]*)\]/g,last=0,m;
+    while((m=re.exec(t))){if(m.index>last)node.appendChild(document.createTextNode(t.slice(last,m.index)));node.appendChild(emoteImg("https://files.kick.com/emotes/"+m[1]+"/fullsize",m[2]));last=re.lastIndex}
+    if(last<t.length)node.appendChild(document.createTextNode(t.slice(last)));
+  }
+
+  /* ---- sound: a short chime made in the browser, different per alert ---- */
+  var actx=null;
+  var NOTES={follow:[659,880],sub:[523,659,784],resub:[523,784,1047],gift:[587,740,880],bomb:[587,740,880,1175,1480],cheer:[784,988,1319],kicks:[698,880,1047,1397],raid:[392,523,659,784,1047],streak:[440,554,659,880,1109]};
+  var sndN=0,sndWait={};
+  function chime(type){
+    if(!cfg.snd)return;
+    var v=cfg.vol*(cfg.tv[type]==null?1:cfg.tv[type]);if(!v)return;
+    // own sound files: ask Streamer.bot to play them; the chime plays if it can't
+    if(cfg.sf&&!cfg.tk&&!cfg.demo&&ws&&ws.readyState===1){
+      var id="al-snd-"+(++sndN);sndWait[id]=type;setTimeout(function(){delete sndWait[id]},5000);
+      send({request:"DoAction",id:id,action:{name:"Alerts Sound"},args:{alertType:type,soundFolder:cfg.sf,soundVolume:Math.round(v*100)/100}});return;
+    }
+    builtIn(type,v);
+  }
+  function builtIn(type,v){
+    try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==="suspended")actx.resume()}catch(e){return}
+    var t0=actx.currentTime+.03,ns=NOTES[type]||NOTES.follow,peak=.22*v;
+    ns.forEach(function(f,i){
+      var o=actx.createOscillator(),o2=actx.createOscillator(),g=actx.createGain(),st=t0+i*.11;
+      o.type="triangle";o.frequency.value=f;o2.type="sine";o2.frequency.value=f*2;
+      g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(peak,st+.015);g.gain.exponentialRampToValueAtTime(.0001,st+(i===ns.length-1?1.1:.45));
+      var g2=actx.createGain();g2.gain.value=.18;o.connect(g);o2.connect(g2);g2.connect(g);g.connect(actx.destination);
+      o.start(st);o2.start(st);o.stop(st+1.2);o2.stop(st+1.2);
+    });
+  }
+
+  /* ---- the alert itself ---- */
+  function fill(tpl,a){
+    if(a.type==="gift"&&!a.to)tpl=tpl.replace(/\s*(to\s*)?\{to\}/i,"");if(a.type==="streak"&&!(+a.amount>0)&&/\{amount\}/i.test(tpl))tpl="Shared their watch streak";return tpl.replace(/\{(amount|months|to|name)\}/gi,function(_,k){k=k.toLowerCase();var v=a[k];return v==null||v===""?"":String(v)}).replace(/\s{2,}/g," ").trim()}
+  function show(a){
+    var pc=a.src==="kick"?"53FC18":"9146FF",g=cfg.g==="platform"?pc:cfg.g.toUpperCase();
+    var c=el("div","al");c.style.setProperty("--gr",hx2rgb(g));c.style.setProperty("--o",cfg.o);c.style.setProperty("--ink",lum(g)>.35?"#000":"#fff");c.style.setProperty("--dur",cfg.dur+"s");
+    var ic=el("div","ic");ic.innerHTML='<svg viewBox="0 0 24 24">'+ICON[a.type]+'</svg>';
+    if(a.type==="note")ic.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></svg>';
+    if(cfg.im[a.type]){var svgHtml=ic.innerHTML;ic.className="ic img"+(cfg.ims==="l"?" big":"");ic.innerHTML="";var im=el("img");im.alt="";
+      im.onerror=function(){ic.className="ic";ic.innerHTML=svgHtml};im.src=cfg.im[a.type];ic.appendChild(im)}
+    if(a.type==="bomb"&&a.amount){var n=el("b");n.textContent="×"+a.amount;ic.appendChild(n)}
+    c.appendChild(ic);
+    var tx=el("div","tx"),tt=el("div","tt");
+    if(cfg.pf){var pf=el("span","pf "+(a.src==="kick"?"kk":"tw"));pf.innerHTML=a.src==="kick"?KK_SVG:TW_SVG;tt.appendChild(pf)}
+    var line=el("span");line.textContent=a.line||fill(cfg.t[a.type],a);tt.appendChild(line);
+    if(a.tier){var ti=el("span","tier");ti.textContent=a.tier;tt.appendChild(ti)}
+    var nm=el("div","nm");nm.textContent=a.name;
+    tx.appendChild(tt);tx.appendChild(nm);
+    if(cfg.msg&&a.msg){var ms=el("div","ms");addText(ms,a.msg);tx.appendChild(ms)}
+    c.appendChild(tx);if(cfg.tb)c.appendChild(el("div","tm"));
+    box.innerHTML="";box.appendChild(c);
+    // long names shrink to fit rather than being cut off
+    var fsz=1.45;while(nm.scrollWidth>nm.clientWidth+1&&fsz>.7){fsz-=.05;nm.style.fontSize=fsz.toFixed(2)+"em"}
+    chime(a.type);cur=c;
+    curT=setTimeout(function(){c.classList.add("out");curT=setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);cur=null;busy=false;curT=setTimeout(next,350)},480)},cfg.dur*1000);
+  }
+  function next(){if(busy||!queue.length)return;busy=true;show(queue.shift())}
+  function push(a,force){
+    if(!a||!a.name)return;
+    if(!force&&cfg.off.indexOf(a.type)>=0)return;
+    if(!force&&cfg.min[a.type]&&(+a.amount||0)<cfg.min[a.type])return;
+    if(queue.length<60)queue.push(a);next();
+  }
+
+  /* ---- reading Streamer.bot's events ---- */
+  function nm(o){if(!o||typeof o!=="object")return "";return String(o.name||o.displayName||o.display_name||o.userName||o.login||o.username||o.slug||"")}
+  function who(d){return nm(d.user)||d.user_name||d.userName||d.displayName||d.display_name||d.username||nm(d.targetUser)||nm(d.follower)||""}
+  // Watch streak length: the event's own number if it has one, else read it from Twitch's
+  // "watched 3 consecutive streams" line.
+  function streakN(d){var n=num(d.streakCount,d.watchStreak,d.streak,d.count,d.value,d.milestone&&d.milestone.value,d.watchStreak&&d.watchStreak.count);if(n)return n;
+    for(var k in d){if(/streak|milestone/i.test(k)&&d[k]&&typeof d[k]==="object"){for(var j in d[k]){var v=parseInt(d[k][j],10);if(/count|value|streak/i.test(j)&&v>0)return v}}}
+    var s=[d.systemMessage,d.system_message,d.systemMsg,typeof d.text==="string"?d.text:""].join(" "),m=s.match(/(\d+)\s*(?:consecutive|streams?\s+in\s+a\s+row)/i)||s.match(/streak\D{0,24}(\d+)/i);
+    return m?parseInt(m[1],10):0}
+  function num(){for(var i=0;i<arguments.length;i++){var v=parseInt(arguments[i],10);if(!isNaN(v)&&v>0)return v}return 0}
+  function txt(d){var m=d.message&&typeof d.message==="object"?d.message:null;var t=typeof d.text==="string"?d.text:typeof d.message==="string"?d.message:m&&typeof m.message==="string"?m.message:"";return t.slice(0,240)}
+  function anon(d){return !!(d.isAnonymous||d.anonymous||d.gifterIsAnonymous)}
+  function tier(d){if(d.isPrime||d.is_prime)return "Prime";var s=String(d.subTier||d.sub_tier||d.tier||"");return /3/.test(s)?"Tier 3":/2/.test(s)?"Tier 2":""}
+  function stripCheer(t,d){
+    var names=(d.cheerEmotes||[]).map(function(c){return String(c.Name||c.name||"").replace(/[^A-Za-z]/g,"")}).filter(Boolean);
+    var re=names.length?new RegExp("(^|\\s)("+names.join("|")+")\\d+(?=\\s|$)","gi"):/(^|\s)cheer\d+(?=\s|$)/gi;
+    return t.replace(re,"$1").replace(/\s{2,}/g," ").trim();
+  }
+  function onceOnly(d){var id=d.messageId||d.id||"";if(!id)return true;id=String(id);if(seen[id])return false;seen[id]=Date.now();
+    var ks=Object.keys(seen);if(ks.length>300)ks.slice(0,100).forEach(function(k){delete seen[k]});return true}
+  function twitch(type,d){
+    switch(type){
+      case "Follow":return {type:"follow",name:who(d)};
+      case "Sub":return {type:"sub",name:who(d),tier:tier(d)};
+      case "ReSub":return {type:"resub",name:who(d),months:num(d.cumulativeMonths,d.cumulative,d.durationMonths,d.monthsSubscribed),tier:tier(d),msg:txt(d)};
+      case "GiftSub":
+        if(d.fromCommunitySubGift||d.from_community_sub_gift)return null; // part of a gift bomb, shown once by GiftBomb
+        return {type:"gift",name:anon(d)?"Anonymous":who(d),to:nm(d.recipient)||d.recipientDisplayName||d.recipientUser||"",tier:tier(d)};
+      case "GiftBomb":return {type:"bomb",name:anon(d)?"Anonymous":who(d),amount:num(d.total,d.gifts,d.count,(d.recipients||[]).length),tier:tier(d)};
+      case "Cheer":{var bits=num(d.bits,d.message&&d.message.bits);return {type:"cheer",name:anon(d)?"Anonymous":who(d),amount:bits,msg:stripCheer(txt(d),d)}}
+      case "Raid":return {type:"raid",name:nm(d.raider)||d.from_broadcaster_user_name||d.fromBroadcasterUserName||who(d),amount:num(d.viewers,d.viewerCount)};
+      case "WatchStreak":return {type:"streak",name:who(d),amount:streakN(d),msg:txt(d)};
+    }
+    return null;
+  }
+  function kick(type,d){
+    switch(type){
+      case "Follow":return {type:"follow",name:who(d)};
+      case "Subscription":return {type:"sub",name:who(d)};
+      case "Resubscription":return {type:"resub",name:who(d),months:num(d.duration,d.months,d.cumulativeMonths),msg:txt(d)};
+      case "GiftSubscription":{
+        var g=anon(d)?"Anonymous":who(d),key=g.toLowerCase(),r=d.recipient||(d.recipients&&d.recipients[0]);
+        var mu=kickMute[key];if(mu&&mu.left>0&&mu.until>Date.now()){mu.left--;return null}  // already shown as part of a mass gift
+        var a={src:"kick",type:"gift",name:g,to:nm(r)};
+        // hold it a moment, in case it turns out to be part of a mass gift
+        var h=kickHold[key]||(kickHold[key]={list:[],t:0});h.list.push(a);clearTimeout(h.t);
+        h.t=setTimeout(function(){delete kickHold[key];if(h.list.length===1)push(h.list[0]);else push({src:"kick",type:"bomb",name:g,amount:h.list.length})},1500);
+        return "held";
+      }
+      case "MassGiftSubscription":{
+        var gg=anon(d)?"Anonymous":who(d),k2=gg.toLowerCase(),n=num((d.recipients||[]).length,d.quantity,d.total,d.count,d.amount);
+        if(kickHold[k2]){clearTimeout(kickHold[k2].t);n=Math.max(n,kickHold[k2].list.length);delete kickHold[k2]}
+        kickMute[k2]={until:Date.now()+20000,left:n};
+        return {type:"bomb",name:gg,amount:n};
+      }
+      case "KicksGifted":{
+        var gift=d.gift&&typeof d.gift==="object"?d.gift:{};
+        return {type:"kicks",name:anon(d)?"Anonymous":(who(d)||nm(d.sender)),amount:num(d.amount,d.kicks,d.quantity,d.total,gift.amount,gift.kicks,gift.value),msg:txt(d)};
+      }
+    }
+    return null;
+  }
+  function handle(src,type,d){
+    if(!onceOnly(d))return;
+    var a=src==="kick"?kick(type,d):twitch(type,d);
+    if(!a||a==="held")return;a.src=src;push(a);
+  }
+  async function sha(s){var d=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode.apply(null,new Uint8Array(d)))}
+  function send(o){try{ws.send(JSON.stringify(o))}catch(e){}}
+  var EVENTS=[["Twitch","Follow"],["Twitch","Sub"],["Twitch","ReSub"],["Twitch","GiftSub"],["Twitch","GiftBomb"],["Twitch","Cheer"],["Twitch","Raid"],["Twitch","WatchStreak"],
+    ["Kick","Follow"],["Kick","Subscription"],["Kick","Resubscription"],["Kick","GiftSubscription"],["Kick","MassGiftSubscription"],["Kick","KicksGifted"]];
+  function subscribe(){
+    if(live)return;live=true;
+    // one request per event, so an event a Streamer.bot version doesn't have can't block the others
+    EVENTS.forEach(function(e,i){var ev={};ev[e[0]]=[e[1]];send({request:"Subscribe",id:"al-"+i,events:ev})});
+  }
+  function connect(){
+    live=false;
+    try{ws=new WebSocket("ws://"+cfg.h+":"+cfg.port+"/")}catch(e){setTimeout(connect,5000);return}
+    var helloT=setTimeout(subscribe,1500);
+    ws.onmessage=async function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}
+      if(m.request==="Hello"){clearTimeout(helloT);if(m.authentication&&cfg.pw){var a=m.authentication;var s=await sha(cfg.pw+a.salt);send({request:"Authenticate",id:"al-auth",authentication:await sha(s+a.challenge)})}else subscribe();return}
+      if(m.id==="al-auth"){subscribe();return}
+      if(m.id&&sndWait[m.id]){var st=sndWait[m.id];delete sndWait[m.id];if(m.status&&m.status!=="ok")builtIn(st,cfg.vol*(cfg.tv[st]==null?1:cfg.tv[st]));return}
+      if(!m.event||!m.data)return;
+      var src=String(m.event.source||"").toLowerCase();
+      if(src==="twitch"||src==="kick")handle(src,String(m.event.type||""),m.data);
+    };
+    ws.onclose=function(){clearTimeout(helloT);live=false;setTimeout(connect,3000)};
+    ws.onerror=function(){try{ws.close()}catch(x){}};
+  }
+  function sample(type){var s=SAMPLE[type],a={type:type,src:s[0],name:s[1]};for(var k in s[2])a[k]=s[2][k];if(type==="sub"&&s[0]==="twitch")a.tier="Tier 2";return a}
+  read();
+  function fit(){box.style.setProperty("--k",Math.min(innerWidth/900,innerHeight/400))}
+  fit();addEventListener("resize",fit);
+  if(cfg.demo){
+    var order=["follow","bomb","cheer","sub","raid","resub","kicks","streak","gift"],i=0,auto=true;cfg.snd=cfg.snd&&false;
+    var loud=new URLSearchParams(location.hash.slice(1)).get("snd")!=="0";
+    window.addEventListener("message",function(e){var d=e.data;if(!d||typeof d.al!=="string"||!SAMPLE[d.al])return;auto=false;cfg.snd=loud;queue=[];clearTimeout(curT);box.innerHTML="";cur=null;busy=false;push(sample(d.al),true)});
+    (function loop(){if(auto&&!busy&&!queue.length)push(sample(order[i++%order.length]));setTimeout(loop,700)})();
+    return;
+  }
+  if(cfg.tk){twitchDirect();return}
+  connect();
+
+  /* ---- Twitch only: straight from Twitch's EventSub, no Streamer.bot ---- */
+  function twitchDirect(){
+    var uid="",sock=null,kaT=0,kaS=30,warned=false,gift=null,bombLeft=0,bombT=0;
+    function hdr(){return {"Authorization":"Bearer "+cfg.tk,"Client-Id":TW_CID,"Content-Type":"application/json"}}
+    function expired(){if(warned)return;warned=true;queue.unshift({src:"twitch",type:"note",name:"Twitch login expired",line:"Alerts paused",msg:"Open the Alerts page, log in with Twitch again and paste the new link into OBS."});cfg.msg=true;next()}
+    function validate(){return fetch("https://id.twitch.tv/oauth2/validate",{headers:{Authorization:"OAuth "+cfg.tk}}).then(function(r){if(r.status===401)return false;if(!r.ok)throw 0;return r.json()})}
+    function start(){validate().then(function(v){if(!v){expired();return}uid=v.user_id;open("wss://eventsub.wss.twitch.tv/ws",false)}).catch(function(){setTimeout(start,15000)})}
+    setInterval(function(){validate().then(function(v){if(v===false)expired()}).catch(function(){})},3600000);
+    var SUBS=[["channel.follow","2",{moderator_user_id:1}],["channel.subscribe","1"],["channel.subscription.gift","1"],["channel.subscription.message","1"],["channel.cheer","1"],["channel.raid","1",{to:1}]];
+    function subscribe(sid){
+      SUBS.forEach(function(s){
+        var c={};if(s[2]&&s[2].to)c.to_broadcaster_user_id=uid;else c.broadcaster_user_id=uid;if(s[2]&&s[2].moderator_user_id)c.moderator_user_id=uid;
+        fetch("https://api.twitch.tv/helix/eventsub/subscriptions",{method:"POST",headers:hdr(),body:JSON.stringify({type:s[0],version:s[1],condition:c,transport:{method:"websocket",session_id:sid}})})
+          .then(function(r){if(r.status===401)expired()}).catch(function(){});
+      });
+    }
+    function alive(){clearTimeout(kaT);kaT=setTimeout(function(){try{sock&&sock.close()}catch(e){}},(kaS+10)*1000)}
+    function open(url,isRe){
+      var old=sock,w;try{w=new WebSocket(url)}catch(e){setTimeout(start,5000);return}
+      w.onmessage=function(e){var m;try{m=JSON.parse(e.data)}catch(x){return}var md=m.metadata||{},pl=m.payload||{};
+        if(w!==sock&&md.message_type!=="session_welcome")return;
+        switch(md.message_type){
+          case "session_welcome":sock=w;kaS=(pl.session&&pl.session.keepalive_timeout_seconds)||30;alive();
+            if(old&&old!==w){old.onclose=null;try{old.close()}catch(x){}}
+            if(!isRe)subscribe(pl.session.id);break;
+          case "session_keepalive":alive();break;
+          case "notification":alive();if(onceOnly({messageId:md.message_id}))tw(pl.subscription&&pl.subscription.type,pl.event||{});break;
+          case "session_reconnect":open(pl.session.reconnect_url,true);break;
+          case "revocation":break;
+        }
+      };
+      w.onclose=function(){if(w!==sock&&sock)return;clearTimeout(kaT);sock=null;setTimeout(start,3000)};
+      if(!old)sock=w;
+    }
+    function tierOf(t){return t==="3000"?"Tier 3":t==="2000"?"Tier 2":""}
+    function tw(type,e){
+      var a=null;
+      switch(type){
+        case "channel.follow":a={type:"follow",name:e.user_name||e.user_login};break;
+        case "channel.subscribe":
+          if(e.is_gift){if(bombLeft>0){bombLeft--;return}if(gift&&!gift.a.to){gift.a.to=e.user_name||e.user_login;clearTimeout(gift.t);var g=gift.a;gift=null;push(g)}return}
+          a={type:"sub",name:e.user_name||e.user_login,tier:tierOf(e.tier)};break;
+        case "channel.subscription.message":a={type:"resub",name:e.user_name||e.user_login,months:e.cumulative_months||e.duration_months||0,tier:tierOf(e.tier),msg:String((e.message&&e.message.text)||"").slice(0,240)};break;
+        case "channel.subscription.gift":{
+          var who=e.is_anonymous?"Anonymous":(e.user_name||e.user_login),n=+e.total||1;
+          if(n>1){bombLeft+=n;clearTimeout(bombT);bombT=setTimeout(function(){bombLeft=0},10000);a={type:"bomb",name:who,amount:n,tier:tierOf(e.tier)};break}
+          var ga={src:"twitch",type:"gift",name:who,to:"",tier:tierOf(e.tier)};
+          if(gift){clearTimeout(gift.t);push(gift.a)}
+          gift={a:ga,t:setTimeout(function(){if(gift){var x=gift.a;gift=null;push(x)}},2000)};return;
+        }
+        case "channel.cheer":a={type:"cheer",name:e.is_anonymous?"Anonymous":(e.user_name||e.user_login),amount:+e.bits||0,msg:stripCheer(String(e.message||"").slice(0,240),{})};break;
+        case "channel.raid":a={type:"raid",name:e.from_broadcaster_user_name||e.from_broadcaster_user_login,amount:+e.viewers||0};break;
+      }
+      if(a){a.src="twitch";push(a)}
+    }
+    start();
+  }
+}
+
+function setup(){
+  var $=function(id){return document.getElementById(id)};
+  var S={mode:"sb",ly:"pop",g:"platform",o:88,fs:26,dur:6,snd:1,vol:50,msg:1,pf:1,off:[],t:{},mb:0,mk:0,mr:0,src:"chime",sf:"",tv:{},im:{},ims:"s",tb:0,h:"127.0.0.1",p:"8080"};
+  try{var sv=JSON.parse(ls("al_cfg")||"null");if(sv)for(var k in S)if(k in sv)S[k]=sv[k]}catch(e){}
+  if(!Array.isArray(S.off))S.off=[];if(!S.t||typeof S.t!=="object")S.t={};if(!S.tv||typeof S.tv!=="object")S.tv={};if(!S.im||typeof S.im!=="object")S.im={};
+  // sounds
+  $("srcSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.src=b.dataset.v;sync()}});
+  $("sf").value=S.sf;$("sf").addEventListener("input",function(){S.sf=this.value.trim().replace(/^"|"$/g,"");sync()});
+  var tvList=$("tvList");
+  TYPES.forEach(function(t){var r=document.createElement("label");r.className="tv-row";r.dataset.k=t[0];
+    r.innerHTML='<span></span><input type="range" min="0" max="100" step="5"><b></b>';r.querySelector("span").textContent=t[1];
+    var rg=r.querySelector("input");rg.setAttribute("aria-label",t[1]+" volume");rg.addEventListener("input",function(){var v=+rg.value;if(v===100)delete S.tv[t[0]];else S.tv[t[0]]=v;sync()});
+    tvList.appendChild(r)});
+  var imList=$("imList");
+  TYPES.forEach(function(t){var r=document.createElement("label");r.className="im-row";
+    r.innerHTML='<span></span><i></i><input class="tin" type="url" spellcheck="false" placeholder="https://…gif">';r.querySelector("span").textContent=t[1];
+    var inp=r.querySelector("input"),th=r.querySelector("i");inp.setAttribute("aria-label",t[1]+" image or GIF link");inp.value=S.im[t[0]]||"";
+    function thumb(){var v=S.im[t[0]];th.style.backgroundImage=v?'url("'+v.replace(/["\\\s()']/g,encodeURIComponent)+'")':""}
+    inp.addEventListener("input",function(){var v=inp.value.trim();if(/^https:\/\//i.test(v))S.im[t[0]]=v;else delete S.im[t[0]];thumb();sync()});
+    thumb();imList.appendChild(r)});
+  if(Object.keys(S.im).length)$("imBox").open=true;
+  $("imSzSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.ims=b.dataset.v;sync()}});
+  // Twitch login
+  var TK=null;try{TK=JSON.parse(ls("al_tk")||"null")}catch(e){}
+  var hp=new URLSearchParams(location.hash.slice(1)),loginMsg="";
+  if(hp.get("access_token")||hp.get("error")){
+    var st="";try{st=sessionStorage.getItem("al_state")||""}catch(e){}
+    if(hp.get("access_token")&&st&&hp.get("state")===st){TK={tk:hp.get("access_token").replace(/[^A-Za-z0-9]/g,""),login:"",exp:0};S.mode="tw"}
+    else if(hp.get("error")){loginMsg="Twitch login was cancelled.";S.mode="tw"}
+    else loginMsg="That login didn't match, so it wasn't used. Please try again.";
+    try{sessionStorage.removeItem("al_state");history.replaceState(null,"",location.pathname+"#setup")}catch(e){}
+  }
+  function saveTk(){ls("al_tk",TK?JSON.stringify(TK):"");if(!TK)try{localStorage.removeItem("al_tk")}catch(e){}}
+  function checkTk(){
+    if(!TK){twUi();return}
+    fetch("https://id.twitch.tv/oauth2/validate",{headers:{Authorization:"OAuth "+TK.tk}}).then(function(r){
+      if(r.status===401){TK=null;saveTk();loginMsg="Your Twitch login has run out. Log in again.";sync();return}
+      return r.ok&&r.json().then(function(v){TK.login=v.login||TK.login;TK.exp=Date.now()+(v.expires_in||0)*1000;saveTk();sync()});
+    }).catch(function(){});
+    twUi();
+  }
+  function twUi(){
+    var on=!!TK;$("twIn").textContent=on?"Log in again":"Log in with Twitch";$("twOut").hidden=!on;$("twWarn").hidden=!on;
+    $("twState").textContent=on?("Logged in"+(TK.login?" as "+TK.login:"")+(TK.exp?". Works until "+new Date(TK.exp).toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}):"")+"."):loginMsg;
+  }
+  $("twIn").addEventListener("click",function(){
+    var st=Array.from(crypto.getRandomValues(new Uint8Array(16)),function(b){return b.toString(16).padStart(2,"0")}).join("");
+    try{sessionStorage.setItem("al_state",st)}catch(e){}
+    location.href="https://id.twitch.tv/oauth2/authorize?"+new URLSearchParams({response_type:"token",client_id:TW_CID,redirect_uri:BASE,scope:TW_SCOPES,state:st,force_verify:"true"}).toString();
+  });
+  $("twOut").addEventListener("click",function(){
+    if(TK)fetch("https://id.twitch.tv/oauth2/revoke",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"client_id="+TW_CID+"&token="+TK.tk}).catch(function(){});
+    TK=null;saveTk();loginMsg="Logged out.";sync();
+  });
+  $("modeSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.mode=b.dataset.v;sync()}});
+  // alert list
+  var list=$("alList");
+  TYPES.forEach(function(t){
+    var r=document.createElement("div");r.className="al-row";r.dataset.k=t[0];
+    r.innerHTML='<input type="checkbox" aria-label="Show '+t[1]+' alerts"><div class="n"></div><input class="tin" spellcheck="false">'+(t[4]?'<label class="mn">Min <input class="tin" type="number" min="0" step="1" inputmode="numeric"></label>':'<span></span>');
+    r.querySelector(".n").innerHTML=t[1]+'<small data-w="'+t[2]+'">'+t[2]+"</small>";
+    var cb=r.querySelector('input[type=checkbox]'),line=r.querySelector(".tin"),mn=r.querySelector(".mn input");
+    line.placeholder=t[3];line.setAttribute("aria-label",t[1]+" wording");line.value=S.t[t[0]]||"";
+    cb.addEventListener("change",function(){var i=S.off.indexOf(t[0]);if(cb.checked&&i>=0)S.off.splice(i,1);if(!cb.checked&&i<0)S.off.push(t[0]);sync()});
+    line.addEventListener("input",function(){var v=line.value.trim();if(v&&v!==t[3])S.t[t[0]]=v;else delete S.t[t[0]];sync()});
+    if(mn){mn.setAttribute("aria-label","Minimum "+t[4]);mn.value=S[MINK[t[0]]]||"";mn.placeholder="0";mn.addEventListener("input",function(){S[MINK[t[0]]]=Math.max(0,parseInt(mn.value,10)||0);sync()})}
+    list.appendChild(r);
+  });
+  // glow swatches
+  var sw=$("glowSw");
+  GLOWS.forEach(function(g){var b=document.createElement("button");b.type="button";b.dataset.v=g[0];b.title=g[1];b.setAttribute("aria-label",g[1]);
+    if(g[0]==="platform")b.style.background="conic-gradient(#9146FF 0 50%,#53FC18 0)";else b.style.setProperty("--c","#"+g[0]);sw.appendChild(b)});
+  var cw=document.createElement("label");cw.className="cust";cw.title="Pick any colour";cw.innerHTML='<span></span><input type="color" aria-label="Pick any colour">';sw.appendChild(cw);
+  var ci=cw.querySelector("input");ci.addEventListener("input",function(){S.g=ci.value.slice(1).toUpperCase();sync()});
+  var nmL=document.createElement("span");nmL.className="name";sw.appendChild(nmL);
+  sw.addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.g=b.dataset.v;sync()}});
+  $("lySeg").addEventListener("click",function(e){var b=e.target.closest("button");if(b){S.ly=b.dataset.v;sync()}});
+  [["op","o"],["fs","fs"],["dur","dur"],["vol","vol"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=+this.value;sync()})});
+  [["optSnd","snd"],["optMsg","msg"],["optPf","pf"],["optTb","tb"]].forEach(function(x){$(x[0]).addEventListener("change",function(){S[x[1]]=this.checked?1:0;sync()})});
+  [["host","h"],["port","p"]].forEach(function(x){$(x[0]).addEventListener("input",function(){S[x[1]]=this.value.trim();sync()})});
+  $("pw").addEventListener("input",sync);
+  // test buttons
+  var tests=$("tests");
+  TYPES.forEach(function(t){var b=document.createElement("button");b.type="button";var src=SAMPLE[t[0]][0];
+    b.dataset.k=t[0];b.innerHTML='<i style="background:'+(src==="kick"?"#53FC18":"#9146FF")+'"></i>'+t[1];b.title="Test a "+(src==="kick"?"Kick":"Twitch")+" "+t[1].toLowerCase();
+    b.addEventListener("click",function(){var f=$("prevFrame");if(f.contentWindow)f.contentWindow.postMessage({al:t[0]},"*")});tests.appendChild(b)});
+  document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){var el=$(b.dataset.copy),o=b.textContent;
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent=o},1400)};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(el.value).then(done,function(){el.select()});else el.select()})});
+  $("host").value=S.h;$("port").value=S.p;
+  function hash(extra){var p=new URLSearchParams();p.set("ov","1");if(S.mode==="tw"&&TK&&!extra.demo)p.set("tk",TK.tk);p.set("ly",S.ly);p.set("g",S.g);
+    if(S.o!==88)p.set("o",String(S.o));if(S.fs!==26)p.set("fs",String(S.fs));if(S.dur!==6)p.set("dur",String(S.dur));
+    if(!S.snd)p.set("snd","0");else{if(S.vol!==50)p.set("vol",String(S.vol));for(var tk in S.tv)p.set("tv_"+tk,String(S.tv[tk]));if(S.mode!=="tw"&&S.src==="sb"&&S.sf&&!extra.demo)p.set("sf",S.sf)}if(!S.msg)p.set("msg","0");if(!S.pf)p.set("pf","0");
+    var off=S.off.slice();if(S.mode==="tw")NOTW.forEach(function(k){if(off.indexOf(k)<0)off.push(k)});if(off.length)p.set("off",off.join(","));["mb","mk","mr","mw"].forEach(function(k){if(S[k])p.set(k,String(S[k]))});
+    TYPES.forEach(function(t){if(S.t[t[0]])p.set("t_"+t[0],S.t[t[0]]);if(S.im[t[0]])p.set("im_"+t[0],S.im[t[0]])});if(Object.keys(S.im).length&&S.ims==="l")p.set("ims","l");if(S.tb)p.set("tb","1");
+    if(S.mode!=="tw"){if(S.h&&S.h!=="127.0.0.1")p.set("h",S.h);if(S.p&&S.p!=="8080")p.set("p",S.p);var pw=$("pw").value;if(pw&&!extra.demo)p.set("pw",pw)}
+    for(var k in extra)p.set(k,extra[k]);return p.toString()}
+  function frame(el,h){var u=OLINK+"#"+h;el.onload=function(){if(el.src.indexOf("about:")!==0)el.style.visibility=""};
+    if(!el.dataset.on){el.src=u;el.dataset.on=1}else{el.style.visibility="hidden";el.src="about:blank";setTimeout(function(){el.src=u},30)}}
+  var pvT=null;
+  function sync(){
+    ls("al_cfg",JSON.stringify(S));
+    $("lySeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.ly)});
+    var isC=!GLOWS.some(function(g){return g[0]===S.g});sw.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.g)});
+    cw.classList.toggle("on",isC);if(isC){ci.value="#"+S.g;cw.style.setProperty("--cc","#"+S.g)}
+    nmL.textContent=isC?"Custom #"+S.g:(GLOWS.find(function(g){return g[0]===S.g})||["",""])[1];
+    $("op").value=S.o;$("opV").textContent=S.o+"%";$("fs").value=S.fs;$("fsV").textContent=S.fs;$("dur").value=S.dur;$("durV").textContent=S.dur+" seconds";
+    $("vol").value=S.vol;$("volV").textContent=S.vol+"%";$("optSnd").checked=!!S.snd;$("sndBox").hidden=!S.snd;$("optMsg").checked=!!S.msg;$("optPf").checked=!!S.pf;$("optTb").checked=!!S.tb;
+    $("imSzSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.ims)});$("imList").classList.toggle("crop",S.ims!=="l");
+    list.querySelectorAll(".al-row").forEach(function(r){var on=S.off.indexOf(r.dataset.k)<0;r.querySelector('input[type=checkbox]').checked=on;r.classList.toggle("off",!on)});
+    var tw=S.mode==="tw";
+    $("modeSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.mode)});
+    $("modeSb").hidden=tw;$("modeTw").hidden=!tw;$("sbConn").hidden=tw;
+    NOTW.forEach(function(k){list.querySelector('.al-row[data-k='+k+']').hidden=tw});
+    tests.querySelectorAll("button").forEach(function(b){if(NOTW.indexOf(b.dataset.k)>=0)b.hidden=tw});
+    list.querySelectorAll(".al-row small").forEach(function(sm){sm.textContent=tw?(sm.dataset.w==="Kick"?"Kick":"Twitch"):sm.dataset.w});
+    twUi();
+    $("srcWrap").hidden=tw;$("sfBox").hidden=tw||S.src!=="sb";
+    $("srcSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===S.src)});
+    tvList.querySelectorAll(".tv-row").forEach(function(r){var k=r.dataset.k,v=S.tv[k]==null?100:S.tv[k];r.querySelector("input").value=v;r.querySelector("b").textContent=v+"%";r.hidden=tw&&NOTW.indexOf(k)>=0});
+    var ob=$("obsUrl"),cb=document.querySelector('[data-copy=obsUrl]');
+    if(tw&&!TK){ob.type="text";ob.value="Log in with Twitch in step 1 first";cb.disabled=true}
+    else{ob.type=tw?"password":"text";ob.value=OLINK+"#"+hash({});cb.disabled=false}
+    clearTimeout(pvT);pvT=setTimeout(function(){frame($("prevFrame"),hash({demo:"1"}))},300);
+  }
+  frame($("heroFrame"),"ov=1&demo=1&ly=pop&g=platform&snd=0&fs=22");
+  sync();checkTk();
+}
 })();
 </script>
-<script src="follow.js?v=2"></script>
+<script src="../follow.js?v=2"></script>
 </body>
 </html>
